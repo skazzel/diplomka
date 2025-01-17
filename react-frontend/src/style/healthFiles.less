@@ -1,0 +1,129 @@
+@import "shared";
+@import "color-scheme";
+
+.main {
+    width: 100%;
+    height: 100vh;
+    @controls-shared();
+    .shared-style();
+}
+
+.main-i {
+    width: max-content;
+}
+
+.h-file {
+    border: 1px solid black;
+    padding: 1em;
+    max-width: 600px;
+    height: auto;
+}
+
+.container-file {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.left-side, .right-side {
+    width: 50%;
+    height: auto;
+}
+
+.h-headline {
+    font-size: 24px;
+    text-align: center;
+    padding-bottom: 0.5em;
+}
+
+.button-container {
+    max-width: 600px;
+}
+
+.reports {
+    max-width: 100%;
+    margin-top: 4em;
+}
+
+.report-h {
+    font-size: 24px;
+    text-align: center;
+    padding-bottom: 0.5em;
+    color: @primary-color;
+    font-weight: 100;
+}
+
+.report #med-description{
+    resize: vertical !important;
+}
+
+.report .textarea-container {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+}
+
+.report textarea {
+    resize: vertical !important;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+}
+
+.first-selector, .second-selector {
+    width: 100%;
+    height: calc(100%/2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.selector-container label, .selector-container select {
+    display: block;
+}
+
+.selector-container{
+    width: 50%;
+}
+
+.selector-container label {
+    margin-bottom: 0.5em;
+}
+
+.selector-container select {
+    width: 100%;
+}
+
+.switch, .send-insurance {
+    max-width: 800px;
+    margin: 2em auto;
+}
+
+.switch h3, .send-insurance h3 {
+    font-size: 20px;
+    color: @primary-color;
+    font-weight: 100;
+    text-align: center;
+}
+
+.switch-file, .send-ticket {
+    border: 1px solid black;
+    max-width: 100%;
+    margin: 1em auto;
+    display: flex;
+    justify-content: flex-start;
+    padding: 1em;
+}
+
+.file-to, .to-doctor, .approve {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: calc(100%/3);
+}
+
+.ticket-to, .fill-space, .send-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: calc(100%/3);
+}

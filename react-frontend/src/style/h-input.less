@@ -1,0 +1,75 @@
+@import "shared";
+
+.h-input-container {
+    position: relative;
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 16px;
+    margin-top: 5px;
+}
+
+.h-input {
+    width: 100%;
+    padding: 12px 16px;
+    margin: 0;
+    border: 1px solid gray;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: 400;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+}
+
+.h-input:hover {
+    border-color: #666;
+}
+
+.h-input:focus {
+    border-color: @primary-color;
+    box-shadow: 0 0 4px rgba(79, 140, 245, 0.5);
+}
+
+.h-input[readonly] {
+    background-color: #f8f9fa;
+    border-color: #ccc;
+}
+
+.h-input-placeholder {
+    position: absolute;
+    top: 35%;
+    left: 16px;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: #aaa;
+    pointer-events: none;
+    transition: all 0.2s;
+}
+
+.h-input:focus + .h-input-placeholder,
+.h-input:not(:placeholder-shown) + .h-input-placeholder {
+    top: -8px;
+    font-size: 12px;
+    color: @primary-color;
+}
+
+.h-input-required::after {
+    content: "*";
+    color: red;
+    margin-left: 4px;
+    font-size: 16px;
+}
+
+.h-flow {
+    margin: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.h-flow-filler {
+    flex-grow: 1;
+}

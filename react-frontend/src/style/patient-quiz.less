@@ -1,0 +1,190 @@
+.patient-view {
+html, body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+.container {
+    max-width: 500px;
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    display: none;
+    margin: 0 auto;
+    transition: all 0.2s ease-in-out;
+}
+
+.container.active {
+    display: block;
+    height: auto;
+}
+
+.progress-bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.progress-bar div {
+    flex: 1;
+    height: 5px;
+    border-radius: 2.5px;
+}
+
+.progress-bar .completed {
+    background-color: #4f8cf5;
+}
+
+.progress-bar .in-progress {
+    background-color: #c0d4f5;
+}
+
+.progress-bar .pending {
+    background-color: #e5eaf1;
+}
+
+h2 {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.input-section {
+    margin-top: 10px;
+    max-width: 309px;
+    min-height: 516px;
+    padding: 0;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    outline: none;
+    box-sizing: border-box;
+    transition: border 0.2s ease-in-out;
+}
+
+input:focus {
+    border-color: #4f8cf5;
+    box-shadow: 0 0 5px rgba(79, 140, 245, 0.5);
+}
+
+label {
+    font-size: 14px;
+    color: #555;
+    margin-top: 10px;
+    display: block;
+    width: 100%;
+    text-align: left;
+}
+
+.button {
+    background-color: #4f8cf5;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    margin-top: 20px;
+    width: 100%;
+    font-size: 16px;
+    font-weight: bold;
+    transition: transform 0.2s ease-in-out;
+}
+
+.button:hover {
+    background-color: #3e73c7;
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+.symptom-section {
+    text-align: left;
+}
+
+.symptom-section input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.tags {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.tags span {
+    padding: 8px 15px;
+    background-color: #e8f0fe;
+    color: #4f8cf5;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.example {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #e8f0fe;
+}
+
+.example span {
+    display: block;
+    margin-top: 5px;
+}
+
+.example .good {
+    color: green;
+}
+
+.example .bad {
+    color: red;
+}
+
+#hs-menu, #hs-wrapper, #hs-app-menu {
+    display: none;
+}
+
+.error-message {
+    color: red;
+    margin-top: 10px;
+    font-size: 14px;
+    text-align: center;
+    overflow-wrap: break-word;
+    max-width: 100%;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+}

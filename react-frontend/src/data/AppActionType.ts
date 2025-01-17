@@ -1,0 +1,9 @@
+export enum AppActionType {
+    LOG_IN,
+    LOG_OUT,
+    SWITCH_VIEW,
+    SWITCH_SECTION,
+    UPDATE_SELF_USER,
+    UPDATE_MANAGED_USER,
+    SWITCH_MANAGED_USER
+}

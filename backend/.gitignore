@@ -1,0 +1,6 @@
+/db_setup.txt
+/settings.json
+/build
+/.gradle
+/src/main/resources/*.jks
+*.json
