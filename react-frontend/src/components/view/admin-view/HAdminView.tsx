@@ -9,6 +9,7 @@ import {Tabulka} from "./AdminTable";
 import {AdminekAdd} from "./AdminEdit";
 import {adminekDeleteDocPat} from "./AdminDelete";
 import {adminekActualize} from "./AdminActualize";
+import { BodyImage } from "../patient-view/BodyImage";
 
 export abstract class HAdminView<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T)
@@ -17,7 +18,7 @@ export abstract class HAdminView<T extends ISectionProps> extends HView<T> {
     }
 }
 
-export class HAdminWelcomeView<T extends ISectionProps> extends HPatientView<T> {
+export class HAdminWelcomeView<T extends ISectionProps> extends BodyImage<T> {
     constructor(props: T)
     {
         super(props);

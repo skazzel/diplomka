@@ -1,6 +1,7 @@
 import { EnumRole, IExtendedUserData, ILoginData, IUserData } from "./UserData";
 import { HView, IHSection } from "../components/view/HView";
 import { HPatientSection } from "../components/view/patient-view/HPatientView";
+import { BodyImageSection } from "../components/view/patient-view/BodyImage";
 import { HDoctorSection } from "../components/view/doctor-view/HDoctorView";
 import { HInsuranceSection } from "../components/view/insurance-view/HInsuranceView";
 import { HAdminSection } from "../components/view/admin-view/HAdminView";
@@ -74,8 +75,8 @@ export function internalAppStateFromRole(role: EnumRole): IInternalApplicationSt
         case EnumRole.PATIENT:
             return  {
                 internalState: EnumInternalState.PATIENT_PANEL,
-                internalSection: HPatientSection,
-                currentView: HPatientSection.defaultView
+                internalSection: BodyImageSection,
+                currentView: BodyImageSection.defaultView
             };
     }
 }

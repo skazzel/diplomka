@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 import { HView, IHSection, ISectionProps } from "../HView";
 import React, { ReactNode } from "react";
 import "../../../style/patient-quiz.less";
@@ -157,7 +158,7 @@ export class HPatientWelcomeView<T extends ISectionProps> extends HPatientView<T
                         </button>
                     </div>
                 </div>
-                </div>
+            </div>
             </>
         );
     }
