@@ -73,11 +73,12 @@ export function internalAppStateFromRole(role: EnumRole): IInternalApplicationSt
             };
 
         case EnumRole.PATIENT:
-            return  {
+            return {
                 internalState: EnumInternalState.PATIENT_PANEL,
-                internalSection: BodyImageSection,
-                currentView: BodyImageSection.defaultView
+                internalSection: BodyImageSection, // ✅ This should be correct
+                currentView: BodyImageSection.defaultView // ✅ Ensure this is correctly set
             };
+            
     }
 }
 

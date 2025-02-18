@@ -3,6 +3,9 @@ import React, { ReactNode } from "react";
 import { withRouter, RouteComponentProps } from "react-router-dom"; // ✅ Import withRouter
 import bodyImg from "../../../img/body.svg";
 import "../../../style/body-parts.less";
+import { Dispatch } from "redux";
+import { HPatientSection, HPatientView, HPatientWelcomeView } from "../patient-view/HPatientView";
+import { SwitchViewAction } from "../../../data/AppAction"; // ✅ Ensure correct import
 
 // Define types for clicked pain areas
 interface HPatientState {
@@ -18,7 +21,9 @@ export abstract class BodyImage<T extends ISectionProps> extends HView<T> {
 }
 
 // ✅ Extend props to include RouteComponentProps (for navigation)
-interface BodyImageProps extends ISectionProps, RouteComponentProps {}
+interface BodyImageProps extends ISectionProps, RouteComponentProps {
+    dispatch: Dispatch;
+}
 
 class BodyImageView<T extends ISectionProps> extends BodyImage<T & BodyImageProps> {
     constructor(props: T & BodyImageProps) {
@@ -37,13 +42,14 @@ class BodyImageView<T extends ISectionProps> extends BodyImage<T & BodyImageProp
         }));
     };
 
-    handleNextClick = () => {
-        this.props.history.push("/patient-details"); // ✅ This is now correctly defined
+    handleNextClickButton = (): void => {
+        console.log("Switching view to HPatientView");
+        this.props.dispatch(new SwitchViewAction(HPatientSection.defaultView));
     };
 
     render(): ReactNode {
         return (
-            <div className="patient-view">
+            <div className="body-view">
                 {/* Symptom Selection */}
                 <div className="container" id="symptom-input">
                     <h2>Select Where You Feel Pain</h2>
@@ -121,9 +127,10 @@ class BodyImageView<T extends ISectionProps> extends BodyImage<T & BodyImageProp
                     </ul>
 
                     {/* ✅ "Next" Button to go to HPatientView */}
-                    <button className="button next-button" onClick={() => this.props.history.push("/HPatientView")}>
+                    <button className="button next-button" onClick={() => this.handleNextClickButton()}>
                         Next
                     </button>
+
                 </div>
             </div>
         );
