@@ -6,6 +6,7 @@ import "../../../style/body-parts.less";
 import { Dispatch } from "redux";
 import { HPatientSection, HPatientView, HPatientWelcomeView } from "../patient-view/HPatientView";
 import { SwitchViewAction } from "../../../data/AppAction"; // ✅ Ensure correct import
+import { PersonalInfoSection } from "../patient-view/PersonalInfo"; // ✅ Corrected Import
 
 // Define types for clicked pain areas
 interface HPatientState {
@@ -44,14 +45,14 @@ class BodyImageView<T extends ISectionProps> extends BodyImage<T & BodyImageProp
 
     handleNextClickButton = (): void => {
         console.log("Switching view to HPatientView");
-        this.props.dispatch(new SwitchViewAction(HPatientSection.defaultView));
+        this.props.dispatch(new SwitchViewAction(PersonalInfoSection.defaultView));
     };
 
     render(): ReactNode {
         return (
             <div className="body-view">
                 {/* Symptom Selection */}
-                <div className="container" id="symptom-input">
+                <div className="container-body" id="symptom-input">
                     <h2>Select Where You Feel Pain</h2>
                     <div className="body-map">
                     <img src={bodyImg} alt="Body Map" className="body-image" />
