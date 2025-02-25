@@ -22,7 +22,7 @@ public class APIAccessManager
     public static synchronized boolean setRole(Connection connection, int user, EnumAPIRole role) throws SQLException
     {
         String sql = """
-        UPDATE doctor SET perm=? WHERE doctor_id=?
+        UPDATE doctors SET perm=? WHERE doctor_id=?
         """;
 
         try (var statement = connection.prepareStatement(sql))
@@ -49,7 +49,7 @@ public class APIAccessManager
         try (var connection = SQLConnection.create())
         {
             String sql = """
-            SELECT perm FROM doctor WHERE doctor_id=?
+            SELECT perm FROM doctors WHERE doctor_id=?
             """;
 
             try (var statement = connection.prepareStatement(sql))

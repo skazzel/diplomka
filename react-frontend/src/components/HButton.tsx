@@ -7,7 +7,8 @@ export enum HButtonStyle
     DEFAULT = "h-button",
     BORDER = "h-button-text-border",
     TEXT = "h-button-text",
-    TEXT_INVERTED = "h-button-text-inverted"
+    TEXT_INVERTED = "h-button-text-inverted",
+    TEXT_SYMPTOM = "hs-userbox-symptom"
 }
 
 export class HButton extends React.Component<{

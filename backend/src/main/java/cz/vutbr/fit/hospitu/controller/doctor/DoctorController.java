@@ -373,7 +373,7 @@ public class DoctorController
             }
 
             var createUserSQL = """
-            INSERT INTO doctor (login, salt, name, surname, password, perm) 
+            INSERT INTO doctors (login, salt, name, surname, password, perm) 
             VALUES (?, ?, ?, ?, SHA2(CONCAT(?, ?), 256), ?);
             """;
 

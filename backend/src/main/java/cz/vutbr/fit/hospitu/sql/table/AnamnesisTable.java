@@ -7,7 +7,7 @@ public class AnamnesisTable extends AbstractTable
 {
     protected AnamnesisTable()
     {
-        super("anamnesis", "ana_");
+        super("anamneses", "ana_");
     }
 
     public List<String> getCreateCommands(Connection connection)

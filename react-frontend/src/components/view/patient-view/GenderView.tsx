@@ -1,10 +1,11 @@
-/* eslint-disable indent */
 import { HView, IHSection, ISectionProps } from "../HView";
 import React, { ReactNode } from "react";
 import "../../../style/genders.less";
-import { HPatientSection } from "../patient-view/HPatientView"; // ✅ Correct reference
-import { SwitchViewAction } from "../../../data/AppAction"; // ✅ Import action
-import { BodyImageSection } from "../patient-view/BodyImage"; // ✅ Corrected Import
+import { SwitchViewAction } from "../../../data/AppAction";
+import { PersonalInfoSection } from "./PersonalInfo";
+import Axios from "axios";
+import {EnumRole} from "../../../data/UserData";
+
 
 export abstract class GenderInfo<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
@@ -15,9 +16,6 @@ export abstract class GenderInfo<T extends ISectionProps> extends HView<T> {
 export class GenderInfoView<T extends ISectionProps> extends GenderInfo<T> {
     constructor(props: T) {
         super(props);
-        this.state = {
-            age: 30, // Default age value
-        };
     }
 
     changeAge = (amount: number): void => {
@@ -31,29 +29,57 @@ export class GenderInfoView<T extends ISectionProps> extends GenderInfo<T> {
         this.setState({ age: parseInt(event.target.value, 10) || 0 });
     };
 
-    handleNextClick = (): void => {
+    handleBackClick = (): void => {
         console.log("Navigating to HPatientViewSelection..."); // ✅ Debugging log
         if (this.props.dispatch) {
-            this.props.dispatch(new SwitchViewAction(HPatientSection.defaultView));
+            //this.props.dispatch(new SwitchViewAction(PersonalInfoSection.defaultView));
+            console.log("back");
         } else {
             console.error("Dispatch function is missing in props.");
         }
     };
 
-    handleBackClick = (): void => {
+    handleNextClick = (): void => {
         console.log("Navigating to HPatientViewSelection..."); // ✅ Debugging log
         if (this.props.dispatch) {
-            this.props.dispatch(new SwitchViewAction(BodyImageSection.defaultView));
+            this.props.dispatch(new SwitchViewAction(PersonalInfoSection.defaultView));
         } else {
             console.error("Dispatch function is missing in props.");
         }
     };
+
+    handleGenderSelect = (gender: string): boolean => {
+        console.log("Gender:", gender);
+    
+        const uid = this.props.loginData?.id ? this.props.loginData.id : "@self"; // ✅ Use ID if available
+    
+        Axios.post(`/users/${uid}/patient-info-create`, 
+        null, // ✅ Send as `null` to make sure the request is recognized as a form submission
+        {
+            params: { gender: gender }, // ✅ Send gender as a query parameter
+            headers: {
+                Authorization: "Bearer " + this.props.loginData.token
+            }
+        })
+        .then((response) => {
+            console.log("✅ Patient Created:", response.data);
+            this.setState({ patientId: response.data.patientId }, () => {
+                this.handleNextClick();
+            });
+        })
+        .catch((error) => {
+            console.error("❌ Error creating patient:", error);
+        });
+    
+        return true;
+    };
+    
 
     render(): ReactNode {
         return (
             <>
             <div className="container">
-                <button className="back-button">← Back</button>
+                <button className="back-button" onClick={this.handleBackClick}>← Back</button>
 
                 <div className="progress-container">
                     <div className="progress-bar">
@@ -73,8 +99,20 @@ export class GenderInfoView<T extends ISectionProps> extends GenderInfo<T> {
 
                 <p className="subtext">Gender here refers to biological divisions.</p>
 
-                <button className="gender-button">male</button>
-                <button className="gender-button">woman</button>
+                <button className="gender-button" onClick={() => {
+                    this.handleGenderSelect("Male"); 
+                    this.handleNextClick();
+                }}>
+                    Male
+                </button>
+
+                <button className="gender-button" onClick={() => {
+                    this.handleGenderSelect("Female"); 
+                    this.handleNextClick();
+                }}>
+                    Female
+                </button>
+
             </div>
             </>
         );

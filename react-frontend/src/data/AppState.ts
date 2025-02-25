@@ -5,6 +5,7 @@ import { BodyImageSection } from "../components/view/patient-view/BodyImage";
 import { HDoctorSection } from "../components/view/doctor-view/HDoctorView";
 import { HInsuranceSection } from "../components/view/insurance-view/HInsuranceView";
 import { HAdminSection } from "../components/view/admin-view/HAdminView";
+import { GenderInfoSection } from "../components/view/patient-view/GenderView";
 
 export enum LoginState {
     LOGGED_IN = "LOGGED_IN",
@@ -75,8 +76,8 @@ export function internalAppStateFromRole(role: EnumRole): IInternalApplicationSt
         case EnumRole.PATIENT:
             return {
                 internalState: EnumInternalState.PATIENT_PANEL,
-                internalSection: BodyImageSection, // ✅ This should be correct
-                currentView: BodyImageSection.defaultView // ✅ Ensure this is correctly set
+                internalSection: GenderInfoSection, // ✅ This should be correct
+                currentView: GenderInfoSection.defaultView // ✅ Ensure this is correctly set
             };
             
     }

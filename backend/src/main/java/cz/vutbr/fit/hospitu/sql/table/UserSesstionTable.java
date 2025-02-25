@@ -7,7 +7,7 @@ public class UserSesstionTable extends AbstractTable
 {
     protected UserSesstionTable()
     {
-        super("userSession", "uss_");
+        super("user_sessions", "uss_");
     }
 
     public List<String> getCreateCommands(Connection connection)

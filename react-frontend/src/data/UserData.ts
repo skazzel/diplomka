@@ -21,6 +21,16 @@ export interface IUserSearchResult {
     readonly role: EnumRole
 }
 
+export interface UISymptomsResult {
+    readonly id: number;
+    readonly symptom: string;
+}
+
+export interface UISymptomsResultExtended {
+    readonly code: number,
+    readonly searchResults: UISymptomsResult[]
+}
+
 export interface IUserSearchResultExtended extends IUserSearchResult{
     readonly id: number;
     readonly name: string;

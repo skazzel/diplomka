@@ -4,6 +4,7 @@ import cz.vutbr.fit.hospitu.access.APIAccessManager;
 import cz.vutbr.fit.hospitu.access.EnumAPIRole;
 import cz.vutbr.fit.hospitu.controller.LoginController;
 import cz.vutbr.fit.hospitu.controller.RegisterController;
+import cz.vutbr.fit.hospitu.controller.SymptomController.SymptomController;
 import cz.vutbr.fit.hospitu.controller.UserController;
 import cz.vutbr.fit.hospitu.controller.UserSearchController;
 import cz.vutbr.fit.hospitu.controller.admin.*;
@@ -84,7 +85,9 @@ public class Main
 
                         ApiBuilder.patch("profile-update", UserController::updateSelfUserProfile, Set.of(EnumAPIRole.PATIENT));
 
-                        ApiBuilder.get("patient-info", PatientInfoController::getPatientSelfInfo, Set.of(EnumAPIRole.PATIENT));
+                        ApiBuilder.post("patient-info-create", PatientInfoController::createPatient, Set.of(EnumAPIRole.PATIENT));
+
+                        ApiBuilder.post("patient-info-update", PatientInfoController::updatePatient, Set.of(EnumAPIRole.PATIENT));
                     });
 
                     ApiBuilder.path(":user-id", () -> {
@@ -95,6 +98,10 @@ public class Main
                         ApiBuilder.patch("profile-update", UserController::updateUserProfile, Set.of(EnumAPIRole.ADMIN));
 
                         ApiBuilder.patch("update-role", RoleController::patchChangeRole, Set.of(EnumAPIRole.ADMIN));
+
+                        ApiBuilder.post("patient-info-create", PatientInfoController::createPatient, Set.of(EnumAPIRole.PATIENT));
+
+                        ApiBuilder.post("patient-info-update", PatientInfoController::updatePatient, Set.of(EnumAPIRole.PATIENT));
                     });
                 });
 
@@ -198,6 +205,10 @@ public class Main
                         ApiBuilder.patch("ticket-report-update", TicketController::updateFileTicketReport, Set.of(EnumAPIRole.DOCTOR));
                     });
                 });
+                ApiBuilder.path("symptoms", () -> {
+                    ApiBuilder.get("info", SymptomController::getSymptom, Set.of(EnumAPIRole.PATIENT, EnumAPIRole.DOCTOR));
+                });
+
             });
 
             app.start(serverConfig.getHttpPort());

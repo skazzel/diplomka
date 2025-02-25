@@ -7,7 +7,7 @@ public class PatientsTable extends AbstractTable
 {
     protected PatientsTable()
     {
-        super("patient", "pt_");
+        super("patients", "pt_");
     }
 
     public List<String> getCreateCommands(Connection connection)
@@ -16,16 +16,9 @@ public class PatientsTable extends AbstractTable
             CREATE TABLE $
             (
                 patient_id              INT                              PRIMARY KEY NOT NULL,
-                name                    VARCHAR(45) NOT NULL
-                surname                 VARCHAR(45) NOT NULL,
-                insurance_number        INT,
-                birthdate               DATE,
-                date                    DATE,
-                social_security_number  INT,
-                address                 VARCHAR(45) NOT NULL,
-                phone_number            INT,
-                email                   VARCHAR(45) NOT NULL,
-                gender                  CHAR(1) NOT NULL
+                gender                  VARCHAR(45) NOT NULL
+                age                     INT,
+                date                    DATE
             );
             """;
 

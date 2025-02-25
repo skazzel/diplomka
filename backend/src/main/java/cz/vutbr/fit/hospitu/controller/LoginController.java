@@ -15,7 +15,7 @@ public class LoginController
 
         SQLConnection.createTransaction(context, connection -> {
             var sql = """
-            SELECT * FROM doctor WHERE login=? AND password=SHA2(CONCAT(?, doc_salt), 256)                
+            SELECT * FROM doctors WHERE login=? AND password=SHA2(CONCAT(?, doc_salt), 256)                
             """;
 
             try (var statement = connection.prepareStatement(sql))

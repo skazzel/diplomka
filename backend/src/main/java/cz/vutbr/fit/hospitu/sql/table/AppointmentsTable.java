@@ -7,7 +7,7 @@ public class AppointmentsTable extends AbstractTable
 {
     protected AppointmentsTable()
     {
-        super("appointment", "apo_");
+        super("appointments", "apo_");
     }
 
     public List<String> getCreateCommands(Connection connection)

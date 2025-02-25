@@ -1,10 +1,9 @@
-/* eslint-disable indent */
 import { HView, IHSection, ISectionProps } from "../HView";
 import React, { ReactNode } from "react";
 import "../../../style/personal-info.less";
-import { HPatientSection } from "../patient-view/HPatientView"; // ✅ Correct reference
-import { SwitchViewAction } from "../../../data/AppAction"; // ✅ Import action
-import { BodyImageSection } from "../patient-view/BodyImage"; // ✅ Corrected Import
+import { HPatientSection } from "../patient-view/HPatientView";
+import { SwitchViewAction } from "../../../data/AppAction";
+import { GenderInfoSection } from "./GenderView"
 
 export abstract class PersonalInfo<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
@@ -43,7 +42,7 @@ export class PersonalInfoView<T extends ISectionProps> extends PersonalInfo<T> {
     handleBackClick = (): void => {
         console.log("Navigating to HPatientViewSelection..."); // ✅ Debugging log
         if (this.props.dispatch) {
-            this.props.dispatch(new SwitchViewAction(BodyImageSection.defaultView));
+            this.props.dispatch(new SwitchViewAction(GenderInfoSection.defaultView));
         } else {
             console.error("Dispatch function is missing in props.");
         }
@@ -53,6 +52,7 @@ export class PersonalInfoView<T extends ISectionProps> extends PersonalInfo<T> {
         return (
             <>
                 <div className="container">
+                    <button className="back-button" onClick={this.handleBackClick}>← Back</button>
                     <div className="progress-bar">
                         <div className="progress"></div>
                     </div>
@@ -75,7 +75,6 @@ export class PersonalInfoView<T extends ISectionProps> extends PersonalInfo<T> {
                     />
 
                     <div>
-                        <button className="button back-button" onClick={this.handleBackClick}>Back</button>
                         <button className="button next-button" onClick={this.handleNextClick}>To the Next</button>
                     </div>
                 </div>
