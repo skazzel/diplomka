@@ -3,7 +3,8 @@ import React, { ReactNode } from "react";
 import "../../../style/personal-info.less";
 import { HPatientSection } from "../patient-view/HPatientView";
 import { SwitchViewAction } from "../../../data/AppAction";
-import { GenderInfoSection } from "./GenderView"
+import { GenderInfoSection } from "./GenderView";
+import Axios from "axios";
 
 export abstract class PersonalInfo<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
@@ -14,14 +15,16 @@ export abstract class PersonalInfo<T extends ISectionProps> extends HView<T> {
 export class PersonalInfoView<T extends ISectionProps> extends PersonalInfo<T> {
     constructor(props: T) {
         super(props);
+        const storedPatientId = localStorage.getItem("patientId");
         this.state = {
-            age: 30, // Default age value
+            age: 30, 
+            patientId: this.props.patientId || storedPatientId || null,
         };
     }
 
     changeAge = (amount: number): void => {
         this.setState((prevState: any) => {
-            const newAge = Math.min(120, Math.max(0, prevState.age + amount)); // Ensure valid range
+            const newAge = Math.min(120, Math.max(0, prevState.age + amount));
             return { age: newAge };
         });
     };
@@ -30,7 +33,38 @@ export class PersonalInfoView<T extends ISectionProps> extends PersonalInfo<T> {
         this.setState({ age: parseInt(event.target.value, 10) || 0 });
     };
 
+    updatePatientAge = (): void => {
+        const patientId = localStorage.getItem("patientId"); // ✅ Retrieve patient ID
+    
+        if (!patientId) {
+            console.error("❌ Error: Patient ID is missing.");
+            return;
+        }
+    
+        console.log("✅ Sending Update for Patient ID:", patientId);
+    
+        Axios.post(`/users/${patientId}/patient-info-update`,
+            new URLSearchParams({ 
+                patientId: patientId, // ✅ Ensure patientId is sent
+                age: this.state.age.toString() // ✅ Convert age to string
+            }).toString(),
+            {
+                headers: {
+                    Authorization: "Bearer " + this.props.loginData.token,
+                    "Content-Type": "application/x-www-form-urlencoded" // ✅ Ensure correct content type
+                }
+            }
+        )
+        .then((response) => {
+            console.log("✅ Age Updated Successfully:", response.data);
+        })
+        .catch((error) => {
+            console.error("❌ Error updating patient age:", error);
+        });
+    };
+
     handleNextClick = (): void => {
+        this.updatePatientAge();
         console.log("Navigating to HPatientViewSelection..."); // ✅ Debugging log
         if (this.props.dispatch) {
             this.props.dispatch(new SwitchViewAction(HPatientSection.defaultView));
@@ -40,11 +74,11 @@ export class PersonalInfoView<T extends ISectionProps> extends PersonalInfo<T> {
     };
 
     handleBackClick = (): void => {
-        console.log("Navigating to HPatientViewSelection..."); // ✅ Debugging log
+        console.log("Navigating to GenderView...");
         if (this.props.dispatch) {
             this.props.dispatch(new SwitchViewAction(GenderInfoSection.defaultView));
         } else {
-            console.error("Dispatch function is missing in props.");
+            console.error("❌ Error: Dispatch function missing.");
         }
     };
 

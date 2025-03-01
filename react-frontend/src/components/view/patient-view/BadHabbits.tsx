@@ -5,15 +5,16 @@ import { SwitchViewAction } from "../../../data/AppAction";
 import { PersonalInfoSection } from "./PersonalInfo";
 import Axios from "axios";
 import {EnumRole} from "../../../data/UserData";
+import { ChronicalSection } from "./ChronicalView";
 
 
-export abstract class GenderInfo<T extends ISectionProps> extends HView<T> {
+export abstract class BadHabbits<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
         super(props);
     }
 }
 
-export class GenderInfoView<T extends ISectionProps> extends GenderInfo<T> {
+export class BadHabbitsView<T extends ISectionProps> extends BadHabbits<T> {
     constructor(props: T) {
         super(props);
     }
@@ -41,7 +42,7 @@ export class GenderInfoView<T extends ISectionProps> extends GenderInfo<T> {
     handleBackClick = (): void => {
         console.log("Navigating to HPatientViewSelection...");
         if (this.props.dispatch) {
-            //this.props.dispatch(new SwitchViewAction(PersonalInfoSection.defaultView));
+            this.props.dispatch(new SwitchViewAction(ChronicalSection.defaultView));
             console.log("back");
         } else {
             console.error("Dispatch function is missing in props.");
@@ -124,10 +125,10 @@ export class GenderInfoView<T extends ISectionProps> extends GenderInfo<T> {
     }
 }
 
-const GenderInfoSection: IHSection = {
+const BadHabbitsSection: IHSection = {
     menuItems: [],
     permitsUserManagement: false,
-    defaultView: GenderInfoView,
+    defaultView: BadHabbitsView,
 };
 
-export { GenderInfoSection };
+export { BadHabbitsSection };

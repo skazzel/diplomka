@@ -3,6 +3,9 @@ import io.javalin.http.Context;
 import cz.vutbr.fit.hospitu.sql.SQLConnection;
 import io.javalin.http.Context;
 import java.sql.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PatientInfoController {
 
@@ -36,7 +39,9 @@ public class PatientInfoController {
                     if (rs.next()) {
                         int patientId = rs.getInt(1);
                         System.out.println("✅ [SUCCESS] Created patient with ID: " + patientId);
-                        context.status(201).json("{\"patientId\": " + patientId + "}");
+                        Map<String, Object> response = new HashMap<>();
+                        response.put("patientId", patientId);
+                        context.status(201).json(response);
                     } else {
                         System.out.println("❌ [ERROR] Failed to retrieve patient ID.");
                         context.status(500).json("{\"error\": \"Failed to retrieve patient ID.\"}");
@@ -53,32 +58,45 @@ public class PatientInfoController {
 
     // ✅ Update existing patient record (age, symptoms, etc.)
     public static void updatePatient(Context context) {
-        int patientId = Integer.parseInt(context.formParam("patientId"));
-        String age = context.formParam("age");
-        String symptoms = context.formParam("symptoms");
+        String patientIdParam = context.formParam("patientId");
+        String ageParam = context.formParam("age");
 
-        if (patientId <= 0) {
-            context.status(400).json("{\"error\": \"Invalid patient ID.\"}");
+        if (patientIdParam == null || ageParam == null) {
+            System.out.println("❌ Error: Missing parameters - patientId or age.");
+            context.status(400).json(Collections.singletonMap("error", "Patient ID and Age are required."));
+            return;
+        }
+
+        int patientId;
+        int age;
+
+        try {
+            patientId = Integer.parseInt(patientIdParam);
+            age = Integer.parseInt(ageParam);
+        } catch (NumberFormatException e) {
+            System.out.println("❌ Error: Invalid number format.");
+            context.status(400).json(Collections.singletonMap("error", "Invalid number format for patientId or age."));
             return;
         }
 
         try (Connection conn = SQLConnection.create()) {
-            String sql = "UPDATE patients SET age = ?, symptoms = ? WHERE id = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setString(1, age);
-                stmt.setString(2, symptoms);
-                stmt.setInt(3, patientId);
+            String sql = "UPDATE patients SET age = ? WHERE patient_id = ?";
 
-                int updated = stmt.executeUpdate();
-                if (updated > 0) {
-                    context.status(200).json("{\"message\": \"Patient updated successfully.\"}");
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, age);
+                stmt.setInt(2, patientId);
+
+                int rowsAffected = stmt.executeUpdate();
+                if (rowsAffected > 0) {
+                    context.status(200).json(Collections.singletonMap("message", "Patient age updated successfully."));
                 } else {
-                    context.status(404).json("{\"error\": \"Patient not found.\"}");
+                    context.status(404).json(Collections.singletonMap("error", "Patient not found."));
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            context.status(500).json("{\"error\": \"Database error.\"}");
+            context.status(500).json(Collections.singletonMap("error", "Database error: " + e.getMessage()));
         }
     }
+
 }

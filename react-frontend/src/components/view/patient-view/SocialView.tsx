@@ -7,13 +7,13 @@ import Axios from "axios";
 import {EnumRole} from "../../../data/UserData";
 
 
-export abstract class GenderInfo<T extends ISectionProps> extends HView<T> {
+export abstract class Social<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
         super(props);
     }
 }
 
-export class GenderInfoView<T extends ISectionProps> extends GenderInfo<T> {
+export class SocialView<T extends ISectionProps> extends Social<T> {
     constructor(props: T) {
         super(props);
     }
@@ -124,10 +124,10 @@ export class GenderInfoView<T extends ISectionProps> extends GenderInfo<T> {
     }
 }
 
-const GenderInfoSection: IHSection = {
+const SocialSelection: IHSection = {
     menuItems: [],
     permitsUserManagement: false,
-    defaultView: GenderInfoView,
+    defaultView: SocialView,
 };
 
-export { GenderInfoSection };
+export { SocialSelection };

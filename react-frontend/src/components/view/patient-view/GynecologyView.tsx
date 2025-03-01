@@ -5,15 +5,17 @@ import { SwitchViewAction } from "../../../data/AppAction";
 import { PersonalInfoSection } from "./PersonalInfo";
 import Axios from "axios";
 import {EnumRole} from "../../../data/UserData";
+import { AllergyMedicationSelection } from "./AllergyMedicationView";
+import { SocialSelection } from "./SocialView";
 
 
-export abstract class GenderInfo<T extends ISectionProps> extends HView<T> {
+export abstract class Gynecology<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
         super(props);
     }
 }
 
-export class GenderInfoView<T extends ISectionProps> extends GenderInfo<T> {
+export class GynecologyView<T extends ISectionProps> extends Gynecology<T> {
     constructor(props: T) {
         super(props);
     }
@@ -32,7 +34,7 @@ export class GenderInfoView<T extends ISectionProps> extends GenderInfo<T> {
     handleNextClick = (): void => {
         console.log("Navigating to HPatientViewSelection...");
         if (this.props.dispatch) {
-            this.props.dispatch(new SwitchViewAction(PersonalInfoSection.defaultView));
+            this.props.dispatch(new SwitchViewAction(SocialSelection.defaultView));
         } else {
             console.error("Dispatch function is missing in props.");
         }
@@ -41,7 +43,7 @@ export class GenderInfoView<T extends ISectionProps> extends GenderInfo<T> {
     handleBackClick = (): void => {
         console.log("Navigating to HPatientViewSelection...");
         if (this.props.dispatch) {
-            //this.props.dispatch(new SwitchViewAction(PersonalInfoSection.defaultView));
+            this.props.dispatch(new SwitchViewAction(AllergyMedicationSelection.defaultView));
             console.log("back");
         } else {
             console.error("Dispatch function is missing in props.");
@@ -124,10 +126,10 @@ export class GenderInfoView<T extends ISectionProps> extends GenderInfo<T> {
     }
 }
 
-const GenderInfoSection: IHSection = {
+const GynecologySection: IHSection = {
     menuItems: [],
     permitsUserManagement: false,
-    defaultView: GenderInfoView,
+    defaultView: GynecologyView,
 };
 
-export { GenderInfoSection };
+export { GynecologySection };

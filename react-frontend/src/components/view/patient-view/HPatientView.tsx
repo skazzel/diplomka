@@ -33,15 +33,8 @@ export class HPatientWelcomeView<T extends ISectionProps> extends HPatientView<T
 
     handleNextClick = (): void => {
         console.log("Switching back to BodyImageView");
+        localStorage.setItem("selectedSymptoms", JSON.stringify(this.state.selectedSymptoms));
         this.props.dispatch(new SwitchViewAction(MainSymptomSection.defaultView));
-    };
-
-    addSymptom = (symptom: string): void => {
-        if (!this.state.selectedSymptoms.includes(symptom)) {
-            this.setState(prevState => ({
-                selectedSymptoms: [...prevState.selectedSymptoms, symptom]
-            }));
-        }
     };
 
     removeSymptom = (symptomToRemove: string): void => {
@@ -84,7 +77,7 @@ export class HPatientWelcomeView<T extends ISectionProps> extends HPatientView<T
             Axios.get("/symptoms/info",
                 {
                     params: {
-                        symptom: symptom,
+                        symptom: symptom + "%",
                         role: this.props.searchRole === EnumRole.PATIENT
                     },
                     method: "GET",
@@ -93,7 +86,6 @@ export class HPatientWelcomeView<T extends ISectionProps> extends HPatientView<T
                     }
                 }
             ).then((response) => {
-                console.log("✅ Response:", response.data);
 
                 if (Array.isArray(response.data)) {
                     this.setState(() => ({
@@ -148,7 +140,7 @@ export class HPatientWelcomeView<T extends ISectionProps> extends HPatientView<T
                             <input 
                                 key={this.state.searchKey} 
                                 type="text"
-                                defaultValue={this.state.searchString} 
+                                value={this.state.searchString} 
                                 onClick={event => {
                                     if (displayName !== null) {
                                         (event.target as HTMLInputElement).value = "";
@@ -179,7 +171,7 @@ export class HPatientWelcomeView<T extends ISectionProps> extends HPatientView<T
                                                     {result.symptom}
                                                 </td>
                                                 <td className="hs-userbox-controls">
-                                                <HButton buttonStyle={HButtonStyle.TEXT_SYMPTOM} action={() => { this.addSymptom(result.symptom); this.handleSelectSymptom(result.symptom); }} >
+                                                <HButton buttonStyle={HButtonStyle.TEXT_SYMPTOM} action={() => { this.handleSelectSymptom(result.symptom); }} >
                                                         Vybrat
                                                     </HButton>
                                                 </td>

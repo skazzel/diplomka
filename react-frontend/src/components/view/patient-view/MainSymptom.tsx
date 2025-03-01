@@ -3,6 +3,7 @@ import React, { ReactNode } from "react";
 import "../../../style/MainSymptom.less";
 import { HPatientSection } from "./HPatientView";
 import { SwitchViewAction } from "../../../data/AppAction";
+import { ChronicalSection } from "./ChronicalView";
 
 export abstract class MainSymptom<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
@@ -13,8 +14,10 @@ export abstract class MainSymptom<T extends ISectionProps> extends HView<T> {
 export class MainSymptomView<T extends ISectionProps> extends MainSymptom<T> {
     constructor(props: T) {
         super(props);
+        const storedSymptoms = localStorage.getItem("selectedSymptoms");
+        
         this.state = {
-            selectedSymptoms: props.selectedSymptoms || [],
+            selectedSymptoms: storedSymptoms ? JSON.parse(storedSymptoms) : [],
         };
     }
 
@@ -30,7 +33,7 @@ export class MainSymptomView<T extends ISectionProps> extends MainSymptom<T> {
     handleNextClick = (): void => {
         console.log("Navigating to HPatientViewSelection...");
         if (this.props.dispatch) {
-            //this.props.dispatch(new SwitchViewAction(PersonalInfoSection.defaultView));
+            this.props.dispatch(new SwitchViewAction(ChronicalSection.defaultView));
             console.log("next");
         } else {
             console.error("Dispatch function is missing in props.");
@@ -41,7 +44,7 @@ export class MainSymptomView<T extends ISectionProps> extends MainSymptom<T> {
         return (
             <>
             <div className="container">
-                <button className="back-button">← Back</button>
+                <button className="back-button" onClick={this.handleBackClick}>← Back</button>
 
                 <div className="progress-container">
                     <div className="progress-bar">
@@ -61,7 +64,7 @@ export class MainSymptomView<T extends ISectionProps> extends MainSymptom<T> {
                     ))}
                 </div>
 
-                <button className="next-button">to the next</button>
+                <button className="next-button" onClick={this.handleNextClick}>to the next</button>
             </div>
 
             </>
