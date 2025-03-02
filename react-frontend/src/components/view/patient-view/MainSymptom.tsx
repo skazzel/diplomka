@@ -43,29 +43,29 @@ export class MainSymptomView<T extends ISectionProps> extends MainSymptom<T> {
     render(): ReactNode {
         return (
             <>
-            <div className="container">
-                <button className="back-button" onClick={this.handleBackClick}>← Back</button>
+                <div className="container">
+                    <button className="back-button" onClick={this.handleBackClick}>← Back</button>
 
-                <div className="progress-container">
-                    <div className="progress-bar">
-                        <div className="progress-fill"></div>
+                    <div className="progress-container">
+                        <div className="progress-bar">
+                            <div className="progress-fill"></div>
+                        </div>
+                        <span className="progress-text">Symptoms of concern</span>
                     </div>
-                    <span className="progress-text">Symptoms of concern</span>
+
+                    <h2>What symptom are you particularly concerned about at this time? Please tell us just one.</h2>
+
+                    <div className="symptom-list">
+                        {this.state.selectedSymptoms.map((symptom, index) => (
+                            <label key={index} className="symptom-option">
+                                <input type="radio" name="symptom" />
+                                <span className="symptom-label">{symptom}</span>
+                            </label>
+                        ))}
+                    </div>
+
+                    <button className="next-button" onClick={this.handleNextClick}>to the next</button>
                 </div>
-
-                <h2>What symptom are you particularly concerned about at this time? Please tell us just one.</h2>
-
-                <div className="symptom-list">
-                    {this.state.selectedSymptoms.map((symptom, index) => (
-                        <label key={index} className="symptom-option">
-                            <input type="radio" name="symptom" />
-                            <span className="symptom-label">{symptom}</span>
-                        </label>
-                    ))}
-                </div>
-
-                <button className="next-button" onClick={this.handleNextClick}>to the next</button>
-            </div>
 
             </>
         );

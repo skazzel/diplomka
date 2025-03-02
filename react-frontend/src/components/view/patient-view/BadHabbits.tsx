@@ -1,12 +1,12 @@
 import { HView, IHSection, ISectionProps } from "../HView";
-import React, { ReactNode } from "react";
-import "../../../style/genders.less";
+import React, { ReactNode, useState } from "react";
+import "../../../style/BadHabbits.less";
 import { SwitchViewAction } from "../../../data/AppAction";
 import { PersonalInfoSection } from "./PersonalInfo";
 import Axios from "axios";
-import {EnumRole} from "../../../data/UserData";
+import { EnumRole } from "../../../data/UserData";
 import { ChronicalSection } from "./ChronicalView";
-
+import { PharmacologySection } from "./PharmacologyView";
 
 export abstract class BadHabbits<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
@@ -17,110 +17,138 @@ export abstract class BadHabbits<T extends ISectionProps> extends HView<T> {
 export class BadHabbitsView<T extends ISectionProps> extends BadHabbits<T> {
     constructor(props: T) {
         super(props);
+        this.state = {
+            showAlcoholAmount: false,
+            showSmokingAmount: false,
+        };
     }
 
-    changeAge = (amount: number): void => {
-        this.setState((prevState: any) => {
-            const newAge = Math.min(120, Math.max(0, prevState.age + amount));
-            return { age: newAge };
-        });
-    };
-
-    updateAge = (event: React.ChangeEvent<HTMLInputElement>): void => {
-        this.setState({ age: parseInt(event.target.value, 10) || 0 });
-    };
-
     handleNextClick = (): void => {
-        console.log("Navigating to HPatientViewSelection...");
+        console.log("Navigating to PersonalInfoSection...");
         if (this.props.dispatch) {
-            this.props.dispatch(new SwitchViewAction(PersonalInfoSection.defaultView));
+            this.props.dispatch(new SwitchViewAction(PharmacologySection.defaultView));
         } else {
             console.error("Dispatch function is missing in props.");
         }
     };
 
     handleBackClick = (): void => {
-        console.log("Navigating to HPatientViewSelection...");
+        console.log("Navigating to ChronicalSection...");
         if (this.props.dispatch) {
             this.props.dispatch(new SwitchViewAction(ChronicalSection.defaultView));
-            console.log("back");
         } else {
             console.error("Dispatch function is missing in props.");
         }
     };
 
-    handleGenderSelect = (gender: string): void => {
-        console.log("Gender Selected:", gender);
+    toggleInput = (field: "showAlcoholAmount" | "showSmokingAmount", value: string): void => {
+        this.setState({ [field]: value === "yes" });
+    };
+
+    handleBadHabitsSelect = (habit: string, amount: string): void => {
+        console.log(`Selected habit: ${habit}, Amount: ${amount}`);
 
         const uid = this.props.loginData?.id ? this.props.loginData.id : "@self";
 
-        Axios.post(`/users/${uid}/patient-info-create`, 
-            null, 
-            {
-                params: { gender: gender },
-                headers: {
-                    Authorization: "Bearer " + this.props.loginData.token
-                }
-            })
+        Axios.post(`/users/${uid}/patient-info-create`, null, {
+            params: { habit: habit, amount: amount },
+            headers: {
+                Authorization: "Bearer " + this.props.loginData.token,
+            },
+        })
             .then((response) => {
-                console.log("✅ Patient Created:", response.data);
-                const data = typeof response.data === "string" ? JSON.parse(response.data) : response.data;
-                const patientId = data.patientId;
-    
-                if (patientId !== undefined) {
-                    localStorage.setItem("patientId", patientId.toString());
-                    console.log("🔹 Stored patient ID:", patientId);
-                } else {
-                    console.error("❌ Error: Patient ID not received.");
-                }
+                console.log("✅ Habit Data Saved:", response.data);
             })
             .catch((error) => {
-                console.error("❌ Error creating patient:", error);
+                console.error("❌ Error saving habit data:", error);
             });
     };
-    
-        
 
-        render(): ReactNode {
-            return (
-                <>
+    render(): ReactNode {
+        return (
+            <div className="Habbit-view">
                 <div className="container">
-                    <button className="back-button" onClick={this.handleBackClick}>← Back</button>
+                    <button className="back-button" onClick={this.handleBackClick}>
+                    ← Back
+                    </button>
+                    <div className="progress-bar">
+                        <div className="completed"></div>
+                        <div className="in-progress"></div>
+                        <div className="pending"></div>
+                    </div>
+                    <h2>Do you drink alcohol?</h2>
+                    <div className="habbits-group">
+                        <label>
+                            <input
+                                type="radio"
+                                name="alcohol"
+                                value="yes"
+                                onChange={() => this.toggleInput("showAlcoholAmount", "yes")}
+                            />{" "}
+                            Yes
+                        </label>
+                        <label>
+                            <input
+                                type="radio"
+                                name="alcohol"
+                                value="no"
+                                onChange={() => this.toggleInput("showAlcoholAmount", "no")}
+                            />{" "}
+                            No
+                        </label>
+                    </div>
 
-                    <div className="progress-container">
-                        <div className="progress-bar">
-                            <div className="progress completed"></div>
-                            <div className="progress active"></div>
-                            <div className="progress pending"></div>
+                    {this.state.showAlcoholAmount && (
+                        <div id="alcohol-amount">
+                            <h2>If yes, how much?</h2>
+                            <input
+                                type="text"
+                                className="input-field"
+                                placeholder="Pocet sklenit denne"
+                                onBlur={(e) => this.handleBadHabitsSelect("alcohol", e.target.value)}
+                            />
                         </div>
-                        <span className="progress-label">basic information</span>
+                    )}
+
+                    <h2>Do you smoke cigarettes?</h2>
+                    <div className="habbits-group">
+                        <label>
+                            <input
+                                type="radio"
+                                name="smoking"
+                                value="yes"
+                                onChange={() => this.toggleInput("showSmokingAmount", "yes")}
+                            />{" "}
+                            Yes
+                        </label>
+                        <label>
+                            <input
+                                type="radio"
+                                name="smoking"
+                                value="no"
+                                onChange={() => this.toggleInput("showSmokingAmount", "no")}
+                            />{" "}
+                            No
+                        </label>
                     </div>
 
-                    <h2>Please tell us the gender of the person whose symptoms you want to check.</h2>
-                    <p>The association of diseases with gender will be taken into consideration.</p>
+                    {this.state.showSmokingAmount && (
+                        <div id="smoking-amount">
+                            <h2>If yes, how much?</h2>
+                            <input
+                                type="text"
+                                className="input-field"
+                                placeholder="pocet cigaret denne"
+                                onBlur={(e) => this.handleBadHabitsSelect("smoking", e.target.value)}
+                            />
+                        </div>
+                    )}
 
-                    <div className="info-box">
-                        <p><strong>If you want to check symptoms</strong>Family (spouse, children, etc.)</p>
-                    </div>
-
-                    <p className="subtext">Gender here refers to biological divisions.</p>
-
-                    <button className="gender-button" onClick={() => {
-                        this.handleGenderSelect("Male");
-                        this.handleNextClick();
-                    }}>
-                        Male
+                    <button className="next-button" onClick={this.handleNextClick}>
+                        Next
                     </button>
-
-                    <button className="gender-button" onClick={() => {
-                        this.handleGenderSelect("Female");
-                        this.handleNextClick();
-                    }}>
-                        Female
-                    </button>
-
                 </div>
-            </>
+            </div>
         );
     }
 }

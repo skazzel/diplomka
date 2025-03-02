@@ -127,16 +127,16 @@ export class PharmacologyView<T extends ISectionProps> extends Pharmacology<T> {
         }
 
         return (
-            <div className="patient-view">
+            <div className="pharma-view">
                 <button className="back-button" onClick={this.handleBackClick}>← Back</button>
-                <div className="patient-container" id="symptom-input">
+                <div className="pharma-container" id="symptom-input">
                     <div className="progress-bar">
                         <div className="completed"></div>
                         <div className="in-progress"></div>
                         <div className="pending"></div>
                     </div>
 
-                    <h2>What symptom bothers you the most?</h2>
+                    <h2>What medication are you currently taking?</h2>
                     <VBox className="scrollable-search-container"> {/* ✅ Added Scrollable Wrapper */}
                         <HBox>
                             <input 
@@ -186,21 +186,14 @@ export class PharmacologyView<T extends ISectionProps> extends Pharmacology<T> {
                     </VBox>
 
                     <div className="tags">
-                        <span>My stomach hurts</span>
-                        <span>Fever</span>
-                        <span>Tired</span>
-                        <span>Headache</span>
-                        <span>Sore throat</span>
-                        <span>Nausea</span>
-                    </div>
-                    <div className="example">
-                        <span>Try entering a short sentence.</span>
-                        <span className="good">Good example: "My stomach hurts"</span>
-                        <span className="bad">Bad example: "Yesterday when I woke up I had a stomach ache, but now it's a little better."</span>
+                        <span>Ibalgin</span>
+                        <span>Heparin</span>
+                        <span>Biseptol</span>
+                        <span>Acylpyrin</span>
                     </div>
 
                     <div className="selected-symptoms-container">
-                        <h3>Are you currently experiencing any of the following symptoms?</h3>
+                        <h3>This medication you are taking?</h3>
                         <div className="scrollable-selected-symptoms">
                             <ul className="selected-symptoms-list">
                                 {this.state.selectedSymptoms.map((symptom, index) => (

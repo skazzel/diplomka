@@ -132,9 +132,9 @@ export class ChronicalView<T extends ISectionProps> extends Chronical<T> {
         }
 
         return (
-            <div className="patient-view">
+            <div className="chronical-view">
                 <button className="back-button" onClick={this.handleBackClick}>← Back</button>
-                <div className="patient-container" id="symptom-input">
+                <div className="chronical-container" id="symptom-input">
                     <div className="progress-bar">
                         <div className="completed"></div>
                         <div className="in-progress"></div>
@@ -198,14 +198,14 @@ export class ChronicalView<T extends ISectionProps> extends Chronical<T> {
                     </div>
 
                     <h2>Did you have any surgeries recently?</h2>
-                    <div class="radio-group">
+                    <div className="radio-group">
                         <label><input type="radio" name="operation" value="yes" onClick={this.toggleDateInput}/> Yes</label>
                         <label><input type="radio" name="operation" value="no" onClick={this.toggleDateInput}/> No</label>
                     </div>
 
                     <div id="operation-date">
                         <h2>If yes, select the date:</h2>
-                        <input type="date" class="input-field"/>
+                        <input type="date" className="input-field"/>
                     </div>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
