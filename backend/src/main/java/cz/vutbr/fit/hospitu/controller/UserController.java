@@ -97,7 +97,6 @@ public class UserController
 
                 if (targetUserType == null)
                 {
-                    System.out.println("WTF");
                     context.status(500);
                     return;
                 }

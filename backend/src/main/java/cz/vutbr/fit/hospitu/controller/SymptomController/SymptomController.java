@@ -29,7 +29,7 @@ public class SymptomController {
             """;
 
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setString(1, "%" + symptomName + "%"); // ✅ Prevents 'null' being passed in query
+                statement.setString(1, symptomName + "%");// ✅ Prevents 'null' being passed in query
 
                 System.out.println("Executing query: " + statement.toString()); // ✅ Debugging log
 

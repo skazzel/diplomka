@@ -27,14 +27,22 @@ export class HPatientWelcomeView<T extends ISectionProps> extends HPatientView<T
     }
 
     handleBackClick = (): void => {
-        console.log("Switching back to BodyImageView");
-        this.props.dispatch(new SwitchViewAction(PersonalInfoSection.defaultView));
-    };
+        this.setState((prevState) => {
+            if (prevState.selectedSymptoms.length === 0) {
+                console.log("No symptoms to remove.");
+                return prevState;
+            }
 
-    handleNextClick = (): void => {
-        console.log("Switching back to BodyImageView");
-        localStorage.setItem("selectedSymptoms", JSON.stringify(this.state.selectedSymptoms));
-        this.props.dispatch(new SwitchViewAction(MainSymptomSection.defaultView));
+            const updatedSymptoms = [...prevState.selectedSymptoms];
+            updatedSymptoms.pop(); // ✅ Remove last symptom
+
+            localStorage.setItem("selectedSymptoms", JSON.stringify(updatedSymptoms)); // ✅ Save updated list
+            console.log("📜 Updated Symptom List (After Back):", updatedSymptoms); // ✅ Print full list after removal
+
+            return { selectedSymptoms: updatedSymptoms };
+        }, () => {
+            this.props.dispatch(new SwitchViewAction(HPatientSection.defaultView)); // ✅ Navigate after update
+        });
     };
 
     removeSymptom = (symptomToRemove: string): void => {
@@ -44,11 +52,44 @@ export class HPatientWelcomeView<T extends ISectionProps> extends HPatientView<T
     };
 
     handleSelectSymptom = (symptom: string) => {
-        this.setState((prevState) => ({
-            selectedSymptoms: [...prevState.selectedSymptoms, symptom],
-        }));
+        this.setState((prevState) => {
+            if (prevState.selectedSymptoms.includes(symptom)) {
+                console.log("⚠️ Symptom already selected.");
+                return prevState;
+            }
+
+            const updatedSymptoms = [...prevState.selectedSymptoms, symptom];
+
+            localStorage.setItem("selectedSymptoms", JSON.stringify(updatedSymptoms)); // ✅ Save updated symptoms
+            console.log("📜 Updated Symptoms:", updatedSymptoms);
+
+            return { selectedSymptoms: updatedSymptoms, selectedSymptom: symptom };
+        });
     };
 
+    saveSymptomAndProceed = (): void => {
+        if (this.state.selectedSymptoms.length === 0) {
+            console.log("⚠️ No symptoms selected.");
+            return;
+        }
+
+        this.setState((prevState) => {
+            // ✅ Ensure patient answers are properly updated
+            let answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
+
+            // ✅ Prevent duplicate entries when switching screens
+            if (!answers.some(answer => JSON.stringify(answer) === JSON.stringify({ symptoms: prevState.selectedSymptoms }))) {
+                answers.push({ symptoms: prevState.selectedSymptoms });
+                localStorage.setItem("patientAnswers", JSON.stringify(answers)); // ✅ Store updated answers
+                console.log("📜 Patient Answers (Updated):", answers);
+            }
+
+            return { selectedSymptom: null };
+        }, () => {
+            this.props.dispatch(new SwitchViewAction(MainSymptomSection.defaultView)); // ✅ Navigate to next section
+        });
+    };
+    
     performSearch = (e: ChangeEvent<HTMLInputElement>): void => {
         const symptom = e.target.value.trim();
 
@@ -72,12 +113,11 @@ export class HPatientWelcomeView<T extends ISectionProps> extends HPatientView<T
         }
 
         const timeout = window.setTimeout(() => {
-            console.log("Value:", symptom);
 
             Axios.get("/symptoms/info",
                 {
                     params: {
-                        symptom: symptom + "%",
+                        symptom: symptom,
                         role: this.props.searchRole === EnumRole.PATIENT
                     },
                     method: "GET",
@@ -140,7 +180,7 @@ export class HPatientWelcomeView<T extends ISectionProps> extends HPatientView<T
                             <input 
                                 key={this.state.searchKey} 
                                 type="text"
-                                value={this.state.searchString} 
+                                value={this.state.searchString || ""} 
                                 onClick={event => {
                                     if (displayName !== null) {
                                         (event.target as HTMLInputElement).value = "";
@@ -217,7 +257,7 @@ export class HPatientWelcomeView<T extends ISectionProps> extends HPatientView<T
                         {/* ✅ Back Button - Switches to BodyImageView */}
                         <button
                             className="button"
-                            onClick={this.handleNextClick}>Next</button>
+                            onClick={this.saveSymptomAndProceed}>Next</button>
                     </div>
                 </div>
             </div>

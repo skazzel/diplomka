@@ -24,18 +24,34 @@ export class ChronicalView<T extends ISectionProps> extends Chronical<T> {
         this.state = {
             showErrorMessage: false,
             selectedSymptoms: [],
+            selectedSymptom: "",
         };
     }
 
-    handleBackClick = (): void => {
-        console.log("Switching back to BodyImageView");
-        this.props.dispatch(new SwitchViewAction(MainSymptomSection.defaultView));
+    handleSymptomSelection = (symptom: string) => {
+        this.setState({ selectedSymptom: symptom });
     };
 
-    handleNextClick = (): void => {
-        console.log("Switching back to BodyImageView");
-        localStorage.setItem("selectedSymptoms", JSON.stringify(this.state.selectedSymptoms));
-        this.props.dispatch(new SwitchViewAction(BadHabbitsSection.defaultView));
+    saveSymptomAndProceed = (): void => {
+        if (!this.state.selectedSymptom) {
+            console.log("⚠️ No chronic condition selected.");
+            return;
+        }
+
+        this.setState((prevState) => {
+            let answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
+
+            // ✅ Ensure no duplicate conditions are added
+            if (!answers.some(entry => JSON.stringify(entry) === JSON.stringify({ chronicCondition: prevState.selectedSymptom }))) {
+                answers.push({ chronicCondition: prevState.selectedSymptom });
+                localStorage.setItem("patientAnswers", JSON.stringify(answers)); // ✅ Store updated answers
+                console.log("📜 Updated Patient Answers:", answers);
+            }
+
+            return { selectedSymptom: null }; // ✅ Reset selectedSymptom after saving
+        }, () => {
+            this.props.dispatch(new SwitchViewAction(BadHabbitsSection.defaultView)); // ✅ Navigate to next section
+        });
     };
 
     removeSymptom = (symptomToRemove: string): void => {
@@ -45,9 +61,7 @@ export class ChronicalView<T extends ISectionProps> extends Chronical<T> {
     };
 
     handleSelectSymptom = (symptom: string) => {
-        this.setState((prevState) => ({
-            selectedSymptoms: [...prevState.selectedSymptoms, symptom],
-        }));
+        this.setState({ selectedSymptom: symptom }); // ✅ Store selected condition
     };
 
     toggleDateInput = (): void => {
@@ -211,7 +225,23 @@ export class ChronicalView<T extends ISectionProps> extends Chronical<T> {
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
                         <button
                             className="button"
-                            onClick={this.handleNextClick}>Next</button>
+                            onClick={this.saveSymptomAndProceed}>Next</button>
+                    </div>
+
+                    <div className="selected-symptoms-container">
+                        <h3>Are you currently experiencing any of the following symptoms?</h3>
+                        <div className="scrollable-selected-symptoms">
+                            <ul className="selected-symptoms-list">
+                                {this.state.selectedSymptoms.map((symptom, index) => (
+                                    <li key={index}>
+                                        • {symptom}  
+                                        <span className="delete-symptom" onClick={() => this.removeSymptom(symptom)}>
+                                            🗑️ delete
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>

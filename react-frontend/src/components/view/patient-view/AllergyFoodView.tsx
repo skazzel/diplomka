@@ -4,7 +4,6 @@ import "../../../style/foodAllergy.less";
 import { SwitchViewAction } from "../../../data/AppAction";
 import { PharmacologySection } from "./PharmacologyView";
 import { AllergyMedicationSelection } from "./AllergyMedicationView";
-import { HButton, HButtonStyle } from "../../HButton";
 
 export abstract class AllergyFood<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
@@ -15,9 +14,17 @@ export abstract class AllergyFood<T extends ISectionProps> extends HView<T> {
 export class AllergyFoodView<T extends ISectionProps> extends AllergyFood<T> {
     constructor(props: T) {
         super(props);
+
+        // ✅ Load stored allergies from `localStorage`
+        let storedAllergies = JSON.parse(localStorage.getItem("selectedAllergies") || "[]");
+
+        if (!Array.isArray(storedAllergies)) {
+            storedAllergies = [];
+        }
+
         this.state = {
-            selectedSymptoms: [],
-            inputText: "",  // ✅ Store user input here
+            selectedSymptoms: [], // ✅ Persisted list of allergies
+            inputText: "",  
         };
     }
 
@@ -26,16 +33,49 @@ export class AllergyFoodView<T extends ISectionProps> extends AllergyFood<T> {
         this.props.dispatch(new SwitchViewAction(PharmacologySection.defaultView));
     };
 
-    handleNextClick = (): void => {
-        console.log("Switching to AllergyMedicationSelection...");
-        localStorage.setItem("selectedSymptoms", JSON.stringify(this.state.selectedSymptoms));
-        this.props.dispatch(new SwitchViewAction(AllergyMedicationSelection.defaultView));
+    saveSymptomAndProceed = (): void => {
+        if (this.state.selectedSymptoms.length === 0 && !this.state.inputText.trim()) {
+            console.log("⚠️ No allergies selected.");
+            return;
+        }
+
+        this.setState((prevState) => {
+            const newAllergy = prevState.inputText.trim();
+            
+            // ✅ Update allergy list only if a new allergy is provided
+            const updatedSymptoms = newAllergy
+                ? [...prevState.selectedSymptoms, newAllergy]
+                : [...prevState.selectedSymptoms];
+
+            // ✅ Prevent duplicate entries when switching screens
+            let answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
+            if (!answers.some(entry => JSON.stringify(entry) === JSON.stringify({ foodAllergies: updatedSymptoms }))) {
+                answers.push({ foodAllergies: updatedSymptoms });
+                localStorage.setItem("patientAnswers", JSON.stringify(answers)); // ✅ Store updated list
+                console.log("📜 Updated Patient Answers:", answers);
+            }
+
+            // ✅ Save allergies into `selectedAllergies`
+            localStorage.setItem("selectedAllergies", JSON.stringify(updatedSymptoms)); // ✅ Save to storage
+
+            console.log("📜 Updated Allergy List:", updatedSymptoms);
+
+            return { selectedSymptoms: updatedSymptoms, inputText: "" }; // ✅ Reset input field
+        }, () => {
+            this.props.dispatch(new SwitchViewAction(AllergyMedicationSelection.defaultView)); // ✅ Navigate forward
+        });
     };
 
     removeSymptom = (symptomToRemove: string): void => {
-        this.setState(prevState => ({
-            selectedSymptoms: prevState.selectedSymptoms.filter(symptom => symptom !== symptomToRemove)
-        }));
+        this.setState((prevState) => {
+            const updatedSymptoms = prevState.selectedSymptoms.filter(symptom => symptom !== symptomToRemove);
+
+            localStorage.setItem("selectedAllergies", JSON.stringify(updatedSymptoms)); // ✅ Update storage
+            console.log("🗑️ Allergy removed:", symptomToRemove);
+            console.log("📜 Updated Allergy List (After Removal):", updatedSymptoms);
+
+            return { selectedSymptoms: updatedSymptoms };
+        });
     };
 
     handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,7 +128,7 @@ export class AllergyFoodView<T extends ISectionProps> extends AllergyFood<T> {
                         </ul>
                     </div>
 
-                    <button className="next-button" onClick={this.handleNextClick}>Next</button>
+                    <button className="next-button" onClick={this.saveSymptomAndProceed}>Next</button>
                 </div>
             </div>
         );

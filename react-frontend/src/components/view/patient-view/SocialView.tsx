@@ -5,6 +5,7 @@ import { SwitchViewAction } from "../../../data/AppAction";
 import { PersonalInfoSection } from "./PersonalInfo";
 import Axios from "axios";
 import {EnumRole} from "../../../data/UserData";
+import { GynecologySection } from "./GynecologyView";
 
 
 export abstract class Social<T extends ISectionProps> extends HView<T> {
@@ -41,7 +42,7 @@ export class SocialView<T extends ISectionProps> extends Social<T> {
     handleBackClick = (): void => {
         console.log("Navigating to HPatientViewSelection...");
         if (this.props.dispatch) {
-            //this.props.dispatch(new SwitchViewAction(PersonalInfoSection.defaultView));
+            this.props.dispatch(new SwitchViewAction(GynecologySection.defaultView));
             console.log("back");
         } else {
             console.error("Dispatch function is missing in props.");

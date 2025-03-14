@@ -1,17 +1,12 @@
 import { HView, IHSection, ISectionProps } from "../HView";
 import React, { ReactNode } from "react";
-import "../../../style/patient-quiz.less";
-import { GenderInfoSection } from "./GenderView";
+import "../../../style/pharmacology-view.less";
 import { SwitchViewAction } from "../../../data/AppAction";
-import { PersonalInfoSection } from "./PersonalInfo";
+import { BadHabbitsSection } from "./BadHabbits";
+import { AllergyFoodSelection } from "./AllergyFoodView";
 import { HBox, VBox } from "../../HCard";
 import Axios from "axios";
 import { HButton, HButtonStyle } from "../../HButton";
-
-import {EnumRole} from "../../../data/UserData";
-import { MainSymptomSection } from "./MainSymptom";
-import { BadHabbitsSection } from "./BadHabbits";
-import { AllergyFood, AllergyFoodSelection } from "./AllergyFoodView";
 
 export abstract class Pharmacology<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
@@ -22,50 +17,93 @@ export abstract class Pharmacology<T extends ISectionProps> extends HView<T> {
 export class PharmacologyView<T extends ISectionProps> extends Pharmacology<T> {
     constructor(props: T) {
         super(props);
+
+        // ✅ Load stored medications from `localStorage`
+        let storedMedications = JSON.parse(localStorage.getItem("selectedMedications") || "[]");
+
+        if (!Array.isArray(storedMedications)) {
+            storedMedications = [];
+        }
+
         this.state = {
             showErrorMessage: false,
             selectedSymptoms: [],
+            selectedSymptom: "",
         };
+
+        console.log("📜 Initial Medication List:", this.state.selectedSymptoms);
     }
 
     handleBackClick = (): void => {
-        console.log("Switching back to BodyImageView");
+        console.log("Navigating to BadHabbitsSection...");
         this.props.dispatch(new SwitchViewAction(BadHabbitsSection.defaultView));
     };
 
-    handleNextClick = (): void => {
-        console.log("Switching back to BodyImageView");
-        localStorage.setItem("selectedSymptoms", JSON.stringify(this.state.selectedSymptoms));
-        this.props.dispatch(new SwitchViewAction(AllergyFoodSelection.defaultView));
+    saveSymptomAndProceed = (): void => {
+        if (this.state.selectedSymptoms.length === 0 && !this.state.selectedSymptom.trim()) {
+            console.log("⚠️ No medication selected.");
+            return;
+        }
+
+        this.setState((prevState) => {
+            let answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
+
+            // ✅ Prevent duplicate entries when switching screens
+            if (!answers.some(entry => JSON.stringify(entry) === JSON.stringify({ medications: prevState.selectedSymptoms }))) {
+                answers.push({ medications: prevState.selectedSymptoms });
+                localStorage.setItem("patientAnswers", JSON.stringify(answers)); // ✅ Store updated answers
+                console.log("📜 Updated Patient Answers:", answers);
+            }
+
+            return { selectedSymptom: "" }; // ✅ Reset selectedSymptom
+        }, () => {
+            this.props.dispatch(new SwitchViewAction(AllergyFoodSelection.defaultView)); // ✅ Navigate to next section
+        });
     };
+    
 
     removeSymptom = (symptomToRemove: string): void => {
-        this.setState(prevState => ({
-            selectedSymptoms: prevState.selectedSymptoms.filter(symptom => symptom !== symptomToRemove)
-        }));
+        this.setState((prevState) => {
+            const updatedSymptoms = prevState.selectedSymptoms.filter(symptom => symptom !== symptomToRemove);
+
+            localStorage.setItem("selectedMedications", JSON.stringify(updatedSymptoms)); // ✅ Update localStorage
+            console.log("🗑️ Medication removed:", symptomToRemove);
+            console.log("📜 Updated Medication List (After Removal):", updatedSymptoms);
+
+            return { selectedSymptoms: updatedSymptoms };
+        });
     };
 
-    handleSelectSymptom = (symptom: string) => {
-        this.setState((prevState) => ({
-            selectedSymptoms: [...prevState.selectedSymptoms, symptom],
-        }));
+    handleSelectSymptom = (medication: string) => {
+        this.setState((prevState) => {
+            if (prevState.selectedSymptoms.includes(medication)) {
+                console.log("⚠️ Medication already added.");
+                return prevState;
+            }
+    
+            const updatedSymptoms = [...prevState.selectedSymptoms, medication];
+    
+            localStorage.setItem("selectedMedications", JSON.stringify(updatedSymptoms)); // ✅ Save to localStorage
+            console.log("📜 Updated Medication List:", updatedSymptoms);
+    
+            return { selectedSymptoms: updatedSymptoms };
+        });
     };
+    
 
-    performSearch = (e: ChangeEvent<HTMLInputElement>): void => {
-        const symptom = e.target.value.trim();
+    performSearch = (e: React.ChangeEvent<HTMLInputElement>): void => {
+        const mecication = e.target.value.trim();
 
-        if (typeof this.state.searchTimeout !== "undefined")
-        {
+        if (typeof this.state.searchTimeout !== "undefined") {
             clearTimeout(this.state.searchTimeout);
         }
 
         this.setState(() => ({
             errorText: "",
-            searchString: symptom
+            searchString: mecication
         }));
 
-        if (symptom === "")
-        {
+        if (mecication === "") {
             this.setState(() => ({
                 userSearch: []
             }));
@@ -74,21 +112,17 @@ export class PharmacologyView<T extends ISectionProps> extends Pharmacology<T> {
         }
 
         const timeout = window.setTimeout(() => {
-            console.log("Value:", symptom);
+            console.log("Value:", mecication);
 
-            Axios.get("/symptoms/info",
-                {
-                    params: {
-                        symptom: symptom + "%",
-                        role: this.props.searchRole === EnumRole.PATIENT
-                    },
-                    method: "GET",
-                    headers: {
-                        Authorization: "Bearer " + this.props.loginData.token 
-                    }
+            Axios.get("/medications/info", {
+                params: {
+                    medication: mecication + "%",
+                },
+                method: "GET",
+                headers: {
+                    Authorization: "Bearer " + this.props.loginData.token
                 }
-            ).then((response) => {
-
+            }).then((response) => {
                 if (Array.isArray(response.data)) {
                     this.setState(() => ({
                         userSearch: response.data
@@ -112,20 +146,6 @@ export class PharmacologyView<T extends ISectionProps> extends Pharmacology<T> {
     }
 
     render(): ReactNode {
-        let displayName: string | null = null;
-
-        if (typeof this.props.managedUser !== "undefined")
-        {
-            if (this.props.managedUser.birthDate !== null)
-            {
-                displayName = `${this.props.managedUser.name} ${this.props.managedUser.surname}, narozen(a) ${this.props.managedUser.birthDate}`;
-            }
-            else
-            {
-                displayName = `${this.props.managedUser.name} ${this.props.managedUser.surname}`;
-            }
-        }
-
         return (
             <div className="pharma-view">
                 <button className="back-button" onClick={this.handleBackClick}>← Back</button>
@@ -143,13 +163,8 @@ export class PharmacologyView<T extends ISectionProps> extends Pharmacology<T> {
                                 key={this.state.searchKey} 
                                 type="text"
                                 value={this.state.searchString} 
-                                onClick={event => {
-                                    if (displayName !== null) {
-                                        (event.target as HTMLInputElement).value = "";
-                                    }
-                                }} 
                                 onChange={this.performSearch} 
-                                placeholder={displayName ?? "Vyberte symptom..."} 
+                                placeholder="Enter medication name..." 
                             />
                         </HBox>
 
@@ -168,12 +183,12 @@ export class PharmacologyView<T extends ISectionProps> extends Pharmacology<T> {
                                     </colgroup>
                                     <tbody>
                                         {this.state.userSearch?.map(result => (
-                                            <tr className="hs-userbox-result" key={result.id}>
+                                            <tr className="hs-userbox-result" key={result.medication_id}>
                                                 <td className="hs-userbox-result-name">
-                                                    {result.symptom}
+                                                    {result.medicine}
                                                 </td>
                                                 <td className="hs-userbox-controls">
-                                                <HButton buttonStyle={HButtonStyle.TEXT_SYMPTOM} action={() => { this.handleSelectSymptom(result.symptom); }} >
+                                                    <HButton buttonStyle={HButtonStyle.TEXT_SYMPTOM} action={() => { this.handleSelectSymptom(result.medicine); }} >
                                                         Vybrat
                                                     </HButton>
                                                 </td>
@@ -193,13 +208,13 @@ export class PharmacologyView<T extends ISectionProps> extends Pharmacology<T> {
                     </div>
 
                     <div className="selected-symptoms-container">
-                        <h3>This medication you are taking?</h3>
+                        <h3>Medications you are taking:</h3>
                         <div className="scrollable-selected-symptoms">
                             <ul className="selected-symptoms-list">
-                                {this.state.selectedSymptoms.map((symptom, index) => (
+                                {this.state.selectedSymptoms.map((mecication, index) => (
                                     <li key={index}>
-                                        • {symptom}  
-                                        <span className="delete-symptom" onClick={() => this.removeSymptom(symptom)}>
+                                        • {mecication}  
+                                        <span className="delete-symptom" onClick={() => this.removeSymptom(mecication)}>
                                             🗑️ delete
                                         </span>
                                     </li>
@@ -209,10 +224,7 @@ export class PharmacologyView<T extends ISectionProps> extends Pharmacology<T> {
                     </div>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
-                        {/* ✅ Back Button - Switches to BodyImageView */}
-                        <button
-                            className="button"
-                            onClick={this.handleNextClick}>Next</button>
+                        <button className="button" onClick={this.saveSymptomAndProceed}>Next</button>
                     </div>
                 </div>
             </div>

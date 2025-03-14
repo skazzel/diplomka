@@ -2,11 +2,9 @@ package cz.vutbr.fit.hospitu;
 
 import cz.vutbr.fit.hospitu.access.APIAccessManager;
 import cz.vutbr.fit.hospitu.access.EnumAPIRole;
-import cz.vutbr.fit.hospitu.controller.LoginController;
-import cz.vutbr.fit.hospitu.controller.RegisterController;
+import cz.vutbr.fit.hospitu.controller.*;
+import cz.vutbr.fit.hospitu.controller.AnswersController.AnswersController;
 import cz.vutbr.fit.hospitu.controller.SymptomController.SymptomController;
-import cz.vutbr.fit.hospitu.controller.UserController;
-import cz.vutbr.fit.hospitu.controller.UserSearchController;
 import cz.vutbr.fit.hospitu.controller.admin.*;
 import cz.vutbr.fit.hospitu.controller.doctor.DoctorController;
 import cz.vutbr.fit.hospitu.controller.doctor.FilesController;
@@ -208,7 +206,12 @@ public class Main
                 ApiBuilder.path("symptoms", () -> {
                     ApiBuilder.get("info", SymptomController::getSymptom, Set.of(EnumAPIRole.PATIENT, EnumAPIRole.DOCTOR));
                 });
-
+                ApiBuilder.path("medications", () -> {
+                    ApiBuilder.get("info", medicationController::getMedication, Set.of(EnumAPIRole.PATIENT, EnumAPIRole.DOCTOR));
+                });
+                ApiBuilder.path("answers", () -> {
+                    ApiBuilder.post("info", AnswersController::saveAnswers, Set.of(EnumAPIRole.PATIENT, EnumAPIRole.DOCTOR));
+                });
             });
 
             app.start(serverConfig.getHttpPort());

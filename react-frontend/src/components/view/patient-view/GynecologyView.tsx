@@ -2,12 +2,10 @@ import { HView, IHSection, ISectionProps } from "../HView";
 import React, { ReactNode } from "react";
 import "../../../style/genders.less";
 import { SwitchViewAction } from "../../../data/AppAction";
-import { PersonalInfoSection } from "./PersonalInfo";
 import Axios from "axios";
-import {EnumRole} from "../../../data/UserData";
 import { AllergyMedicationSelection } from "./AllergyMedicationView";
 import { SocialSelection } from "./SocialView";
-
+import { EnumRole } from "../../../data/UserData";
 
 export abstract class Gynecology<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
@@ -18,73 +16,85 @@ export abstract class Gynecology<T extends ISectionProps> extends HView<T> {
 export class GynecologyView<T extends ISectionProps> extends Gynecology<T> {
     constructor(props: T) {
         super(props);
+
+        this.state = {
+            selectedSymptoms: [], // ✅ Persisted list of pregnancy status
+        };
+
+        console.log("📜 Initial Gynecology List:", this.state.selectedSymptoms);
     }
 
-    changeAge = (amount: number): void => {
-        this.setState((prevState: any) => {
-            const newAge = Math.min(120, Math.max(0, prevState.age + amount));
-            return { age: newAge };
+    handleBackClick = (): void => {
+        console.log("🔙 Navigating to AllergyMedicationSelection...");
+        this.props.dispatch(new SwitchViewAction(AllergyMedicationSelection.defaultView));
+    };
+
+    saveSymptomAndProceed = (pregnancyStatus: string): void => {
+        this.setState((prevState) => {
+            if (prevState.selectedSymptoms.includes(pregnancyStatus)) {
+                console.log("⚠️ Pregnancy status already selected.");
+                return prevState;
+            }
+
+            const updatedSymptoms = [...prevState.selectedSymptoms, pregnancyStatus];
+
+            // ✅ Prevent duplicate entries when switching screens
+            let answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
+            if (!answers.some(entry => JSON.stringify(entry) === JSON.stringify({ pregnancyStatus }))) {
+                answers.push({ pregnancyStatus });
+                localStorage.setItem("patientAnswers", JSON.stringify(answers)); // ✅ Store updated list
+                console.log("📜 Updated Patient Answers:", answers);
+            }
+
+            // ✅ Save pregnancy status into `selectedGynecology`
+            localStorage.setItem("selectedGynecology", JSON.stringify(updatedSymptoms)); // ✅ Save to storage
+
+            console.log("📜 AAAAA:", answers);
+
+            return { selectedSymptoms: updatedSymptoms }; // ✅ Update state
+        }, () => {
+            this.submitAllPatientAnswersToAPI();
         });
     };
 
-    updateAge = (event: React.ChangeEvent<HTMLInputElement>): void => {
-        this.setState({ age: parseInt(event.target.value, 10) || 0 });
-    };
-
-    handleNextClick = (): void => {
-        console.log("Navigating to HPatientViewSelection...");
-        if (this.props.dispatch) {
-            this.props.dispatch(new SwitchViewAction(SocialSelection.defaultView));
-        } else {
-            console.error("Dispatch function is missing in props.");
+    submitAllPatientAnswersToAPI = (): void => {
+        let answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
+    
+        if (answers.length === 0) {
+            console.log("⚠️ No patient answers to submit.");
+            return;
         }
-    };
-
-    handleBackClick = (): void => {
-        console.log("Navigating to HPatientViewSelection...");
-        if (this.props.dispatch) {
-            this.props.dispatch(new SwitchViewAction(AllergyMedicationSelection.defaultView));
-            console.log("back");
-        } else {
-            console.error("Dispatch function is missing in props.");
-        }
-    };
-
-    handleGenderSelect = (gender: string): void => {
-        console.log("Gender Selected:", gender);
-
-        const uid = this.props.loginData?.id ? this.props.loginData.id : "@self";
-
-        Axios.post(`/users/${uid}/patient-info-create`, 
-            null, 
+    
+        // ✅ Convert list of key-value objects into a single object
+        const formattedAnswers = answers.reduce((acc, obj) => {
+            return { ...acc, ...obj };
+        }, {});
+    
+        console.log("📤 Sending formatted patient answers:", formattedAnswers);
+    
+        Axios.post(`/answers/info`, 
+            formattedAnswers,  // ✅ Send as a single JSON object
             {
-                params: { gender: gender },
                 headers: {
-                    Authorization: "Bearer " + this.props.loginData.token
+                    Authorization: "Bearer " + this.props.loginData.token,
+                    "Content-Type": "application/json",
                 }
             })
             .then((response) => {
-                console.log("✅ Patient Created:", response.data);
-                const data = typeof response.data === "string" ? JSON.parse(response.data) : response.data;
-                const patientId = data.patientId;
-    
-                if (patientId !== undefined) {
-                    localStorage.setItem("patientId", patientId.toString());
-                    console.log("🔹 Stored patient ID:", patientId);
-                } else {
-                    console.error("❌ Error: Patient ID not received.");
-                }
+                console.log("✅ Patient Answers Submitted:", response.data);
+                localStorage.removeItem("patientAnswers"); // ✅ Clear stored answers after submission
+                alert("Patient answers successfully submitted!");
             })
             .catch((error) => {
-                console.error("❌ Error creating patient:", error);
+                console.error("❌ Error submitting patient answers:", error);
+                alert("Error submitting patient data. Please try again.");
             });
-    };
+    };    
     
-        
 
-        render(): ReactNode {
-            return (
-                <>
+    render(): ReactNode {
+        return (
+            <>
                 <div className="container">
                     <button className="back-button" onClick={this.handleBackClick}>← Back</button>
 
@@ -94,32 +104,18 @@ export class GynecologyView<T extends ISectionProps> extends Gynecology<T> {
                             <div className="progress active"></div>
                             <div className="progress pending"></div>
                         </div>
-                        <span className="progress-label">basic information</span>
+                        <span className="progress-label">Basic Information</span>
                     </div>
 
-                    <h2>Please tell us the gender of the person whose symptoms you want to check.</h2>
-                    <p>The association of diseases with gender will be taken into consideration.</p>
+                    <h2>Is there posibility of you to be pregnant?</h2>
 
-                    <div className="info-box">
-                        <p><strong>If you want to check symptoms</strong>Family (spouse, children, etc.)</p>
-                    </div>
-
-                    <p className="subtext">Gender here refers to biological divisions.</p>
-
-                    <button className="gender-button" onClick={() => {
-                        this.handleGenderSelect("Male");
-                        this.handleNextClick();
-                    }}>
-                        Male
+                    <button className="gender-button" onClick={() => this.saveSymptomAndProceed("Yes")}>
+                        Yes
                     </button>
 
-                    <button className="gender-button" onClick={() => {
-                        this.handleGenderSelect("Female");
-                        this.handleNextClick();
-                    }}>
-                        Female
+                    <button className="gender-button" onClick={() => this.saveSymptomAndProceed("No")}>
+                        No
                     </button>
-
                 </div>
             </>
         );

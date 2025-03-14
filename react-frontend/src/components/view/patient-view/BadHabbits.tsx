@@ -1,10 +1,7 @@
 import { HView, IHSection, ISectionProps } from "../HView";
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode } from "react";
 import "../../../style/BadHabbits.less";
 import { SwitchViewAction } from "../../../data/AppAction";
-import { PersonalInfoSection } from "./PersonalInfo";
-import Axios from "axios";
-import { EnumRole } from "../../../data/UserData";
 import { ChronicalSection } from "./ChronicalView";
 import { PharmacologySection } from "./PharmacologyView";
 
@@ -17,65 +14,84 @@ export abstract class BadHabbits<T extends ISectionProps> extends HView<T> {
 export class BadHabbitsView<T extends ISectionProps> extends BadHabbits<T> {
     constructor(props: T) {
         super(props);
+
+        // ✅ Load stored habits from `localStorage`
+        const storedHabits = JSON.parse(localStorage.getItem("badHabits") || "{}");
+
         this.state = {
-            showAlcoholAmount: false,
-            showSmokingAmount: false,
+            selectedHabits: {},
         };
     }
 
-    handleNextClick = (): void => {
-        console.log("Navigating to PersonalInfoSection...");
-        if (this.props.dispatch) {
-            this.props.dispatch(new SwitchViewAction(PharmacologySection.defaultView));
-        } else {
-            console.error("Dispatch function is missing in props.");
-        }
-    };
-
     handleBackClick = (): void => {
-        console.log("Navigating to ChronicalSection...");
-        if (this.props.dispatch) {
-            this.props.dispatch(new SwitchViewAction(ChronicalSection.defaultView));
-        } else {
-            console.error("Dispatch function is missing in props.");
+        console.log("🔙 Navigating to ChronicalSection...");
+        this.props.dispatch(new SwitchViewAction(ChronicalSection.defaultView));
+    };
+
+    saveHabitAndProceed = (): void => {
+        if (Object.keys(this.state.selectedHabits).length === 0) {
+            console.log("⚠️ No habits selected.");
+            return;
         }
+
+        this.setState((prevState) => {
+            let answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
+
+            // ✅ Prevent duplicate entries when switching screens
+            if (!answers.some(entry => JSON.stringify(entry) === JSON.stringify({ badHabits: prevState.selectedHabits }))) {
+                answers.push({ badHabits: prevState.selectedHabits });
+                localStorage.setItem("patientAnswers", JSON.stringify(answers)); // ✅ Store updated answers
+                console.log("📜 Updated Patient Answers:", answers);
+            }
+
+            return {};
+        }, () => {
+            this.props.dispatch(new SwitchViewAction(PharmacologySection.defaultView)); // ✅ Navigate forward
+        });
     };
 
-    toggleInput = (field: "showAlcoholAmount" | "showSmokingAmount", value: string): void => {
-        this.setState({ [field]: value === "yes" });
+    handleHabitSelection = (habit: string, value: string): void => {
+        this.setState((prevState) => {
+            const updatedHabits = { ...prevState.selectedHabits, [habit]: value };
+
+            if (habit === "alcohol") updatedHabits.alcoholAmount = value === "yes" ? prevState.selectedHabits.alcoholAmount || "" : "";
+            if (habit === "smoking") updatedHabits.smokingAmount = value === "yes" ? prevState.selectedHabits.smokingAmount || "" : "";
+
+            localStorage.setItem("badHabits", JSON.stringify(updatedHabits)); // ✅ Save habits
+            console.log("📜 Updated Bad Habits:", updatedHabits);
+
+            return {
+                selectedHabits: updatedHabits,
+                showAlcoholAmount: habit === "alcohol" ? value === "yes" : prevState.showAlcoholAmount,
+                showSmokingAmount: habit === "smoking" ? value === "yes" : prevState.showSmokingAmount,
+            };
+        });
     };
 
-    handleBadHabitsSelect = (habit: string, amount: string): void => {
-        console.log(`Selected habit: ${habit}, Amount: ${amount}`);
+    handleAmountInput = (habit: string, amount: string): void => {
+        this.setState((prevState) => {
+            const updatedHabits = { ...prevState.selectedHabits, [`${habit}Amount`]: amount };
 
-        const uid = this.props.loginData?.id ? this.props.loginData.id : "@self";
+            localStorage.setItem("badHabits", JSON.stringify(updatedHabits)); // ✅ Save habits
+            console.log("📜 Updated Habit Amount:", updatedHabits);
 
-        Axios.post(`/users/${uid}/patient-info-create`, null, {
-            params: { habit: habit, amount: amount },
-            headers: {
-                Authorization: "Bearer " + this.props.loginData.token,
-            },
-        })
-            .then((response) => {
-                console.log("✅ Habit Data Saved:", response.data);
-            })
-            .catch((error) => {
-                console.error("❌ Error saving habit data:", error);
-            });
+            return {
+                selectedHabits: updatedHabits,
+            };
+        });
     };
 
     render(): ReactNode {
         return (
             <div className="Habbit-view">
                 <div className="container">
-                    <button className="back-button" onClick={this.handleBackClick}>
-                    ← Back
-                    </button>
+                    <button className="back-button" onClick={this.handleBackClick}>← Back</button>
                     <div className="progress-bar">
                         <div className="completed"></div>
                         <div className="in-progress"></div>
                         <div className="pending"></div>
                     </div>
+
                     <h2>Do you drink alcohol?</h2>
                     <div className="habbits-group">
                         <label>
@@ -83,18 +99,18 @@ export class BadHabbitsView<T extends ISectionProps> extends BadHabbits<T> {
                                 type="radio"
                                 name="alcohol"
                                 value="yes"
-                                onChange={() => this.toggleInput("showAlcoholAmount", "yes")}
-                            />{" "}
-                            Yes
+                                checked={this.state.selectedHabits.alcohol === "yes"}
+                                onChange={() => this.handleHabitSelection("alcohol", "yes")}
+                            /> Yes
                         </label>
                         <label>
                             <input
                                 type="radio"
                                 name="alcohol"
                                 value="no"
-                                onChange={() => this.toggleInput("showAlcoholAmount", "no")}
-                            />{" "}
-                            No
+                                checked={this.state.selectedHabits.alcohol === "no"}
+                                onChange={() => this.handleHabitSelection("alcohol", "no")}
+                            /> No
                         </label>
                     </div>
 
@@ -104,8 +120,9 @@ export class BadHabbitsView<T extends ISectionProps> extends BadHabbits<T> {
                             <input
                                 type="text"
                                 className="input-field"
-                                placeholder="Pocet sklenit denne"
-                                onBlur={(e) => this.handleBadHabitsSelect("alcohol", e.target.value)}
+                                placeholder="Number of drinks per day"
+                                value={this.state.selectedHabits.alcoholAmount || ""}
+                                onChange={(e) => this.handleAmountInput("alcohol", e.target.value)}
                             />
                         </div>
                     )}
@@ -117,18 +134,18 @@ export class BadHabbitsView<T extends ISectionProps> extends BadHabbits<T> {
                                 type="radio"
                                 name="smoking"
                                 value="yes"
-                                onChange={() => this.toggleInput("showSmokingAmount", "yes")}
-                            />{" "}
-                            Yes
+                                checked={this.state.selectedHabits.smoking === "yes"}
+                                onChange={() => this.handleHabitSelection("smoking", "yes")}
+                            /> Yes
                         </label>
                         <label>
                             <input
                                 type="radio"
                                 name="smoking"
                                 value="no"
-                                onChange={() => this.toggleInput("showSmokingAmount", "no")}
-                            />{" "}
-                            No
+                                checked={this.state.selectedHabits.smoking === "no"}
+                                onChange={() => this.handleHabitSelection("smoking", "no")}
+                            /> No
                         </label>
                     </div>
 
@@ -138,15 +155,14 @@ export class BadHabbitsView<T extends ISectionProps> extends BadHabbits<T> {
                             <input
                                 type="text"
                                 className="input-field"
-                                placeholder="pocet cigaret denne"
-                                onBlur={(e) => this.handleBadHabitsSelect("smoking", e.target.value)}
+                                placeholder="Number of cigarettes per day"
+                                value={this.state.selectedHabits.smokingAmount || ""}
+                                onChange={(e) => this.handleAmountInput("smoking", e.target.value)}
                             />
                         </div>
                     )}
 
-                    <button className="next-button" onClick={this.handleNextClick}>
-                        Next
-                    </button>
+                    <button className="next-button" onClick={this.saveHabitAndProceed}>Next</button>
                 </div>
             </div>
         );
