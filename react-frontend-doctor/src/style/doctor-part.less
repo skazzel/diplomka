@@ -1,0 +1,67 @@
+/* General Page Styling */
+html, body {
+    display: block;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #a7bddc; /* jemně modrá jako na obrázku */
+    padding: 10px 20px;
+    height: 70px;
+}
+
+/* Logo vlevo */
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    height: 50px;
+}
+
+/* Uživatel vpravo */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 16px;
+    color: #000;
+}
+
+.user-icon {
+    font-size: 24px;
+}
+
+/* Hlavní část */
+.main {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 40px 20px;
+    background-color: #ffffff;
+    min-height: calc(100vh - 70px);
+}
+
+/* Input pole */
+.rc-input {
+    padding: 12px 20px;
+    border: 2px solid #000;
+    border-radius: 8px;
+    font-size: 16px;
+    width: 240px;
+    text-align: center;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f9f9f9;
+    outline: none;
+    transition: box-shadow 0.3s ease;
+}
+
+.rc-input:focus {
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    border-color: #007bff;
+}

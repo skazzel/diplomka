@@ -4,6 +4,7 @@ import cz.vutbr.fit.hospitu.access.APIAccessManager;
 import cz.vutbr.fit.hospitu.access.EnumAPIRole;
 import cz.vutbr.fit.hospitu.controller.*;
 import cz.vutbr.fit.hospitu.controller.AnswersController.AnswersController;
+import cz.vutbr.fit.hospitu.controller.SymptomController.DiseaseController;
 import cz.vutbr.fit.hospitu.controller.SymptomController.SymptomController;
 import cz.vutbr.fit.hospitu.controller.admin.*;
 import cz.vutbr.fit.hospitu.controller.doctor.DoctorController;
@@ -205,6 +206,9 @@ public class Main
                 });
                 ApiBuilder.path("symptoms", () -> {
                     ApiBuilder.get("info", SymptomController::getSymptom, Set.of(EnumAPIRole.PATIENT, EnumAPIRole.DOCTOR));
+                });
+                ApiBuilder.path("diseases", () -> {
+                    ApiBuilder.get("info", DiseaseController::getDisease, Set.of(EnumAPIRole.PATIENT, EnumAPIRole.DOCTOR));
                 });
                 ApiBuilder.path("medications", () -> {
                     ApiBuilder.get("info", medicationController::getMedication, Set.of(EnumAPIRole.PATIENT, EnumAPIRole.DOCTOR));

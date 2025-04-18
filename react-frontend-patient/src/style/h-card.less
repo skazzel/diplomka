@@ -1,0 +1,50 @@
+@import "shared";
+
+.h-card
+{
+    @controls-shared();
+    .shared-style();
+
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 0 0.5px 1px rgba(0, 0, 0, 50%);
+    display: inline-block;
+    overflow: hidden;
+}
+
+.h-hbox
+{
+    display: flex;
+    flex-direction: row;
+}
+
+.h-vbox
+{
+    display: flex;
+    flex-direction: column;
+}
+
+.h-header
+{
+    font-size: 150%;
+    color: @primary-color;
+    padding: 10px;
+}
+
+.h-sub-header
+{
+    font-size: 125%;
+    color: greyscale(@primary-color);
+    padding: 10px;
+}
+
+.h-grid
+{
+    display: grid;
+    grid-template-columns: auto auto;
+}
+
+.h-grid-shrink
+{
+    grid-template-rows: min-content;
+}

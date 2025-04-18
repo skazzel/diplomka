@@ -30,7 +30,7 @@ public class UserSearchController
                 name,
                 surname,
                 perm
-            FROM doctor
+            FROM doctors
             WHERE 
                 (
                     LOWER(CONCAT(name, ' ', surname)) LIKE LOWER(?)
@@ -88,7 +88,7 @@ public class UserSearchController
                 name,
                 surname,
                 perm
-            FROM doctor
+            FROM doctors
             WHERE 
                 (
                     LOWER(CONCAT(name, ' ', surname)) LIKE LOWER(?)

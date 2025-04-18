@@ -1,0 +1,110 @@
+.genderview {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+
+    .container {
+        width: 100%;
+        max-width: 500px;
+        background: white;
+        padding: 30px 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .back-button {
+        background: none;
+        border: none;
+        font-size: 18px;
+        color: #007bff;
+        cursor: pointer;
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .back-button:hover {
+        text-decoration: underline;
+    }
+
+    .progress-container {
+        margin-bottom: 25px;
+    }
+
+    .progress-bar {
+        display: flex;
+        height: 6px;
+        background: #e0e0e0;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .progress {
+        height: 100%;
+    }
+
+    .completed {
+        background: #3b82f6;
+        width: 33%;
+    }
+
+    .active {
+        background: #60a5fa;
+        width: 33%;
+    }
+
+    .pending {
+        background: #e0e0e0;
+        width: 34%;
+    }
+
+    .progress-label {
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 8px;
+        text-align: right;
+        display: block;
+    }
+
+    h2 {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+        text-align: center;
+        color: #111;
+    }
+
+    p {
+        font-size: 0.95rem;
+        color: #555;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .gender-button {
+        width: 100%;
+        padding: 14px;
+        margin: 10px 0;
+        font-size: 1rem;
+        font-weight: 500;
+        border: 2px solid #3b82f6;
+        border-radius: 8px;
+        background-color: white;
+        color: #3b82f6;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .gender-button:hover {
+        background-color: #3b82f6;
+        color: white;
+    }
+
+    .gender-button:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
+    }
+}

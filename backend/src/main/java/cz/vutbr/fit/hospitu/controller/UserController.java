@@ -147,7 +147,7 @@ public class UserController
                     name,
                     surname,
                     perm
-                FROM doctor
+                FROM doctors
                 WHERE doctor_id=?
             """;
 
