@@ -7,6 +7,7 @@ import { AllergyFoodSelection } from "./AllergyFoodView";
 import { HBox, VBox } from "../../HCard";
 import Axios from "axios";
 import { HButton, HButtonStyle } from "../../HButton";
+import { MedicationDetailsSection } from "./PharmacologyDetails";
 
 export abstract class Pharmacology<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
@@ -18,25 +19,29 @@ export class PharmacologyView<T extends ISectionProps> extends Pharmacology<T> {
     constructor(props: T) {
         super(props);
 
-        // ✅ Load stored medications from `localStorage`
         let storedMedications = JSON.parse(localStorage.getItem("selectedMedications") || "[]");
-
-        if (!Array.isArray(storedMedications)) {
-            storedMedications = [];
-        }
+        if (!Array.isArray(storedMedications)) storedMedications = [];
 
         this.state = {
             showErrorMessage: false,
-            selectedSymptoms: [],
+            selectedSymptoms: storedMedications,
             selectedSymptom: "",
+            searchString: "",
+            searchKey: 0,
+            errorText: "",
+            userSearch: []
         };
+    }
 
-        console.log("📜 Initial Medication List:", this.state.selectedSymptoms);
+    componentDidUpdate(): void {
+        localStorage.setItem("selectedMedications", JSON.stringify(this.state.selectedSymptoms));
     }
 
     handleBackClick = (): void => {
-        console.log("Navigating to BadHabbitsSection...");
-        this.props.dispatch(new SwitchViewAction(BadHabbitsSection.defaultView));
+        const answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
+        const filteredAnswers = answers.filter((entry: any) => !entry.hasOwnProperty("drugs"));
+        localStorage.setItem("patientAnswers", JSON.stringify(filteredAnswers));
+        this.props.dispatch(new SwitchViewAction(require("./DrugsView").DrugsSection.defaultView));
     };
 
     saveSymptomAndProceed = (): void => {
@@ -47,56 +52,41 @@ export class PharmacologyView<T extends ISectionProps> extends Pharmacology<T> {
 
         this.setState((prevState) => {
             let answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
-
-            // ✅ Prevent duplicate entries when switching screens
             if (!answers.some(entry => JSON.stringify(entry) === JSON.stringify({ medications: prevState.selectedSymptoms }))) {
                 answers.push({ medications: prevState.selectedSymptoms });
-                localStorage.setItem("patientAnswers", JSON.stringify(answers)); // ✅ Store updated answers
-                console.log("📜 Updated Patient Answers:", answers);
+                localStorage.setItem("patientAnswers", JSON.stringify(answers));
             }
-
-            return { selectedSymptom: "" }; // ✅ Reset selectedSymptom
+            return { selectedSymptom: "" };
         }, () => {
-            this.props.dispatch(new SwitchViewAction(AllergyFoodSelection.defaultView)); // ✅ Navigate to next section
+            this.props.dispatch(new SwitchViewAction(MedicationDetailsSection.defaultView));
         });
     };
-    
+
+    handleNoneAndProceed = (): void => {
+        let answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
+        answers.push({ medications: ["None"] });
+        localStorage.setItem("patientAnswers", JSON.stringify(answers));
+        this.props.dispatch(new SwitchViewAction(AllergyFoodSelection.defaultView));
+    };
 
     removeSymptom = (symptomToRemove: string): void => {
         this.setState((prevState) => {
             const updatedSymptoms = prevState.selectedSymptoms.filter(symptom => symptom !== symptomToRemove);
-
-            localStorage.setItem("selectedMedications", JSON.stringify(updatedSymptoms)); // ✅ Update localStorage
-            console.log("🗑️ Medication removed:", symptomToRemove);
-            console.log("📜 Updated Medication List (After Removal):", updatedSymptoms);
-
             return { selectedSymptoms: updatedSymptoms };
         });
     };
 
     handleSelectSymptom = (medication: string) => {
         this.setState((prevState) => {
-            if (prevState.selectedSymptoms.includes(medication)) {
-                console.log("⚠️ Medication already added.");
-                return prevState;
-            }
-    
+            if (prevState.selectedSymptoms.includes(medication)) return prevState;
             const updatedSymptoms = [...prevState.selectedSymptoms, medication];
-    
-            localStorage.setItem("selectedMedications", JSON.stringify(updatedSymptoms)); // ✅ Save to localStorage
-            console.log("📜 Updated Medication List:", updatedSymptoms);
-    
             return { selectedSymptoms: updatedSymptoms };
         });
     };
-    
 
     performSearch = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const mecication = e.target.value.trim();
-
-        if (typeof this.state.searchTimeout !== "undefined") {
-            clearTimeout(this.state.searchTimeout);
-        }
+        if (typeof this.state.searchTimeout !== "undefined") clearTimeout(this.state.searchTimeout);
 
         this.setState(() => ({
             errorText: "",
@@ -104,45 +94,29 @@ export class PharmacologyView<T extends ISectionProps> extends Pharmacology<T> {
         }));
 
         if (mecication === "") {
-            this.setState(() => ({
-                userSearch: []
-            }));
-
+            this.setState(() => ({ userSearch: [] }));
             return;
         }
 
         const timeout = window.setTimeout(() => {
-            console.log("Value:", mecication);
-
             Axios.get("/medications/info", {
-                params: {
-                    medication: mecication + "%",
-                },
+                params: { medication: mecication + "%" },
                 method: "GET",
                 headers: {
                     Authorization: "Bearer " + this.props.loginData.token
                 }
             }).then((response) => {
                 if (Array.isArray(response.data)) {
-                    this.setState(() => ({
-                        userSearch: response.data
-                    }));
+                    this.setState(() => ({ userSearch: response.data }));
                 } else {
-                    console.log("❌ Unexpected API response format:", response.data);
-                    this.setState(() => ({
-                        errorText: "Unexpected API response format."
-                    }));
+                    this.setState(() => ({ errorText: "Unexpected API response format." }));
                 }
             }).catch(() => {
-                this.setState(() => ({
-                    errorText: "Došlo k chybě při vyhledávání, prosím zkuste to znovu později."
-                }));
+                this.setState(() => ({ errorText: "Došlo k chybě při vyhledávání, prosím zkuste to znovu později." }));
             });
         }, 350);
 
-        this.setState({
-            searchTimeout: timeout
-        });
+        this.setState({ searchTimeout: timeout });
     }
 
     render(): ReactNode {
@@ -158,7 +132,7 @@ export class PharmacologyView<T extends ISectionProps> extends Pharmacology<T> {
                         </div>
 
                         <h2>What medication are you currently taking?</h2>
-                        <VBox className="scrollable-search-container"> {/* ✅ Added Scrollable Wrapper */}
+                        <VBox className="scrollable-search-container">
                             <HBox>
                                 <input 
                                     key={this.state.searchKey} 
@@ -183,13 +157,13 @@ export class PharmacologyView<T extends ISectionProps> extends Pharmacology<T> {
                                             <col span={1} className="hs-userbox-col-controls" />
                                         </colgroup>
                                         <tbody>
-                                            {this.state.userSearch?.map(result => (
-                                                <tr className="hs-userbox-result" key={result.medication_id}>
+                                            {this.state.userSearch?.map((result, index) => (
+                                                <tr className="hs-userbox-result" key={`${result.medication_id || result.medicine}-${index}`}>
                                                     <td className="hs-userbox-result-name">
                                                         {result.medicine}
                                                     </td>
                                                     <td className="hs-userbox-controls">
-                                                        <HButton buttonStyle={HButtonStyle.TEXT_SYMPTOM} action={() => { this.handleSelectSymptom(result.medicine); }} >
+                                                        <HButton buttonStyle={HButtonStyle.TEXT_SYMPTOM} action={() => { this.handleSelectSymptom(result.medicine); }}>
                                                             Vybrat
                                                         </HButton>
                                                     </td>
@@ -201,20 +175,13 @@ export class PharmacologyView<T extends ISectionProps> extends Pharmacology<T> {
                             )}
                         </VBox>
 
-                        <div className="tags">
-                            <span>Ibalgin</span>
-                            <span>Heparin</span>
-                            <span>Biseptol</span>
-                            <span>Acylpyrin</span>
-                        </div>
-
                         <div className="selected-symptoms-container">
                             <h3>Medications you are taking:</h3>
                             <div className="scrollable-selected-symptoms">
                                 <ul className="selected-symptoms-list">
-                                    {this.state.selectedSymptoms.map((mecication, index) => (
-                                        <li key={index}>
-                                            • {mecication}  
+                                    {this.state.selectedSymptoms.map((mecication) => (
+                                        <li key={mecication}>
+                                            • {mecication}
                                             <span className="delete-symptom" onClick={() => this.removeSymptom(mecication)}>
                                                 🗑️ delete
                                             </span>
@@ -226,6 +193,7 @@ export class PharmacologyView<T extends ISectionProps> extends Pharmacology<T> {
 
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
                             <button className="button" onClick={this.saveSymptomAndProceed}>Next</button>
+                            <button className="button" onClick={this.handleNoneAndProceed}>I take no medications</button>
                         </div>
                     </div>
                 </div>
@@ -234,7 +202,6 @@ export class PharmacologyView<T extends ISectionProps> extends Pharmacology<T> {
     }
 }
 
-/** ✅ Updated Section Export */
 const PharmacologySection: IHSection = {
     menuItems: [],
     permitsUserManagement: false,

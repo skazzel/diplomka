@@ -2,6 +2,8 @@ import React, { ReactNode } from "react";
 import { EnumInternalState, internalAppStateFromRole, InternalScreenSectionState } from "../data/AppState";
 import { Dispatch } from "redux";
 import { LogoutAction, SwitchManagedUserAction, SwitchSectionAction, SwitchViewAction } from "../data/AppAction";
+import watermarkLogo from "../img/znak.png";
+
 
 import "../style/h-internal-shared.less";
 
@@ -83,11 +85,22 @@ export class InternalAppScreen extends React.Component<{
         });
     }
 
-    viewUser = (result: IUserSearchResult): void => {
-        this.chooseUser(result);
+    viewUser = (result: { id: number, anamnesis: string }): void => {
+        // Neposílej request na profile-detail
+        this.props.dispatch(new SwitchManagedUserAction({
+            id: result.id,
+            name: "Pacient",
+            surname: `#${result.id}`,
+            birthDate: "",
+            birthID: "",
+            email: "",
+            phone: "",
+            login: "",
+            role: 0 // Nebo EnumRole.PATIENT
+        }));
         this.props.dispatch(new SwitchViewAction(HOtherProfileView));
     }
-
+    
     logout = (): void => {
         this.props.dispatch(new LogoutAction());
     }
@@ -192,15 +205,15 @@ export class InternalAppScreen extends React.Component<{
                             ) : null
                         }
                         {
-                            this.props.sectionState.sectionState.internalSection.permitsUserManagement && this.state.userManagementEnabled ? (
+                            this.state.userManagementEnabled ? (
                                 <HUserSearchBox
                                     chooseUserCallback={ this.chooseUser }
                                     viewUserCallback={ this.viewUser }
                                     loginData={ this.props.sectionState.loginData }
-                                    managedUser={ this.props.sectionState.managedUser }
-                                    searchRole={ this.props.sectionState.sectionState.internalState === EnumInternalState.ADMIN_PANEL ? EnumRole.ADMIN : EnumRole.DOCTOR } />
+                                />
                             ) : undefined
                         }
+
                         <div id="hs-app-viewport-inner">
                             {
                                 viewComponent

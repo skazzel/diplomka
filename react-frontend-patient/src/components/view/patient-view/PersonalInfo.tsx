@@ -76,20 +76,21 @@ export class PersonalInfoView<T extends ISectionProps> extends PersonalInfo<T> {
 
                 <h2>Please tell us the age of the person you want to check for symptoms.</h2>
 
-                <div className="slider-container">
-                    <button onClick={() => this.changeAge(-1)}>-</button>
-                    <span>Age: {this.state.age}</span>
-                    <button onClick={() => this.changeAge(1)}>+</button>
-                </div>
-
+                <div className="number-input-row">
+                <label htmlFor="ageInput" className="age-label">Age:</label>
                 <input
-                    type="range"
-                    id="ageSlider"
+                    id="ageInput"
+                    type="number"
                     min="0"
                     max="120"
                     value={this.state.age}
                     onChange={this.updateAge}
+                    className="age-number-input"
+                    placeholder="e.g. 30"
                 />
+                </div>
+
+
 
                 <div>
                     <button className="button next-button" onClick={this.saveAgeAndProceed}>To the Next</button>

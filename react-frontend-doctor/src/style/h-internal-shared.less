@@ -145,7 +145,27 @@
 #hs-app-viewport {
     background-color: white;
     flex-grow: 1;
-}
+    position: relative;
+    z-index: 1;
+  }
+  
+  #hs-app-viewport::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 700px;
+    height: 700px;
+    opacity: 0.06;
+    transform: translate(-50%, -50%);
+    background-image: url("../img/znak.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    pointer-events: none;
+    z-index: 0;
+  }
+   
 
 #hs-app-viewport-inner {
     padding: 10px;

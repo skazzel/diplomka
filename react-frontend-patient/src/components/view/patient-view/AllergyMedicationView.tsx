@@ -2,14 +2,12 @@ import { HView, IHSection, ISectionProps } from "../HView";
 import React, { ReactNode } from "react";
 import "../../../style/MedicationAllergy.less";
 import { SwitchViewAction } from "../../../data/AppAction";
-import { PharmacologySection } from "./PharmacologyView";
 import { HButton, HButtonStyle } from "../../HButton";
 import { AllergyFoodSelection } from "./AllergyFoodView";
 import { GynecologySection } from "./GynecologyView";
 import { HBox, VBox } from "../../HCard";
 import Axios from "axios";
 import { SocialSelection } from "./SocialView";
-
 
 export abstract class AllergyMedication<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
@@ -21,24 +19,34 @@ export class AllergyMedicationView<T extends ISectionProps> extends AllergyMedic
     constructor(props: T) {
         super(props);
 
-        // ✅ Load stored medications from `localStorage`
-        let storedMedications = JSON.parse(localStorage.getItem("selectedMedications") || "[]");
-
-        if (!Array.isArray(storedMedications)) {
-            storedMedications = [];
-        }
+        const stored = JSON.parse(localStorage.getItem("selectedMedicationAllergies") || "[]");
 
         this.state = {
             showErrorMessage: false,
-            selectedSymptoms: [],
+            selectedSymptoms: stored,
             selectedSymptom: "",
+            searchString: "",
+            searchKey: 0,
+            errorText: "",
+            userSearch: []
         };
 
         console.log("📜 Initial Medication List:", this.state.selectedSymptoms);
     }
 
+    componentDidUpdate(): void {
+        localStorage.setItem("selectedMedicationAllergies", JSON.stringify(this.state.selectedSymptoms));
+    }
+
     handleBackClick = (): void => {
-        console.log("Navigating to BadHabbitsSection...");
+        let answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
+        answers = answers.filter((entry: any) => 
+            !entry.hasOwnProperty("foodAllergies") && 
+            !entry.hasOwnProperty("allergySymptoms")
+        );
+        localStorage.setItem("patientAnswers", JSON.stringify(answers));
+        console.log("🗑️ Removed 'foodAllergies' and 'allergySymptoms' entries from patientAnswers:", answers);
+
         this.props.dispatch(new SwitchViewAction(AllergyFoodSelection.defaultView));
     };
 
@@ -51,41 +59,43 @@ export class AllergyMedicationView<T extends ISectionProps> extends AllergyMedic
         this.setState((prevState) => {
             const newMedication = prevState.selectedSymptom.trim();
 
-            // ✅ Update medication list only if a new medication is provided
             const updatedSymptoms = newMedication
                 ? [...prevState.selectedSymptoms, newMedication]
                 : [...prevState.selectedSymptoms];
 
-            // ✅ Prevent duplicate entries when switching screens
             let answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
             if (!answers.some(entry => JSON.stringify(entry) === JSON.stringify({ medication_allergy: updatedSymptoms }))) {
                 answers.push({ medication_allergy: updatedSymptoms });
-                localStorage.setItem("patientAnswers", JSON.stringify(answers)); // ✅ Store updated list
+                localStorage.setItem("patientAnswers", JSON.stringify(answers));
                 console.log("📜 Updated Patient Answers:", answers);
             }
 
-            // ✅ Save medication allergies into `selectedMedicationAllergies`
-            localStorage.setItem("selectedMedicationAllergies", JSON.stringify(updatedSymptoms)); // ✅ Save to storage
-
+            localStorage.setItem("selectedMedicationAllergies", JSON.stringify(updatedSymptoms));
             console.log("📜 Updated Medication Allergy List:", updatedSymptoms);
 
-            return { selectedSymptoms: updatedSymptoms, selectedSymptom: "" }; // ✅ Reset selectedSymptom
+            return { selectedSymptoms: updatedSymptoms, selectedSymptom: "" };
         }, () => {
-            this.props.dispatch(new SwitchViewAction(SocialSelection.defaultView)); // ✅ Navigate forward
+            this.props.dispatch(new SwitchViewAction(SocialSelection.defaultView));
         });
     };
-    
 
     removeSymptom = (symptomToRemove: string): void => {
         this.setState((prevState) => {
             const updatedSymptoms = prevState.selectedSymptoms.filter(symptom => symptom !== symptomToRemove);
 
-            localStorage.setItem("selectedMedications", JSON.stringify(updatedSymptoms)); // ✅ Update localStorage
+            localStorage.setItem("selectedMedicationAllergies", JSON.stringify(updatedSymptoms));
             console.log("🗑️ Medication removed:", symptomToRemove);
             console.log("📜 Updated Medication List (After Removal):", updatedSymptoms);
 
             return { selectedSymptoms: updatedSymptoms };
         });
+    };
+
+    saveNoneAndProceed = (): void => {
+        let answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
+        answers.push({ medication_allergy: ["None"] });
+        localStorage.setItem("patientAnswers", JSON.stringify(answers));
+        this.props.dispatch(new SwitchViewAction(SocialSelection.defaultView));
     };
 
     handleSelectSymptom = (medication: string) => {
@@ -94,16 +104,15 @@ export class AllergyMedicationView<T extends ISectionProps> extends AllergyMedic
                 console.log("⚠️ Medication already added.");
                 return prevState;
             }
-    
+
             const updatedSymptoms = [...prevState.selectedSymptoms, medication];
-    
-            localStorage.setItem("selectedMedications", JSON.stringify(updatedSymptoms)); // ✅ Save to localStorage
+
+            localStorage.setItem("selectedMedicationAllergies", JSON.stringify(updatedSymptoms));
             console.log("📜 Updated Medication List:", updatedSymptoms);
-    
+
             return { selectedSymptoms: updatedSymptoms };
         });
     };
-    
 
     performSearch = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const mecication = e.target.value.trim();
@@ -121,17 +130,12 @@ export class AllergyMedicationView<T extends ISectionProps> extends AllergyMedic
             this.setState(() => ({
                 userSearch: []
             }));
-
             return;
         }
 
         const timeout = window.setTimeout(() => {
-            console.log("Value:", mecication);
-
             Axios.get("/medications/info", {
-                params: {
-                    medication: mecication + "%",
-                },
+                params: { medication: mecication + "%" },
                 method: "GET",
                 headers: {
                     Authorization: "Bearer " + this.props.loginData.token
@@ -142,7 +146,6 @@ export class AllergyMedicationView<T extends ISectionProps> extends AllergyMedic
                         userSearch: response.data
                     }));
                 } else {
-                    console.log("❌ Unexpected API response format:", response.data);
                     this.setState(() => ({
                         errorText: "Unexpected API response format."
                     }));
@@ -157,7 +160,7 @@ export class AllergyMedicationView<T extends ISectionProps> extends AllergyMedic
         this.setState({
             searchTimeout: timeout
         });
-    }
+    };
 
     render(): ReactNode {
         return (
@@ -171,14 +174,14 @@ export class AllergyMedicationView<T extends ISectionProps> extends AllergyMedic
                     </div>
 
                     <h2>What medication are you allergic to?</h2>
-                    <VBox className="scrollable-search-container"> {/* ✅ Added Scrollable Wrapper */}
+                    <VBox className="scrollable-search-container">
                         <HBox>
-                            <input 
-                                key={this.state.searchKey} 
+                            <input
+                                key={this.state.searchKey}
                                 type="text"
-                                value={this.state.searchString} 
-                                onChange={this.performSearch} 
-                                placeholder="Enter medication name..." 
+                                value={this.state.searchString || ""}
+                                onChange={this.performSearch}
+                                placeholder="Enter medication name..."
                             />
                         </HBox>
 
@@ -196,7 +199,7 @@ export class AllergyMedicationView<T extends ISectionProps> extends AllergyMedic
                                         <col span={1} className="hs-userbox-col-controls" />
                                     </colgroup>
                                     <tbody>
-                                        {this.state.userSearch?.map(result => (
+                                        {this.state.userSearch?.map((result) => (
                                             <tr className="hs-userbox-result" key={result.medication_id}>
                                                 <td className="hs-userbox-result-name">
                                                     {result.medicine}
@@ -214,20 +217,13 @@ export class AllergyMedicationView<T extends ISectionProps> extends AllergyMedic
                         )}
                     </VBox>
 
-                    <div className="tags">
-                        <span>None</span>
-                        <span>Heparin</span>
-                        <span>Biseptol</span>
-                        <span>Acylpyrin</span>
-                    </div>
-
                     <div className="selected-symptoms-container">
                         <h3>Medications you are allergic to:</h3>
                         <div className="scrollable-selected-symptoms">
                             <ul className="selected-symptoms-list">
-                                {this.state.selectedSymptoms.map((mecication, index) => (
-                                    <li key={index}>
-                                        • {mecication}  
+                                {this.state.selectedSymptoms.map((mecication) => (
+                                    <li key={mecication}>
+                                        • {mecication}
                                         <span className="delete-symptom" onClick={() => this.removeSymptom(mecication)}>
                                             🗑️ delete
                                         </span>
@@ -239,6 +235,7 @@ export class AllergyMedicationView<T extends ISectionProps> extends AllergyMedic
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
                         <button className="button" onClick={this.saveSymptomAndProceed}>Next</button>
+                        <button className="button" onClick={this.saveNoneAndProceed}>None</button>
                     </div>
                 </div>
             </div>
@@ -246,7 +243,6 @@ export class AllergyMedicationView<T extends ISectionProps> extends AllergyMedic
     }
 }
 
-/** ✅ Updated Section Export */
 const AllergyMedicationSelection: IHSection = {
     menuItems: [],
     permitsUserManagement: false,

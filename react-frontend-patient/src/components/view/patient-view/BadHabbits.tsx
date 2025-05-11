@@ -2,8 +2,8 @@ import { HView, IHSection, ISectionProps } from "../HView";
 import React, { ReactNode } from "react";
 import "../../../style/BadHabbits.less";
 import { SwitchViewAction } from "../../../data/AppAction";
-import { ChronicalSection } from "./ChronicalView";
-import { PharmacologySection } from "./PharmacologyView";
+import { SurgeryTypeSection } from "./operationView";
+import { DrugsSection } from "./DrugsView";
 
 export abstract class BadHabbits<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
@@ -15,38 +15,40 @@ export class BadHabbitsView<T extends ISectionProps> extends BadHabbits<T> {
     constructor(props: T) {
         super(props);
 
-        // ✅ Load stored habits from `localStorage`
         const storedHabits = JSON.parse(localStorage.getItem("badHabits") || "{}");
 
         this.state = {
-            selectedHabits: {},
+            selectedHabits: storedHabits,
+            showAlcoholAmount: storedHabits.alcohol === "yes",
+            showSmokingAmount: storedHabits.smoking === "yes",
+            smokingSince: storedHabits.smokingSince || ""
         };
     }
 
+    componentDidUpdate(): void {
+        localStorage.setItem("badHabits", JSON.stringify(this.state.selectedHabits));
+    }
+
     handleBackClick = (): void => {
-        console.log("🔙 Navigating to ChronicalSection...");
-        this.props.dispatch(new SwitchViewAction(ChronicalSection.defaultView));
+        let answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
+        answers = answers.filter((entry: any) => !entry.hasOwnProperty("surgeries"));
+        localStorage.setItem("patientAnswers", JSON.stringify(answers));
+        this.props.dispatch(new SwitchViewAction(SurgeryTypeSection.defaultView));
     };
 
     saveHabitAndProceed = (): void => {
-        if (Object.keys(this.state.selectedHabits).length === 0) {
-            console.log("⚠️ No habits selected.");
-            return;
-        }
+        if (Object.keys(this.state.selectedHabits).length === 0) return;
 
         this.setState((prevState) => {
             let answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
-
-            // ✅ Prevent duplicate entries when switching screens
             if (!answers.some(entry => JSON.stringify(entry) === JSON.stringify({ badHabits: prevState.selectedHabits }))) {
                 answers.push({ badHabits: prevState.selectedHabits });
-                localStorage.setItem("patientAnswers", JSON.stringify(answers)); // ✅ Store updated answers
-                console.log("📜 Updated Patient Answers:", answers);
+                localStorage.setItem("patientAnswers", JSON.stringify(answers));
             }
 
             return {};
         }, () => {
-            this.props.dispatch(new SwitchViewAction(PharmacologySection.defaultView)); // ✅ Navigate forward
+            this.props.dispatch(new SwitchViewAction(DrugsSection.defaultView));
         });
     };
 
@@ -54,29 +56,46 @@ export class BadHabbitsView<T extends ISectionProps> extends BadHabbits<T> {
         this.setState((prevState) => {
             const updatedHabits = { ...prevState.selectedHabits, [habit]: value };
 
-            if (habit === "alcohol") updatedHabits.alcoholAmount = value === "yes" ? prevState.selectedHabits.alcoholAmount || "" : "";
-            if (habit === "smoking") updatedHabits.smokingAmount = value === "yes" ? prevState.selectedHabits.smokingAmount || "" : "";
+            if (habit === "alcohol" && value !== "yes") {
+                delete updatedHabits.alcoholHard;
+                delete updatedHabits.alcoholWine;
+                delete updatedHabits.alcoholBeer;
+            }
 
-            localStorage.setItem("badHabits", JSON.stringify(updatedHabits)); // ✅ Save habits
-            console.log("📜 Updated Bad Habits:", updatedHabits);
+            if (habit === "smoking" && value !== "yes") {
+                delete updatedHabits.smokingAmount;
+                delete updatedHabits.smokingSince;
+            }
 
             return {
                 selectedHabits: updatedHabits,
                 showAlcoholAmount: habit === "alcohol" ? value === "yes" : prevState.showAlcoholAmount,
                 showSmokingAmount: habit === "smoking" ? value === "yes" : prevState.showSmokingAmount,
+                smokingSince: habit === "smoking" && value === "yes" ? prevState.smokingSince : ""
             };
+        });
+    };
+
+    handleAlcoholInput = (type: string, amount: string): void => {
+        this.setState((prevState) => {
+            const updatedHabits = { ...prevState.selectedHabits, [type]: amount };
+            return { selectedHabits: updatedHabits };
         });
     };
 
     handleAmountInput = (habit: string, amount: string): void => {
         this.setState((prevState) => {
             const updatedHabits = { ...prevState.selectedHabits, [`${habit}Amount`]: amount };
+            return { selectedHabits: updatedHabits };
+        });
+    };
 
-            localStorage.setItem("badHabits", JSON.stringify(updatedHabits)); // ✅ Save habits
-            console.log("📜 Updated Habit Amount:", updatedHabits);
-
+    handleSinceInput = (value: string): void => {
+        this.setState((prevState) => {
+            const updatedHabits = { ...prevState.selectedHabits, smokingSince: value };
             return {
                 selectedHabits: updatedHabits,
+                smokingSince: value
             };
         });
     };
@@ -86,80 +105,40 @@ export class BadHabbitsView<T extends ISectionProps> extends BadHabbits<T> {
             <div className="Habbit-view">
                 <div className="container">
                     <button className="back-button" onClick={this.handleBackClick}>← Back</button>
-                    <div className="progress-bar">
-                        <div className="completed"></div>
-                        <div className="in-progress"></div>
-                        <div className="pending"></div>
-                    </div>
+                    <div className="progress-bar"><div className="progress"></div></div>
 
                     <h2>Do you drink alcohol?</h2>
                     <div className="habbits-group">
-                        <label>
-                            <input
-                                type="radio"
-                                name="alcohol"
-                                value="yes"
-                                checked={this.state.selectedHabits.alcohol === "yes"}
-                                onChange={() => this.handleHabitSelection("alcohol", "yes")}
-                            /> Yes
-                        </label>
-                        <label>
-                            <input
-                                type="radio"
-                                name="alcohol"
-                                value="no"
-                                checked={this.state.selectedHabits.alcohol === "no"}
-                                onChange={() => this.handleHabitSelection("alcohol", "no")}
-                            /> No
-                        </label>
+                        <label><input type="radio" name="alcohol" value="yes" checked={this.state.selectedHabits.alcohol === "yes"} onChange={() => this.handleHabitSelection("alcohol", "yes")} /> Yes</label>
+                        <label><input type="radio" name="alcohol" value="no" checked={this.state.selectedHabits.alcohol === "no"} onChange={() => this.handleHabitSelection("alcohol", "no")} /> No</label>
                     </div>
 
                     {this.state.showAlcoholAmount && (
-                        <div id="alcohol-amount">
-                            <h2>If yes, how much?</h2>
-                            <input
-                                type="text"
-                                className="input-field"
-                                placeholder="Number of drinks per day"
-                                value={this.state.selectedHabits.alcoholAmount || ""}
-                                onChange={(e) => this.handleAmountInput("alcohol", e.target.value)}
-                            />
+                        <div className="alcohol-types">
+                            <h2>If yes, how much per week?</h2>
+                            <div className="alcohol-item"><img src="/img/whiskey.png" className="icon" alt="hard" /><input type="number" placeholder="Shots of hard liquor" value={this.state.selectedHabits.alcoholHard || ""} onChange={(e) => this.handleAlcoholInput("alcoholHard", e.target.value)} /></div>
+                            <div className="alcohol-item"><img src="/img/wine-glass.png" className="icon" alt="wine" /><input type="number" placeholder="Glasses of wine" value={this.state.selectedHabits.alcoholWine || ""} onChange={(e) => this.handleAlcoholInput("alcoholWine", e.target.value)} /></div>
+                            <div className="alcohol-item"><img src="/img/beer.png" className="icon" alt="beer" /><input type="number" placeholder="Beers" value={this.state.selectedHabits.alcoholBeer || ""} onChange={(e) => this.handleAlcoholInput("alcoholBeer", e.target.value)} /></div>
                         </div>
                     )}
 
                     <h2>Do you smoke cigarettes?</h2>
                     <div className="habbits-group">
-                        <label>
-                            <input
-                                type="radio"
-                                name="smoking"
-                                value="yes"
-                                checked={this.state.selectedHabits.smoking === "yes"}
-                                onChange={() => this.handleHabitSelection("smoking", "yes")}
-                            /> Yes
-                        </label>
-                        <label>
-                            <input
-                                type="radio"
-                                name="smoking"
-                                value="no"
-                                checked={this.state.selectedHabits.smoking === "no"}
-                                onChange={() => this.handleHabitSelection("smoking", "no")}
-                            /> No
-                        </label>
+                        <label><input type="radio" name="smoking" value="yes" checked={this.state.selectedHabits.smoking === "yes"} onChange={() => this.handleHabitSelection("smoking", "yes")} /> Yes</label>
+                        <label><input type="radio" name="smoking" value="no" checked={this.state.selectedHabits.smoking === "no"} onChange={() => this.handleHabitSelection("smoking", "no")} /> No</label>
                     </div>
 
                     {this.state.showSmokingAmount && (
-                        <div id="smoking-amount">
-                            <h2>If yes, how much?</h2>
-                            <input
-                                type="text"
-                                className="input-field"
-                                placeholder="Number of cigarettes per day"
-                                value={this.state.selectedHabits.smokingAmount || ""}
-                                onChange={(e) => this.handleAmountInput("smoking", e.target.value)}
-                            />
-                        </div>
+                        <>
+                            <div id="smoking-amount">
+                                <h2>If yes, how much?</h2>
+                                <input type="number" className="input-field" placeholder="Number of cigarettes per day" value={this.state.selectedHabits.smokingAmount || ""} onChange={(e) => this.handleAmountInput("smoking", e.target.value)} />
+                            </div>
+                            <div className="smoking-detail-row">
+                                <label className="smoking-label">Since when do you smoke?</label>
+                                <input type="text" className="smoking-since-input" placeholder="e.g. 2015" value={this.state.smokingSince} onChange={(e) => this.handleSinceInput(e.target.value)} />
+                            </div>
+                        </>
                     )}
 
                     <button className="next-button" onClick={this.saveHabitAndProceed}>Next</button>

@@ -99,4 +99,33 @@ public class PatientInfoController {
         }
     }
 
+    public static void getLatestAnamnesis(Context context) {
+        String idParam = context.pathParam("id");
+
+        if (idParam == null || idParam.isEmpty()) {
+            context.status(400).json(Collections.singletonMap("error", "Missing patient ID"));
+            return;
+        }
+
+        try (Connection conn = SQLConnection.create()) {
+            String sql = "SELECT content FROM anamneses WHERE patient_id = ? ORDER BY created DESC LIMIT 1";
+
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, Integer.parseInt(idParam));
+
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        String content = rs.getString("content");
+                        context.status(200).json(Collections.singletonMap("anamnesis", content));
+                    } else {
+                        context.status(200).json(Collections.singletonMap("anamnesis", ""));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            context.status(500).json(Collections.singletonMap("error", "Internal server error"));
+        }
+    }
+
 }

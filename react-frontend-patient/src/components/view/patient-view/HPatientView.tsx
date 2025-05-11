@@ -6,9 +6,9 @@ import { HBox, VBox } from "../../HCard";
 import Axios from "axios";
 import { HButton, HButtonStyle } from "../../HButton";
 import { EnumRole } from "../../../data/UserData";
-import { GynecologySection } from "./GynecologyView";
 import { PainCheckSection } from "./PainView";
-import { MainConditionSection } from "./ConditionView";
+import { MainSymptomSection } from "./MainSymptom";
+import { BodyImageSection } from "./BodyImage";
 
 export abstract class HPatientView<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
@@ -19,35 +19,38 @@ export abstract class HPatientView<T extends ISectionProps> extends HView<T> {
 export class HPatientWelcomeView<T extends ISectionProps> extends HPatientView<T> {
     constructor(props: T) {
         super(props);
+
+        const stored = JSON.parse(localStorage.getItem("selectedSymptoms") || "[]");
+        const validSymptoms = Array.isArray(stored) ? stored.filter(s => typeof s === "string" && s.trim() !== "") : [];
+        const similarAround = localStorage.getItem("symptomNearbyOption") || "";
+
         this.state = {
-            selectedSymptoms: [],
+            selectedSymptoms: validSymptoms,
             symptomTypes: {},
             hasPainSymptom: false,
             searchString: "",
             userSearch: [],
             errorText: "",
-            similarAround: ""
+            similarAround: similarAround
         };
+
+        console.log("📦 Loaded selectedSymptoms from localStorage:", validSymptoms);
     }
 
     handleBackClick = (): void => {
-        this.setState((prevState) => {
-            if (prevState.selectedSymptoms.length === 0) return prevState;
-
-            const updatedSymptoms = [...prevState.selectedSymptoms];
-            updatedSymptoms.pop();
-            localStorage.setItem("selectedSymptoms", JSON.stringify(updatedSymptoms));
-
-            return { selectedSymptoms: updatedSymptoms };
-        }, () => {
-            this.props.dispatch(new SwitchViewAction(HPatientSection.defaultView));
-        });
+        const answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
+        const filteredAnswers = answers.filter((entry: any) => !entry.hasOwnProperty("age"));
+        localStorage.setItem("patientAnswers", JSON.stringify(filteredAnswers));
+        console.log("🗑️ Removed only 'age', kept selectedSymptoms and similarAround");
+        this.props.dispatch(new SwitchViewAction(BodyImageSection.defaultView));
     };
 
     removeSymptom = (symptomToRemove: string): void => {
         this.setState(prevState => ({
             selectedSymptoms: prevState.selectedSymptoms.filter(symptom => symptom !== symptomToRemove)
-        }));
+        }), () => {
+            localStorage.setItem("selectedSymptoms", JSON.stringify(this.state.selectedSymptoms));
+        });
     };
 
     handleSelectSymptom = (symptom: string) => {
@@ -69,8 +72,6 @@ export class HPatientWelcomeView<T extends ISectionProps> extends HPatientView<T
                 selectedSymptoms: updatedSymptoms,
                 symptomTypes: updatedTypes,
                 hasPainSymptom: prevState.hasPainSymptom || isPain,
-                searchString: "",
-                userSearch: [],
             };
         }, () => {
             localStorage.setItem("selectedSymptoms", JSON.stringify(this.state.selectedSymptoms));
@@ -82,60 +83,81 @@ export class HPatientWelcomeView<T extends ISectionProps> extends HPatientView<T
             console.log("⚠️ No symptoms selected.");
             return;
         }
-    
+
+        localStorage.setItem("symptomNearbyOption", this.state.similarAround);
+
         const answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
-    
         const symptomEntry = { symptoms: this.state.selectedSymptoms };
         const similarAroundEntry = { similarAround: this.state.similarAround };
-    
         const entriesToSave = [symptomEntry, similarAroundEntry];
-    
+
         for (const entry of entriesToSave) {
             const alreadyExists = answers.some(a => JSON.stringify(a) === JSON.stringify(entry));
             if (!alreadyExists) {
                 answers.push(entry);
             }
         }
-    
+
         localStorage.setItem("patientAnswers", JSON.stringify(answers));
         console.log("📦 Updated patientAnswers:", answers);
-    
+
         const nextSection = this.state.hasPainSymptom
             ? PainCheckSection.defaultView
-            : MainConditionSection.defaultView;
-    
+            : MainSymptomSection.defaultView;
+
         this.props.dispatch(new SwitchViewAction(nextSection));
-    };    
+    };
 
     performSearch = (e: ChangeEvent<HTMLInputElement>): void => {
         const symptom = e.target.value.trim();
-        if (typeof this.state.searchTimeout !== "undefined") clearTimeout(this.state.searchTimeout);
 
-        this.setState(() => ({ errorText: "", searchString: symptom }));
+        if (typeof this.state.searchTimeout !== "undefined") {
+            clearTimeout(this.state.searchTimeout);
+        }
+
+        this.setState(() => ({
+            errorText: "",
+            searchString: symptom
+        }));
 
         if (symptom === "") {
-            this.setState(() => ({ userSearch: [] }));
+            this.setState(() => ({
+                userSearch: []
+            }));
             return;
         }
 
         const timeout = window.setTimeout(() => {
             Axios.get("/symptoms/info", {
-                params: { symptom: symptom, role: this.props.searchRole === EnumRole.PATIENT },
+                params: {
+                    symptom: symptom + "%",
+                    role: this.props.searchRole === EnumRole.PATIENT
+                },
                 method: "GET",
-                headers: { Authorization: "Bearer " + this.props.loginData.token }
+                headers: {
+                    Authorization: "Bearer " + this.props.loginData.token
+                }
             }).then((response) => {
                 if (Array.isArray(response.data)) {
-                    this.setState(() => ({ userSearch: response.data }));
+                    this.setState(() => ({
+                        userSearch: response.data
+                    }));
                 } else {
-                    this.setState(() => ({ errorText: "Unexpected API response format." }));
+                    this.setState(() => ({
+                        errorText: "Unexpected API response format."
+                    }));
                 }
             }).catch(() => {
-                this.setState(() => ({ errorText: "Došlo k chybě při vyhledávání, prosím zkuste to znovu později." }));
+                this.setState(() => ({
+                    errorText: "Došlo k chybě při vyhledávání, prosím zkuste to znovu později."
+                }));
             });
         }, 350);
 
-        this.setState({ searchTimeout: timeout });
-    };
+        this.setState({
+            searchTimeout: timeout
+        });
+    }
 
     render(): ReactNode {
         return (
@@ -181,15 +203,6 @@ export class HPatientWelcomeView<T extends ISectionProps> extends HPatientView<T
                         )}
                     </VBox>
 
-                    <div className="tags">
-                        <span>My stomach hurts</span>
-                        <span>Fever</span>
-                        <span>Tired</span>
-                        <span>Headache</span>
-                        <span>Sore throat</span>
-                        <span>Nausea</span>
-                    </div>
-
                     <div className="selected-symptoms-container">
                         <h3>You are currently experiencing this symptoms?</h3>
                         <div className="scrollable-selected-symptoms">
@@ -203,13 +216,15 @@ export class HPatientWelcomeView<T extends ISectionProps> extends HPatientView<T
                         </div>
                     </div>
 
-                    <h3>Does anyone around you have similar symptoms?</h3>
+                    <h3>Does anyone around you have similar symptoms? (In school, home, sport club,...)</h3>
                     <div className="symptom-nearby-options">
                         {["Yes", "No"].map((option) => (
                             <span
                                 key={option}
                                 className={`symptomNearbyOption ${this.state.similarAround === option ? "selected" : ""}`}
-                                onClick={() => this.setState({ similarAround: option })}
+                                onClick={() => this.setState({ similarAround: option }, () => {
+                                    localStorage.setItem("symptomNearbyOption", option);
+                                })}
                             >
                                 {option}
                             </span>

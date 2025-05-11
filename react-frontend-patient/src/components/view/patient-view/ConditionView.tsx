@@ -1,5 +1,5 @@
 import { HView, IHSection, ISectionProps } from "../HView";
-import React, { ReactNode } from "react";
+import React, { ReactNode, ChangeEvent } from "react";
 import "../../../style/condition.less";
 import { GenderInfoSection } from "../patient-view/GenderView";
 import { SwitchViewAction } from "../../../data/AppAction";
@@ -8,7 +8,7 @@ import { HBox, VBox } from "../../HCard";
 import Axios from "axios";
 import { HButton, HButtonStyle } from "../../HButton";
 
-import {EnumRole} from "../../../data/UserData";
+import { EnumRole } from "../../../data/UserData";
 import { MainSymptomSection } from "./MainSymptom";
 import { ChronicalSection } from "./ChronicalView";
 
@@ -21,67 +21,71 @@ export abstract class MainCondition<T extends ISectionProps> extends HView<T> {
 export class MainConditionView<T extends ISectionProps> extends MainCondition<T> {
     constructor(props: T) {
         super(props);
+        const storedCondition = localStorage.getItem("selectedCondition") || "";
+        const storedPreviousTrouble = localStorage.getItem("previousTrouble") || "";
+        const storedNumber = localStorage.getItem("durationNumber") || "";
+        const storedUnit = localStorage.getItem("durationUnit") || "";
+
         this.state = {
             showErrorMessage: false,
             selectedSymptoms: [],
-            selectedCondition: "",
-            selectedNumber: "",
-            selectedUnit: "",
-            previousTrouble: "",
+            selectedCondition: storedCondition,
+            selectedNumber: storedNumber,
+            selectedUnit: storedUnit,
+            previousTrouble: storedPreviousTrouble,
+            searchString: "",
+            searchTimeout: undefined,
+            userSearch: [],
+            errorText: ""
         };
     }
 
     handleBackClick = (): void => {
-        this.setState((prevState) => {
-            if (prevState.selectedSymptoms.length === 0) {
-                console.log("No symptoms to remove.");
-                return prevState;
-            }
-
-            const updatedSymptoms = [...prevState.selectedSymptoms];
-            updatedSymptoms.pop(); // ✅ Remove last symptom
-
-            localStorage.setItem("selectedSymptoms", JSON.stringify(updatedSymptoms)); // ✅ Save updated list
-            console.log("📜 Updated Symptom List (After Back):", updatedSymptoms); // ✅ Print full list after removal
-
-            return { selectedSymptoms: updatedSymptoms };
-        }, () => {
-            this.props.dispatch(new SwitchViewAction(HPatientSection.defaultView)); // ✅ Navigate after update
-        });
+        const answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
+        const filteredAnswers = answers.filter((entry: any) => !entry.hasOwnProperty("main_symptom"));
+        localStorage.setItem("patientAnswers", JSON.stringify(filteredAnswers));
+        this.props.dispatch(new SwitchViewAction(MainSymptomSection.defaultView));
     };
 
-    handleSelectCondition = (condition: string) => {
-        this.setState((prevState) => {
-            const updatedCondition = [...prevState.selectedCondition, condition];
-
-            localStorage.setItem("selectedCondition", JSON.stringify(updatedCondition)); // ✅ Save updated symptoms
-            console.log("📜 Updated Condition:", updatedCondition);
-
-            return { selectedCondition: condition };
-        });
+    handleSelect = (field: string, value: string) => {
+        this.setState({ [field]: value });
+        localStorage.setItem(field, value);
     };
 
     saveSymptomAndProceed = (): void => {
         const numberValue = this.selectedNumber?.value;
         const unitValue = this.selectedUnit?.value;
-    
-        if (!numberValue || !unitValue) {
-            console.log("⚠️ Duration number or unit is missing.");
+        const { selectedCondition, previousTrouble } = this.state;
+
+        if (!numberValue || !unitValue || unitValue === "---" || selectedCondition === "---" || previousTrouble === "---") {
+            console.log("⚠️ Missing values in form.");
             return;
         }
-    
+
+        localStorage.setItem("durationNumber", numberValue);
+        localStorage.setItem("durationUnit", unitValue);
+
         const fullDuration = `${numberValue} ${unitValue}`;
-    
+
         this.setState((prevState) => {
-            let answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
-    
+            let answers: any[] = [];
+            try {
+                const stored = localStorage.getItem("patientAnswers");
+                answers = stored ? JSON.parse(stored) : [];
+                if (!Array.isArray(answers)) {
+                    answers = [];
+                }
+            } catch (e) {
+                answers = [];
+            }
+
             const entriesToSave = [
                 { symptoms: prevState.selectedSymptoms },
-                { condition: prevState.selectedCondition },
-                { previousTrouble: prevState.previousTrouble },
+                { condition: selectedCondition },
+                { previousTrouble },
                 { duration: fullDuration }
             ];
-    
+
             for (const entry of entriesToSave) {
                 const isDuplicate = answers.some(
                     (existing) => JSON.stringify(existing) === JSON.stringify(entry)
@@ -90,10 +94,10 @@ export class MainConditionView<T extends ISectionProps> extends MainCondition<T>
                     answers.push(entry);
                 }
             }
-    
+
             localStorage.setItem("patientAnswers", JSON.stringify(answers));
             console.log("📦 Updated patientAnswers:", answers);
-    
+
             return {
                 selectedSymptom: null,
                 selectedNumber: numberValue,
@@ -104,13 +108,11 @@ export class MainConditionView<T extends ISectionProps> extends MainCondition<T>
             this.props.dispatch(new SwitchViewAction(ChronicalSection.defaultView));
         });
     };
-    
-    
+
     performSearch = (e: ChangeEvent<HTMLInputElement>): void => {
         const symptom = e.target.value.trim();
 
-        if (typeof this.state.searchTimeout !== "undefined")
-        {
+        if (typeof this.state.searchTimeout !== "undefined") {
             clearTimeout(this.state.searchTimeout);
         }
 
@@ -119,36 +121,29 @@ export class MainConditionView<T extends ISectionProps> extends MainCondition<T>
             searchString: symptom
         }));
 
-        if (symptom === "")
-        {
+        if (symptom === "") {
             this.setState(() => ({
                 userSearch: []
             }));
-
             return;
         }
 
         const timeout = window.setTimeout(() => {
-
-            Axios.get("/symptoms/info",
-                {
-                    params: {
-                        symptom: symptom,
-                        role: this.props.searchRole === EnumRole.PATIENT
-                    },
-                    method: "GET",
-                    headers: {
-                        Authorization: "Bearer " + this.props.loginData.token 
-                    }
+            Axios.get("/symptoms/info", {
+                params: {
+                    symptom: symptom,
+                    role: this.props.searchRole === EnumRole.PATIENT
+                },
+                method: "GET",
+                headers: {
+                    Authorization: "Bearer " + this.props.loginData.token
                 }
-            ).then((response) => {
-
+            }).then((response) => {
                 if (Array.isArray(response.data)) {
                     this.setState(() => ({
                         userSearch: response.data
                     }));
                 } else {
-                    console.log("❌ Unexpected API response format:", response.data);
                     this.setState(() => ({
                         errorText: "Unexpected API response format."
                     }));
@@ -163,23 +158,9 @@ export class MainConditionView<T extends ISectionProps> extends MainCondition<T>
         this.setState({
             searchTimeout: timeout
         });
-    }
+    };
 
     render(): ReactNode {
-        let displayName: string | null = null;
-
-        if (typeof this.props.managedUser !== "undefined")
-        {
-            if (this.props.managedUser.birthDate !== null)
-            {
-                displayName = `${this.props.managedUser.name} ${this.props.managedUser.surname}, narozen(a) ${this.props.managedUser.birthDate}`;
-            }
-            else
-            {
-                displayName = `${this.props.managedUser.name} ${this.props.managedUser.surname}`;
-            }
-        }
-
         return (
             <div className="patient-view">
                 <button className="back-button" onClick={this.handleBackClick}>← Back</button>
@@ -190,35 +171,27 @@ export class MainConditionView<T extends ISectionProps> extends MainCondition<T>
                         <div className="pending"></div>
                     </div>
 
-                    <div className="symptom-trend-container">
-                        <h3>Are your symptoms getting better or worse?</h3>
-                        <div className="symptom-trend-options">
-                            <span
-                                className={`symptomTrend ${this.state.selectedCondition === "Better" ? "selected" : ""}`}
-                                onClick={() => this.handleSelectCondition("Better")}
-                            >
-                                better
-                            </span>
-                            <span
-                                className={`symptomTrend ${this.state.selectedCondition === "Worse" ? "selected" : ""}`}
-                                onClick={() => this.handleSelectCondition("Worse")}
-                            >
-                                worse
-                            </span>
-                            <span
-                                className={`symptomTrend ${this.state.selectedCondition === "No change" ? "selected" : ""}`}
-                                onClick={() => this.handleSelectCondition("No change")}
-                            >
-                                no change
-                            </span>
-                        </div>
+                    <div className="symptom-row">
+                        <label className="symptom-label">Are your symptoms getting better or worse?</label>
+                        <select className="symptom-select" value={this.state.selectedCondition} onChange={(e) => this.handleSelect("selectedCondition", e.target.value)}>
+                            <option value="">---</option>
+                            <option value="Better">Better</option>
+                            <option value="Worse">Worse</option>
+                            <option value="No change">No change</option>
+                        </select>
                     </div>
 
-                    <div className="symptom-duration-container">
-                        <h3>How long have you had these symptoms?</h3>
+                    <div className="symptom-row">
+                        <label className="symptom-label">How long have you had these symptoms?</label>
                         <div className="duration-input-group">
-                            <input ref={(ref) => (this.selectedNumber = ref)} type="number" min="0" placeholder="e.g. 3" className="duration-number-input" />
-                            <select ref={(ref) => (this.selectedUnit = ref)} className="duration-unit-select">
+                            <select className="symptom-select" ref={(ref) => (this.selectedNumber = ref)} defaultValue={this.state.selectedNumber} onChange={(e) => localStorage.setItem("durationNumber", e.target.value)}>
+                                <option value="">---</option>
+                                {[...Array(31)].map((_, i) => (
+                                    <option key={i + 1} value={i + 1}>{i + 1}</option>
+                                ))}
+                            </select>
+                            <select className="symptom-select" ref={(ref) => (this.selectedUnit = ref)} defaultValue={this.state.selectedUnit} onChange={(e) => localStorage.setItem("durationUnit", e.target.value)}>
+                                <option value="">---</option>
                                 <option value="hours">hours</option>
                                 <option value="days">days</option>
                                 <option value="weeks">weeks</option>
@@ -227,27 +200,19 @@ export class MainConditionView<T extends ISectionProps> extends MainCondition<T>
                         </div>
                     </div>
 
-                    <div className="previous-troubles-container">
-                        <h3>Have you had these problems before?</h3>
-                        <div className="previous-troubles-options">
-                            {["Yes, repeatedly", "Yes, once", "No, never", "I don't know"].map((option) => (
-                                <span
-                                    key={option}
-                                    className={`previousTroubleOption ${this.state.previousTrouble === option ? "selected" : ""}`}
-                                    onClick={() => this.setState({ previousTrouble: option })}
-                                >
-                                    {option}
-                                </span>
-                            ))}
-                        </div>
+                    <div className="symptom-row">
+                        <label className="symptom-label">Have you had these problems before?</label>
+                        <select className="symptom-select" value={this.state.previousTrouble} onChange={(e) => this.handleSelect("previousTrouble", e.target.value)}>
+                            <option value="">---</option>
+                            <option value="Yes, repeatedly">Yes, repeatedly</option>
+                            <option value="Yes, once">Yes, once</option>
+                            <option value="No, never">No, never</option>
+                            <option value="I don't know">I don't know</option>
+                        </select>
                     </div>
 
-
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
-                        {/* ✅ Back Button - Switches to BodyImageView */}
-                        <button
-                            className="button"
-                            onClick={this.saveSymptomAndProceed}>Next</button>
+                        <button className="button" onClick={this.saveSymptomAndProceed}>Next</button>
                     </div>
                 </div>
             </div>
@@ -255,7 +220,6 @@ export class MainConditionView<T extends ISectionProps> extends MainCondition<T>
     }
 }
 
-/** ✅ Updated Section Export */
 const MainConditionSection: IHSection = {
     menuItems: [],
     permitsUserManagement: false,

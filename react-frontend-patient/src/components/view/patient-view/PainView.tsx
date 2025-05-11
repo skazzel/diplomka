@@ -4,6 +4,15 @@ import "../../../style/pain.less";
 import { SwitchViewAction } from "../../../data/AppAction";
 import { MainConditionSection } from "./ConditionView";
 import { HPatientSection } from "./HPatientView";
+import { MainSymptomSection } from "./MainSymptom";
+import { BodyImageSection } from "./BodyImage";
+
+
+import emoji1 from "../../../img/color-emoji-clean-1.png";
+import emoji3 from "../../../img/color-emoji-clean-2.png";
+import emoji5 from "../../../img/color-emoji-clean-3.png";
+import emoji7 from "../../../img/color-emoji-clean-4.png";
+import emoji10 from "../../../img/color-emoji-clean-5.png";
 
 export abstract class PainChoice<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
@@ -21,23 +30,24 @@ export class PainChoiceView<T extends ISectionProps> extends PainChoice<T> {
             painRelief: "",
             painIntensity: 1,
             painTime: "",
-            painTrigger: ""
+            painTrigger: "",
+            tookPainkillers: "",
+            painkillerEffect: ""
         };
     }
 
     handleBackClick = (): void => {
+        const answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
+        const filteredAnswers = answers.filter((entry: any) => 
+            !entry.hasOwnProperty("symptoms") && !entry.hasOwnProperty("similarAround")
+        );
+        localStorage.setItem("patientAnswers", JSON.stringify(filteredAnswers));
         this.props.dispatch(new SwitchViewAction(HPatientSection.defaultView));
     };
 
     saveSymptomAndProceed = (): void => {
         const {
-            painType,
-            painChange,
-            painWorse,
-            painRelief,
-            painIntensity,
-            painTime,
-            painTrigger
+            painType, painChange, painWorse, painRelief, painIntensity, painTime, painTrigger, tookPainkillers, painkillerEffect
         } = this.state;
 
         const answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
@@ -49,8 +59,13 @@ export class PainChoiceView<T extends ISectionProps> extends PainChoice<T> {
             { painRelief },
             { painIntensity: parseInt(painIntensity) },
             { painTime },
-            { painTrigger }
+            { painTrigger },
+            { tookPainkillers }
         ];
+
+        if (tookPainkillers === "Ano") {
+            entriesToSave.push({ painkillerEffect });
+        }
 
         for (const entry of entriesToSave) {
             const isDuplicate = answers.some(existing => JSON.stringify(existing) === JSON.stringify(entry));
@@ -60,18 +75,20 @@ export class PainChoiceView<T extends ISectionProps> extends PainChoice<T> {
         }
 
         localStorage.setItem("patientAnswers", JSON.stringify(answers));
-        console.log("📦 Updated patientAnswers:", answers);
 
-        this.props.dispatch(new SwitchViewAction(MainConditionSection.defaultView));
+        const symptomsEntry = answers.find((entry: any) => entry.symptoms);
+        const symptoms = symptomsEntry ? symptomsEntry.symptoms : [];
+
+        if (symptoms.length > 1) {
+            this.props.dispatch(new SwitchViewAction(MainSymptomSection.defaultView));
+        } else {
+            this.props.dispatch(new SwitchViewAction(BodyImageSection.defaultView));
+        }
     };
 
     render(): ReactNode {
-        const singleOptions = [
-            "Ostrá", "Tupá", "Pálivá", "Pulsující", "Křečová", "Vystřelující", "Tlaková"
-        ];
-
+        const singleOptions = ["Ostrá", "Tupá", "Pálivá", "Pulsující", "Křečová", "Vystřelující", "Tlaková"];
         const changeOptions = ["Zhoršuje", "Zlepšuje", "Je stejná"];
-
         const timeOptions = [
             "Ano, zhoršují se v noci",
             "Ano, zhoršují se ráno",
@@ -81,99 +98,110 @@ export class PainChoiceView<T extends ISectionProps> extends PainChoice<T> {
             "Ano, zhoršují se při chladu/teple",
             "Ne, příznaky jsou stejné celý den"
         ];
-
-        const triggerOptions = [
-            "Pohyb", "Odpočinek", "Jídlo / pití", "Teplo", "Chlad", "Sezení / stání", "Stres"
-        ];
-
+        const triggerOptions = ["Pohyb", "Odpočinek", "Jídlo / pití", "Teplo", "Chlad", "Sezení / stání", "Stres"];
         const reliefOptions = [
             "Léky proti bolesti", "Odpočinek", "Teplý obklad", "Studený obklad",
             "Změna polohy", "Jídlo / pití", "Nic nepomáhá"
         ];
 
+        const emojiMap: { [key: number]: string } = {
+            1: emoji1,
+            3: emoji3,
+            5: emoji5,
+            7: emoji7,
+            10: emoji10
+        };
+
         return (
             <div className="pain-check-container">
                 <button className="back-button" onClick={this.handleBackClick}>← Zpět</button>
 
-                <h2>Jaký je typ bolesti?</h2>
-                <div className="option-group">
-                    {singleOptions.map((type) => (
-                        <span
-                            key={type}
-                            className={`option ${this.state.painType === type ? "selected" : ""}`}
-                            onClick={() => this.setState({ painType: type })}
-                        >
-                            {type}
-                        </span>
-                    ))}
+                <div className="dropdown-row">
+                    <label className="dropdown-label">Typ bolesti:</label>
+                    <select className="dropdown-select" value={this.state.painType} onChange={(e) => this.setState({ painType: e.target.value })}>
+                        <option value="">-- Vyberte --</option>
+                        {singleOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                    </select>
                 </div>
 
-                <h2>Bolest se...</h2>
-                <div className="option-group">
-                    {changeOptions.map((option) => (
-                        <span
-                            key={option}
-                            className={`option ${this.state.painChange === option ? "selected" : ""}`}
-                            onClick={() => this.setState({ painChange: option })}
-                        >
-                            {option}
-                        </span>
-                    ))}
+                <div className="dropdown-row">
+                    <label className="dropdown-label">Bolest se:</label>
+                    <select className="dropdown-select" value={this.state.painChange} onChange={(e) => this.setState({ painChange: e.target.value })}>
+                        <option value="">-- Vyberte --</option>
+                        {changeOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                    </select>
                 </div>
 
-                <h2>Kdy během dne se bolest zhoršuje?</h2>
-                <div className="option-group">
-                    {timeOptions.map((option) => (
-                        <span
-                            key={option}
-                            className={`option ${this.state.painTime === option ? "selected" : ""}`}
-                            onClick={() => this.setState({ painTime: option })}
-                        >
-                            {option}
-                        </span>
-                    ))}
+                <div className="dropdown-row">
+                    <label className="dropdown-label">Kdy se bolest zhoršuje:</label>
+                    <select className="dropdown-select" value={this.state.painTime} onChange={(e) => this.setState({ painTime: e.target.value })}>
+                        <option value="">-- Vyberte --</option>
+                        {timeOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                    </select>
                 </div>
 
-                <h2>Co bolest zhoršuje?</h2>
-                <div className="option-group">
-                    {triggerOptions.map((option) => (
-                        <span
-                            key={option}
-                            className={`option ${this.state.painWorse === option ? "selected" : ""}`}
-                            onClick={() => this.setState({ painWorse: option })}
-                        >
-                            {option}
-                        </span>
-                    ))}
+                <div className="dropdown-row">
+                    <label className="dropdown-label">Co bolest zhoršuje:</label>
+                    <select className="dropdown-select" value={this.state.painWorse} onChange={(e) => this.setState({ painWorse: e.target.value })}>
+                        <option value="">-- Vyberte --</option>
+                        {triggerOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                    </select>
                 </div>
 
-                <h2>Co bolest zlepšuje?</h2>
-                <div className="option-group">
-                    {reliefOptions.map((option) => (
-                        <span
-                            key={option}
-                            className={`option ${this.state.painRelief === option ? "selected" : ""}`}
-                            onClick={() => this.setState({ painRelief: option })}
-                        >
-                            {option}
-                        </span>
-                    ))}
+                <div className="dropdown-row">
+                    <label className="dropdown-label">Co bolest zlepšuje:</label>
+                    <select className="dropdown-select" value={this.state.painRelief} onChange={(e) => this.setState({ painRelief: e.target.value })}>
+                        <option value="">-- Vyberte --</option>
+                        {reliefOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                    </select>
                 </div>
 
-                <h2>Jak velká je bolest? <small>(1 = žádná, 10 = nesnesitelná)</small></h2>
-                <div className="pain-intensity-container">
-                    <input
-                        type="range"
-                        min="1"
-                        max="10"
-                        step="1"
-                        className="pain-slider"
-                        value={this.state.painIntensity}
-                        onChange={(e) => this.setState({ painIntensity: e.target.value })}
-                    />
-                    <div className="scale-labels">
-                        <span>1</span>
-                        <span>10</span>
+                <div className="dropdown-row">
+                    <label className="dropdown-label">Užil(a) jste léky proti bolesti?</label>
+                    <select className="dropdown-select" value={this.state.tookPainkillers} onChange={(e) => this.setState({ tookPainkillers: e.target.value })}>
+                        <option value="">-- Vyberte --</option>
+                        <option value="Ano">Ano</option>
+                        <option value="Ne">Ne</option>
+                    </select>
+                </div>
+
+                {this.state.tookPainkillers === "Ano" && (
+                    <div className="dropdown-row">
+                        <label className="dropdown-label">Měly léky účinek?</label>
+                        <select className="dropdown-select" value={this.state.painkillerEffect} onChange={(e) => this.setState({ painkillerEffect: e.target.value })}>
+                            <option value="">-- Vyberte --</option>
+                            <option value="Zlepšení">Zlepšení</option>
+                            <option value="Stejné">Stejné</option>
+                            <option value="Zhoršení">Zhoršení</option>
+                        </select>
+                    </div>
+                )}
+
+                <h2>Jak velká je bolest?</h2>
+                <div className="pain-scale-wrapper">
+                    <div className="pain-emojis">
+                        {[10, 7, 5, 3, 1].map(level => (
+                            <img
+                                key={level}
+                                src={emojiMap[level]}
+                                alt={`Pain level ${level}`}
+                                className="pain-emoji"
+                            />
+                        ))}
+                    </div>
+                    <div className="pain-buttons">
+                        {[...Array(10)].map((_, index) => {
+                            const level = index + 1;
+                            return (
+                                <button
+                                    key={level}
+                                    className={`pain-button ${this.state.painIntensity === level ? "selected" : ""}`}
+                                    onClick={() => this.setState({ painIntensity: level })}
+                                >
+                                    {level}
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
 

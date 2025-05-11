@@ -110,16 +110,7 @@ export class HDoctorWelcomeView<T extends ISectionProps> extends HDoctorView<T> 
 
 const HDoctorSection: IHSection = {
     menuItems: [
-        {
-            icon: accountLogo,
-            name: "Správa pacientů",
-            targetView: HOtherProfileView
-        },
-        {
-            icon: accountLogo,
-            name: "Můj profil",
-            targetView: HSelfProfileView
-        }
+
     ],
     permitsUserManagement: true,
     defaultView: HDoctorWelcomeView

@@ -22,10 +22,10 @@ public class AppointmentsTable extends AbstractTable
                  status           VARCHAR(45) NOT NULL,
                                       
                  CONSTRAINT fk_doctor_id
-                     FOREIGN KEY (doctor_id) REFERENCES doctor (doctor_id),
+                     FOREIGN KEY (doctor_id) REFERENCES doctors (doctor_id),
                      
                  CONSTRAINT fk_patient_id
-                     FOREIGN KEY (patient_id) REFERENCES patient (patient_id)
+                     FOREIGN KEY (patient_id) REFERENCES patients (patient_id)
                          ON DELETE CASCADE
              );
             """;

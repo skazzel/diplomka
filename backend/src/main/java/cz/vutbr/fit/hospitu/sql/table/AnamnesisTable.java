@@ -22,7 +22,7 @@ public class AnamnesisTable extends AbstractTable
                 created         DATE,
                 
                 CONSTRAINT patient_id
-                     FOREIGN KEY (patient_id) REFERENCES patient (patient_id) ON DELETE CASCADE
+                     FOREIGN KEY (patient_id) REFERENCES patients (patient_id) ON DELETE CASCADE
             );
             """;
 

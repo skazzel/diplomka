@@ -1,0 +1,50 @@
+.scrollable-results {
+    max-height: 250px;
+    overflow-y: auto;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.search-result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #eee;
+    font-size: 16px;
+}
+
+.search-result-row:last-child {
+    border-bottom: none;
+}
+
+.search-result-name {
+    flex: 1;
+    color: #333;
+}
+
+.search-result-button {
+    margin-left: 12px;
+}
+
+.surgery-buttons-row {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 30px;
+  }
+  
+  .button.no-surgery {
+    background-color: #dbeafe;
+    color: #1e3a8a;
+    border: 1px solid #60a5fa;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .button.no-surgery:hover {
+    background-color: #bfdbfe;
+  }
+  

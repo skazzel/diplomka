@@ -1,10 +1,12 @@
 .pain-check-container {
   font-family: 'Segoe UI', sans-serif;
   max-width: 800px;
-  margin: 40px auto;
+  height: 100vh; // full height of viewport
+  overflow-y: auto; // enables vertical scrolling
   padding: 20px;
-  text-align: center;
+  box-sizing: border-box;
 }
+
 
 h2 {
   margin: 30px 0 15px;
@@ -78,11 +80,87 @@ h2 {
 }
 
 .back-button {
-  margin-bottom: 20px;
   background: none;
   border: none;
-  color: #3b82f6;
-  font-size: 16px;
+  font-size: 18px;
+  color: #007bff;
   cursor: pointer;
-  text-align: left;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.dropdown-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 20px auto;
+  max-width: 600px;
+  justify-content: space-between;
+}
+
+.dropdown-label {
+  font-size: 18px;
+  font-weight: 500;
+  color: #333;
+  flex: 1;
+}
+
+.dropdown-select {
+  flex: 2;
+  padding: 10px;
+  font-size: 16px;
+  border: 2px solid #4f8cf5;
+  border-radius: 6px;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.dropdown-select:focus {
+  outline: none;
+  border-color: #3e73c7;
+  box-shadow: 0 0 5px rgba(79, 140, 245, 0.4);
+}
+
+.pain-scale-wrapper {
+  margin: 30px auto;
+  max-width: 600px;
+  text-align: center;
+}
+
+.pain-emojis {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.pain-emoji {
+  width: 40px;
+  height: 40px;
+}
+
+.pain-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.pain-button {
+  flex: 1;
+  padding: 8px;
+  font-size: 16px;
+  background-color: #e9ecef;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.pain-button:hover {
+  background-color: #d0d8e0;
+}
+
+.pain-button.selected {
+  background-color: #4f8cf5;
+  color: white;
+  font-weight: bold;
 }

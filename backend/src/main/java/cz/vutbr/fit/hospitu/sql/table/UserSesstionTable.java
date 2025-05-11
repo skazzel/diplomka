@@ -22,7 +22,7 @@ public class UserSesstionTable extends AbstractTable
                 expiration_date     DATE,
                 
                 CONSTRAINT f_patient_id
-                     FOREIGN KEY (patient_id) REFERENCES patient (patient_id)
+                     FOREIGN KEY (patient_id) REFERENCES patients (patient_id)
                          ON DELETE CASCADE
             );
             """;

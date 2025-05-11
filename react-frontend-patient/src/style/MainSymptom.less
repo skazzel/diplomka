@@ -59,28 +59,54 @@ h2 {
     gap: 10px;
 }
 
-/* Symptom Option */
 .symptom-option {
     display: flex;
     align-items: center;
+    justify-content: center;
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     border: 2px solid #3366ff;
     border-radius: 10px;
     cursor: pointer;
-    transition: 0.2s;
+    transition: all 0.2s ease;
+    background-color: white;
+    position: relative;
+    font-size: 16px;
+    font-weight: normal;
+    text-align: center;
 }
 
+/* Skryj input */
 .symptom-option input {
     display: none;
 }
 
-.symptom-option input:checked + .symptom-label {
-    background-color: #f0f4ff;
-    border-radius: 8px;
-    padding: 10px;
+/* Roztažení labelu */
+.symptom-label {
     width: 100%;
+    text-align: center;
+    z-index: 1;
 }
+
+/* ZVÝRAZNĚNÍ CELÉHO SYMPTOM-OPTION PŘI VÝBĚRU */
+.symptom-option input:checked ~ .symptom-label {
+    color: #003366;
+    font-weight: bold;
+}
+
+/* Svícení celého bloku pomocí pseudo-elementu */
+.symptom-option input:checked ~ .symptom-label::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: #e0ecff;
+    border-radius: 10px;
+    box-shadow: 0 0 12px rgba(51, 102, 255, 0.6);
+    z-index: -1;
+    transition: all 0.2s ease;
+}
+
+
 
 .symptom-label {
     font-size: 16px;

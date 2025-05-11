@@ -16,3 +16,7 @@ Builds the app for production to the `dist` folder.
 ## Learn More
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+npm start

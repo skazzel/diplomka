@@ -48,7 +48,7 @@ public class DoctorController
                 LEFT JOIN patientcheckups AS pc ON pc.ptch_dr_id = d.dr_us_id
                 JOIN users AS u ON u.us_id = d.dr_us_id
                 LEFT JOIN usercontactinfo AS uc ON uc.uci_us_id = u.us_id
-                LEFTJOIN departments AS de ON de.dp_id = d.dr_dp_id
+                LEFT JOIN departments AS de ON de.dp_id = d.dr_dp_id
             """;
 
             try (var statement = connection.prepareStatement(sql))

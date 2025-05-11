@@ -160,6 +160,8 @@ export class LoginScreen extends HFormComponent<{
                         this.props.dispatch(new LoginAction(responseData));
                         loggedIn = true;
 
+                        console.log("AHOJ " + responseData.token);
+
                         break;
                     }
 

@@ -59,20 +59,6 @@ export function internalAppStateFromRole(role: EnumRole): IInternalApplicationSt
                 currentView: HAdminSection.defaultView
             };
 
-        case EnumRole.DOCTOR:
-            return {
-                internalState: EnumInternalState.DOCTOR_PANEL,
-                internalSection: HDoctorSection,
-                currentView: HDoctorSection.defaultView
-            };
-
-        case EnumRole.INSURANCE_WORKER:
-            return {
-                internalState: EnumInternalState.INSURANCE_WORKER_PANEL,
-                internalSection: HInsuranceSection,
-                currentView: HInsuranceSection.defaultView
-            };
-
         case EnumRole.PATIENT:
             return {
                 internalState: EnumInternalState.PATIENT_PANEL,
@@ -99,7 +85,7 @@ export class InternalScreenSectionState implements IApplicationSection {
 }
 
 const mockLoginData: ILoginData = {
-    token: "demo-token",            // nebo prázdný string
+    token: "demo-token",
     role: EnumRole.PATIENT,
     id: "@self"
 };

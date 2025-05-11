@@ -4,12 +4,14 @@ import cz.vutbr.fit.hospitu.access.APIAccessManager;
 import cz.vutbr.fit.hospitu.access.EnumAPIRole;
 import cz.vutbr.fit.hospitu.controller.*;
 import cz.vutbr.fit.hospitu.controller.AnswersController.AnswersController;
+import cz.vutbr.fit.hospitu.controller.OperationController.OperationsController;
 import cz.vutbr.fit.hospitu.controller.SymptomController.DiseaseController;
 import cz.vutbr.fit.hospitu.controller.SymptomController.SymptomController;
 import cz.vutbr.fit.hospitu.controller.admin.*;
 import cz.vutbr.fit.hospitu.controller.doctor.DoctorController;
 import cz.vutbr.fit.hospitu.controller.doctor.FilesController;
 import cz.vutbr.fit.hospitu.controller.doctor.TicketController;
+import cz.vutbr.fit.hospitu.controller.patient.AllergySymptomController;
 import cz.vutbr.fit.hospitu.controller.patient.PatientInfoController;
 import cz.vutbr.fit.hospitu.controller.validator.ValidationException;
 import cz.vutbr.fit.hospitu.data.response.generic.Generic400ResponseData;
@@ -68,6 +70,11 @@ public class Main
             app.error(500, ctx -> ctx.json(new Generic500ResponseData()));
             app.error(400, ctx -> ctx.json(new Generic400ResponseData()));
             app.routes(() -> {
+                ApiBuilder.path("patients", () -> {
+                    ApiBuilder.path(":id", () -> {
+                        ApiBuilder.get("latest-anamnesis", PatientInfoController::getLatestAnamnesis, Set.of(EnumAPIRole.DOCTOR));
+                    });
+                });
                 ApiBuilder.path("users", () -> {
                     ApiBuilder.post("login", LoginController::postLogin, Set.of(EnumAPIRole.ANONYMOUS));
 
@@ -215,6 +222,12 @@ public class Main
                 });
                 ApiBuilder.path("answers", () -> {
                     ApiBuilder.post("info", AnswersController::saveAnswers, Set.of(EnumAPIRole.PATIENT, EnumAPIRole.DOCTOR));
+                });
+                ApiBuilder.path("operations", () -> {
+                    ApiBuilder.get("info", OperationsController::getOperation, Set.of(EnumAPIRole.PATIENT, EnumAPIRole.DOCTOR));
+                });
+                ApiBuilder.path("allergy_symptom", () -> {
+                    ApiBuilder.get("info", AllergySymptomController::getSymptom, Set.of(EnumAPIRole.PATIENT, EnumAPIRole.DOCTOR));
                 });
             });
 

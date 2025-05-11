@@ -77,7 +77,7 @@ public class UserController
         try (var connection = SQLConnection.create())
         {
             var sql = """
-            SELECT * FROM doctor WHERE doctor_id=?
+            SELECT * FROM doctors WHERE doctor_id=?
             """;
 
             try (var statement = connection.prepareStatement(sql))
@@ -275,7 +275,7 @@ public class UserController
             }
 
             var updateSql = """
-            UPDATE doctor SET name=?, surname=?
+            UPDATE doctors SET name=?, surname=?
             WHERE doctor_id=?
             """;
 

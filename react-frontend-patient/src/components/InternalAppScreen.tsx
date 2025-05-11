@@ -101,6 +101,7 @@ export class InternalAppScreen extends React.Component<{
             loginData={ this.props.sectionState.loginData }
             sectionState={ this.props.sectionState.sectionState }
             managedUser={ this.props.sectionState.managedUser }
+            searchRole={this.props.sectionState.loginData.role}
             requiresUserManagementCallback={ enabled => this.setState({
                 userManagementEnabled: enabled
             })} />;

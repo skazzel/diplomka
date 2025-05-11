@@ -26,7 +26,7 @@ public class RegisterController
 
         SQLConnection.createTransaction(context, connection -> {
             var findExistingSql = """
-            SELECT login FROM doctor WHERE login=?
+            SELECT login FROM doctors WHERE login=?
             """;
 
             try (var statement = connection.prepareStatement(findExistingSql))
@@ -46,7 +46,7 @@ public class RegisterController
             }
 
             var createSql = """
-            INSERT INTO doctor (login, doc_salt, name, surname, password, perm) 
+            INSERT INTO doctors (login, doc_salt, name, surname, password, perm) 
             VALUES (?, ?, ?, ?, SHA2(CONCAT(?, ?), 256), ?);
             """;
 

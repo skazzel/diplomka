@@ -5,6 +5,7 @@ import { HPatientSection } from "./HPatientView";
 import { SwitchViewAction } from "../../../data/AppAction";
 import { ChronicalSection } from "./ChronicalView";
 import { MainConditionSection } from "./ConditionView";
+import { PainCheckSection } from "./PainView";
 
 export abstract class MainSymptom<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
@@ -16,45 +17,60 @@ export class MainSymptomView<T extends ISectionProps> extends MainSymptom<T> {
     constructor(props: T) {
         super(props);
 
-        // Load symptoms from localStorage, filter out empty/undefined ones
-        let storedSymptoms = JSON.parse(localStorage.getItem("selectedSymptoms") || "[]");
+        const storedSymptoms = JSON.parse(localStorage.getItem("selectedSymptoms") || "[]");
+        const validSymptoms = Array.isArray(storedSymptoms) ? storedSymptoms.filter((symptom) => typeof symptom === "string" && symptom.trim() !== "") : [];
 
-        if (!Array.isArray(storedSymptoms)) {
-            storedSymptoms = [];
-        }
-
-        storedSymptoms = storedSymptoms.filter((symptom) => typeof symptom === "string" && symptom.trim() !== "");
+        const selectedSymptom = localStorage.getItem("selectedMainSymptom") || "";
 
         this.state = {
             showErrorMessage: false,
-            selectedSymptoms: storedSymptoms, 
-            selectedSymptom: "", 
+            selectedSymptoms: validSymptoms,
+            selectedSymptom: selectedSymptom,
         };
 
-        console.log("📜 Initial Symptom List:", this.state.selectedSymptoms);
+        console.log("📜 Initial Symptom List:", validSymptoms);
     }
 
     handleBackClick = (): void => {
+        const answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
 
-        this.setState((prevState) => {
-            if (prevState.selectedSymptoms.length === 0) {
-                console.log("No symptoms to remove.");
-                return prevState;
-            }
+        const hasPainAnswers = answers.some((entry: any) =>
+            entry.hasOwnProperty("painType") ||
+            entry.hasOwnProperty("painChange") ||
+            entry.hasOwnProperty("painWorse") ||
+            entry.hasOwnProperty("painRelief") ||
+            entry.hasOwnProperty("painIntensity") ||
+            entry.hasOwnProperty("painTime")
+        );
 
-            const updatedSymptoms = [...prevState.selectedSymptoms];
-            updatedSymptoms.pop(); // ✅ Remove last symptom
+        let filteredAnswers;
 
-            localStorage.setItem("selectedSymptoms", JSON.stringify(updatedSymptoms)); // ✅ Save updated list
+        if (hasPainAnswers) {
+            filteredAnswers = answers.filter((entry: any) =>
+                !(
+                    entry.hasOwnProperty("painType") ||
+                    entry.hasOwnProperty("painChange") ||
+                    entry.hasOwnProperty("painWorse") ||
+                    entry.hasOwnProperty("painRelief") ||
+                    entry.hasOwnProperty("painIntensity") ||
+                    entry.hasOwnProperty("painTime")
+                )
+            );
 
-            return { selectedSymptoms: updatedSymptoms };
-        }, () => {
-            this.props.dispatch(new SwitchViewAction(HPatientSection.defaultView)); // ✅ Navigate after update
-        });
+            console.log("🗑️ Removed pain-related entries:", filteredAnswers);
+            this.props.dispatch(new SwitchViewAction(PainCheckSection.defaultView));
+        } else {
+            console.log("↩️ Returning to HPatientView, keeping symptoms intact.");
+            filteredAnswers = answers;
+            this.props.dispatch(new SwitchViewAction(HPatientSection.defaultView));
+        }
+
+        localStorage.setItem("patientAnswers", JSON.stringify(filteredAnswers));
     };
 
     handleSymptomSelection = (symptom: string) => {
         this.setState({ selectedSymptom: symptom });
+        localStorage.setItem("selectedMainSymptom", symptom);
     };
 
     saveSymptomAndProceed = (): void => {
@@ -63,20 +79,15 @@ export class MainSymptomView<T extends ISectionProps> extends MainSymptom<T> {
             return;
         }
 
-        this.setState((prevState) => {
-            let answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
+        const answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
 
-            // ✅ Ensure no duplicate main symptoms are added
-            if (!answers.some(entry => JSON.stringify(entry) === JSON.stringify({ main_symptom: prevState.selectedSymptom }))) {
-                answers.push({ main_symptom: prevState.selectedSymptom });
-                localStorage.setItem("patientAnswers", JSON.stringify(answers)); // ✅ Store updated answers
-                console.log("📜 Updated Patient Answers:", answers);
-            }
+        if (!answers.some(entry => JSON.stringify(entry) === JSON.stringify({ main_symptom: this.state.selectedSymptom }))) {
+            answers.push({ main_symptom: this.state.selectedSymptom });
+            localStorage.setItem("patientAnswers", JSON.stringify(answers));
+            console.log("📜 Updated Patient Answers:", answers);
+        }
 
-            return { selectedSymptom: null }; // ✅ Reset selectedSymptom after saving
-        }, () => {
-            this.props.dispatch(new SwitchViewAction(MainConditionSection.defaultView)); // ✅ Navigate to the next section
-        });
+        this.props.dispatch(new SwitchViewAction(MainConditionSection.defaultView));
     };
 
     render(): ReactNode {

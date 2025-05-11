@@ -2,8 +2,9 @@ import { HView, IHSection, ISectionProps } from "../HView";
 import React, { ReactNode } from "react";
 import "../../../style/social.less";
 import { SwitchViewAction } from "../../../data/AppAction";
-import { PersonalInfoSection } from "./PersonalInfo";
 import { GynecologySection } from "./GynecologyView";
+import { AllergyMedicationSelection } from "./AllergyMedicationView";
+import { ReferredDoctorSection } from "./ReferralUploadView";
 
 export abstract class Social<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
@@ -14,17 +15,24 @@ export abstract class Social<T extends ISectionProps> extends HView<T> {
 export class SocialView<T extends ISectionProps> extends Social<T> {
     constructor(props: T) {
         super(props);
+
+        const stored = JSON.parse(localStorage.getItem("socialInfo") || "{}");
+
         this.state = {
-            employmentStatus: "",
-            livingWith: "",
-            residenceType: "",
-            apartmentFloor: "",
-            hasElevator: "",
-            isForeigner: "",
-            foreignerOrigin: "",
-            foreignerReason: "",
-            traveledOutsideEurope: ""
+            employmentStatus: stored.employmentStatus || "",
+            livingWith: stored.livingWith || "",
+            residenceType: stored.residenceType || "",
+            apartmentFloor: stored.apartmentFloor || "",
+            hasElevator: stored.hasElevator || "",
+            isForeigner: stored.isForeigner || "",
+            foreignerOrigin: stored.foreignerOrigin || "",
+            foreignerReason: stored.foreignerReason || "",
+            traveledOutsideEurope: stored.traveledOutsideEurope || ""
         };
+    }
+
+    componentDidUpdate(): void {
+        localStorage.setItem("socialInfo", JSON.stringify(this.state));
     }
 
     handleNextClick = (): void => {
@@ -56,11 +64,16 @@ export class SocialView<T extends ISectionProps> extends Social<T> {
             console.log("📦 Sociální odpovědi uloženy:", entry);
         }
 
-        this.props.dispatch(new SwitchViewAction(PersonalInfoSection.defaultView));
+        this.props.dispatch(new SwitchViewAction(ReferredDoctorSection.defaultView));
     };
 
     handleBackClick = (): void => {
-        this.props.dispatch(new SwitchViewAction(GynecologySection.defaultView));
+        let answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
+        answers = answers.filter((entry: any) => !entry.hasOwnProperty("medication_allergy"));
+        localStorage.setItem("patientAnswers", JSON.stringify(answers));
+        console.log("🗑️ Removed 'medication_allergy' from patientAnswers:", answers);
+
+        this.props.dispatch(new SwitchViewAction(AllergyMedicationSelection.defaultView));
     };
 
     render(): ReactNode {
@@ -68,93 +81,97 @@ export class SocialView<T extends ISectionProps> extends Social<T> {
             <div className="container">
                 <button className="back-button" onClick={this.handleBackClick}>← Zpět</button>
 
-                <div className="progress-container">
-                    <div className="progress-bar">
-                        <div className="progress completed"></div>
-                        <div className="progress active"></div>
-                        <div className="progress pending"></div>
+                <div className="scrollable-content">
+                    <div className="progress-container">
+                        <div className="progress-bar">
+                            <div className="progress completed"></div>
+                            <div className="progress active"></div>
+                            <div className="progress pending"></div>
+                        </div>
+                        <span className="progress-label">Sociální informace</span>
                     </div>
-                    <span className="progress-label">Sociální informace</span>
+
+                    <h2>1. Jaký je váš současný status?</h2>
+                    <select value={this.state.employmentStatus} onChange={(e) => this.setState({ employmentStatus: e.target.value })}>
+                        <option value="">-- vyberte --</option>
+                        <option value="pracuji">Pracuji</option>
+                        <option value="studuji">Studuji</option>
+                        <option value="v důchodu">Jsem v důchodu</option>
+                        <option value="nezaměstnaný">Nezaměstnaný</option>
+                    </select>
+
+                    <h2>2. Kde a s kým bydlíte?</h2>
+                    <select value={this.state.livingWith} onChange={(e) => this.setState({ livingWith: e.target.value })}>
+                        <option value="">-- vyberte --</option>
+                        <option value="sám">Sám/Sama</option>
+                        <option value="s rodinou">S rodinou</option>
+                        <option value="s partnerem a dětmi">S partnerem a dětmi</option>
+                        <option value="s přáteli">S přáteli</option>
+                    </select>
+
+                    <h2>3. Bydlíte v paneláku nebo v domě?</h2>
+                    <select value={this.state.residenceType} onChange={(e) => this.setState({ residenceType: e.target.value })}>
+                        <option value="">-- vyberte --</option>
+                        <option value="panelák">Panelák</option>
+                        <option value="dům">Dům</option>
+                    </select>
+
+                    {this.state.residenceType === "panelák" && (
+                        <>
+                            <h2>Na kterém patře bydlíte?</h2>
+                            <input
+                                type="number"
+                                min="0"
+                                max="30"
+                                placeholder="např. 3"
+                                value={this.state.apartmentFloor}
+                                onChange={(e) => this.setState({ apartmentFloor: e.target.value })}
+                            />
+
+                            <h2>Máte ve vchodě výtah?</h2>
+                            <select value={this.state.hasElevator} onChange={(e) => this.setState({ hasElevator: e.target.value })}>
+                                <option value="">-- vyberte --</option>
+                                <option value="ano">Ano</option>
+                                <option value="ne">Ne</option>
+                            </select>
+                        </>
+                    )}
+
+                    <h2>4. Jste cizinec?</h2>
+                    <select value={this.state.isForeigner} onChange={(e) => this.setState({ isForeigner: e.target.value })}>
+                        <option value="">-- vyberte --</option>
+                        <option value="ano">Ano</option>
+                        <option value="ne">Ne</option>
+                    </select>
+
+                    {this.state.isForeigner === "ano" && (
+                        <>
+                            <h2>Odkud pocházíte?</h2>
+                            <input
+                                type="text"
+                                placeholder="Země původu"
+                                value={this.state.foreignerOrigin}
+                                onChange={(e) => this.setState({ foreignerOrigin: e.target.value })}
+                            />
+
+                            <h2>Co děláte v ČR?</h2>
+                            <select value={this.state.foreignerReason} onChange={(e) => this.setState({ foreignerReason: e.target.value })}>
+                                <option value="">-- vyberte --</option>
+                                <option value="studium">Studium</option>
+                                <option value="práce">Práce</option>
+                                <option value="turismus">Turismus</option>
+                                <option value="jiné">Jiné</option>
+                            </select>
+                        </>
+                    )}
+
+                    <h2>5. Vycestoval(a) jste mimo Evropu během posledních 6 měsíců?</h2>
+                    <select value={this.state.traveledOutsideEurope} onChange={(e) => this.setState({ traveledOutsideEurope: e.target.value })}>
+                        <option value="">-- vyberte --</option>
+                        <option value="ano">Ano</option>
+                        <option value="ne">Ne</option>
+                    </select>
                 </div>
-
-                <h2>1. Jaký je váš současný status?</h2>
-                <select onChange={(e) => this.setState({ employmentStatus: e.target.value })}>
-                    <option value="">-- vyberte --</option>
-                    <option value="pracuji">Pracuji</option>
-                    <option value="studuji">Studuji</option>
-                    <option value="v důchodu">Jsem v důchodu</option>
-                    <option value="nezaměstnaný">Nezaměstnaný</option>
-                </select>
-
-                <h2>2. Kde a s kým bydlíte?</h2>
-                <select onChange={(e) => this.setState({ livingWith: e.target.value })}>
-                    <option value="">-- vyberte --</option>
-                    <option value="sám">Sám/Sama</option>
-                    <option value="s rodinou">S rodinou</option>
-                    <option value="s partnerem a dětmi">S partnerem a dětmi</option>
-                    <option value="s přáteli">S přáteli</option>
-                </select>
-
-                <h2>3. Bydlíte v paneláku nebo v domě?</h2>
-                <select onChange={(e) => this.setState({ residenceType: e.target.value })}>
-                    <option value="">-- vyberte --</option>
-                    <option value="panelák">Panelák</option>
-                    <option value="dům">Dům</option>
-                </select>
-
-                {this.state.residenceType === "panelák" && (
-                    <>
-                        <h2>Na kterém patře bydlíte?</h2>
-                        <input
-                            type="number"
-                            min="0"
-                            max="30"
-                            placeholder="např. 3"
-                            onChange={(e) => this.setState({ apartmentFloor: e.target.value })}
-                        />
-
-                        <h2>Máte ve vchodě výtah?</h2>
-                        <select onChange={(e) => this.setState({ hasElevator: e.target.value })}>
-                            <option value="">-- vyberte --</option>
-                            <option value="ano">Ano</option>
-                            <option value="ne">Ne</option>
-                        </select>
-                    </>
-                )}
-
-                <h2>4. Jste cizinec?</h2>
-                <select onChange={(e) => this.setState({ isForeigner: e.target.value })}>
-                    <option value="">-- vyberte --</option>
-                    <option value="ano">Ano</option>
-                    <option value="ne">Ne</option>
-                </select>
-
-                {this.state.isForeigner === "ano" && (
-                    <>
-                        <h2>Odkud pocházíte?</h2>
-                        <input
-                            type="text"
-                            placeholder="Země původu"
-                            onChange={(e) => this.setState({ foreignerOrigin: e.target.value })}
-                        />
-
-                        <h2>Co děláte v ČR?</h2>
-                        <select onChange={(e) => this.setState({ foreignerReason: e.target.value })}>
-                            <option value="">-- vyberte --</option>
-                            <option value="studium">Studium</option>
-                            <option value="práce">Práce</option>
-                            <option value="turismus">Turismus</option>
-                            <option value="jiné">Jiné</option>
-                        </select>
-                    </>
-                )}
-
-                <h2>5. Vycestoval(a) jste mimo Evropu během posledních 6 měsíců?</h2>
-                <select onChange={(e) => this.setState({ traveledOutsideEurope: e.target.value })}>
-                    <option value="">-- vyberte --</option>
-                    <option value="ano">Ano</option>
-                    <option value="ne">Ne</option>
-                </select>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '30px' }}>
                     <button className="button" onClick={this.handleNextClick}>Pokračovat</button>
