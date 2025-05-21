@@ -101,9 +101,7 @@ export class HDoctorWelcomeView<T extends ISectionProps> extends HDoctorView<T> 
     render(): ReactNode
     {
         return (
-            <h1>
-                Vítejte v panelu lékaře!
-            </h1>
+            <div></div>
         );
     }
 }

@@ -87,9 +87,16 @@ export class BodyImageView<T extends ISectionProps> extends HView<T & BodyImageP
     };
 
     return (
-      <div className="body-view">
-        <div className="container-body" id="symptom-input">
-          <button className="back-button" onClick={this.handleBackClick}>← Back</button>
+      <div className="patient-view">
+        <div className="container" id="symptom-input">
+        <button className="back-button" onClick={this.handleBackClick}>← Back</button>
+          <div className="progress-container">
+              <div className="progress-bar">
+                  <div className="progress completed"></div>
+                  <div className="progress active"></div>
+                  <div className="progress pending"></div>
+              </div>
+          </div>
           <h2 className="body-title">Vyberte, kde pociťujete bolest</h2>
           <div className="body-wrapper-single">
             <img src={bodyImage} alt="Tělo" className="base-image" />
@@ -149,7 +156,7 @@ export class BodyImageView<T extends ISectionProps> extends HView<T & BodyImageP
                 {polygon("825,910 859,911 862,921 869,931 875,938 871,946 863,951 859,960 851,965 839,967 826,962 821,951 823,937 827,926", "back-right-foot", "Zadní pravé chodidlo")}
             </svg>
           </div>
-          <button className="button next-button mt-3" onClick={this.handleNextClickButton}>
+          <button className="button-next" onClick={this.handleNextClickButton}>
             next
           </button>
         </div>

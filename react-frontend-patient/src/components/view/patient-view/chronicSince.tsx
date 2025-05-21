@@ -102,9 +102,9 @@ export class ChronicalSinceView<T extends ISectionProps> extends ChronicalSince<
         const years = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => 1900 + i);
 
         return (
-            <div className="chronical-view">
+            <div className="patient-view">
+                <div className="container">
                 <button className="back-button" onClick={this.handleBackClick}>← Back</button>
-                <div className="chronical-container">
                     <h2>When did you develop each of these chronic conditions?</h2>
 
                     <ul className="selected-symptoms-list">
@@ -137,7 +137,7 @@ export class ChronicalSinceView<T extends ISectionProps> extends ChronicalSince<
                         ))}
                     </ul>
 
-                    <button className="button" onClick={this.handleNext}>Next</button>
+                    <button className="button-next" onClick={this.handleNext}>Next</button>
                 </div>
             </div>
         );

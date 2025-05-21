@@ -43,6 +43,8 @@ export class MainSymptomView<T extends ISectionProps> extends MainSymptom<T> {
             entry.hasOwnProperty("painTime")
         );
 
+        console.log("WTF " + hasPainAnswers.toString());
+
         let filteredAnswers;
 
         if (hasPainAnswers) {
@@ -93,14 +95,15 @@ export class MainSymptomView<T extends ISectionProps> extends MainSymptom<T> {
     render(): ReactNode {
         return (
             <>
+            <div className="patient-view">
                 <div className="container">
                     <button className="back-button" onClick={this.handleBackClick}>← Back</button>
-
                     <div className="progress-container">
                         <div className="progress-bar">
-                            <div className="progress-fill"></div>
+                            <div className="progress completed"></div>
+                            <div className="progress active"></div>
+                            <div className="progress pending"></div>
                         </div>
-                        <span className="progress-text">Symptoms of concern</span>
                     </div>
 
                     <h2>What symptom are you particularly concerned about at this time? Please select just one.</h2>
@@ -120,7 +123,8 @@ export class MainSymptomView<T extends ISectionProps> extends MainSymptom<T> {
                         ))}
                     </div>
 
-                    <button className="next-button" onClick={this.saveSymptomAndProceed}>To the Next</button>
+                    <button className="button-next" onClick={this.saveSymptomAndProceed}>To the Next</button>
+                </div>
                 </div>
             </>
         );

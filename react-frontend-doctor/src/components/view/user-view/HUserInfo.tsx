@@ -1,249 +1,130 @@
 import { HView, ISectionProps } from "../HView";
 import React, { ReactNode } from "react";
-import { HForm, HFormComponent } from "../../HForm";
-import {
-    IAPIReadableResponse,
-    IAPIResponse,
-    IExtendedUserData,
-    ILoginData,
-    IUserData,
-    RoleToNameMap
-} from "../../../data/UserData";
-import { HFlow } from "../../HInput";
-import { HCard, HHeader, VBox } from "../../HCard";
-import { HButton, HButtonStyle } from "../../HButton";
-import { Dispatch } from "redux";
+import { HCard, HHeader, VBox, HBox } from "../../HCard";
+import { HFormComponent } from "../../HForm";
+import { ILoginData } from "../../../data/UserData";
 import Axios from "axios";
-import { EnumInternalState } from "../../../data/AppState";
-import { UpdateManagedUserAction, UpdateSelfUserAction } from "../../../data/AppAction";
+import "../../../style/anamnesis_container.less";
 
-const HAnamnesisPanel = ({ text }: { text: string }) => (
-    <div style={{
-        backgroundColor: "#f9f9f9",
-        padding: "20px",
-        borderRadius: "8px",
-        border: "1px solid #ddd",
-        width: "100%",
-        whiteSpace: "pre-wrap",
-        fontSize: "15px",
-        fontFamily: "monospace",
-        lineHeight: "1.6"
-    }}>
-        {text}
-    </div>
-);
-
-interface HUserProfileProps {
-    user?: IUserData;
-    userData?: IExtendedUserData;
-    editor: ILoginData;
-    editAllowed?: boolean;
-    dispatch: Dispatch;
+interface AnamnesisRecord {
+    patient_id: number;
+    content: string;
+    created: string;
 }
 
-class HUserProfile extends HFormComponent<HUserProfileProps, {
-    yourProfile: boolean,
-    loaded: number,
-    editMode: boolean,
-    anamnesis?: string,
-    fields: {
-        id: string,
-        login: string,
-        name: string,
-        surname: string,
-        role: string,
-        birthDate: string,
-        birthID: string,
-        email: string,
-        phone: string
-    },
-    errorText?: string
-}> {
-    constructor(props: HUserProfileProps) {
+interface HUserInfoProps extends ISectionProps {
+    loginData: ILoginData;
+}
+
+interface HUserInfoState {
+    anamneses: AnamnesisRecord[];
+    errorText?: string;
+    birthNumber: string;
+    selectedContent: string;
+}
+
+export class HUserInfo extends HFormComponent<HUserInfoProps, HUserInfoState> {
+    constructor(props: HUserInfoProps) {
         super(props);
 
-        if (this.props.userData) {
-            this.state = {
-                yourProfile: this.props.userData.id === this.props.editor.id,
-                loaded: 0,
-                editMode: false,
-                anamnesis: undefined,
-                fields: {
-                    ...this.props.userData,
-                    role: RoleToNameMap[this.props.userData.role],
-                    id: this.props.userData.id.toString()
-                }
-            };
-        } else {
-            this.state = {
-                yourProfile: this.props.user ? (this.props.user.id === this.props.editor.id) : true,
-                loaded: 0,
-                editMode: false,
-                anamnesis: undefined,
-                fields: {
-                    id: "",
-                    login: "",
-                    name: "",
-                    surname: "",
-                    role: "",
-                    birthDate: "",
-                    birthID: "",
-                    email: "",
-                    phone: ""
-                }
-            };
-        }
+        const birthNumber = localStorage.getItem("hospitu_birthNumber") || "";
+        console.log("🔍 birthNumber loaded from localStorage:", birthNumber);
+
+        this.state = {
+            birthNumber,
+            anamneses: [],
+            errorText: undefined,
+            selectedContent: ""
+        };
     }
 
-    componentDidMount() {
-        const patientId = parseInt(this.state.fields.id);
-        if (!isNaN(patientId)) {
-            this.loadLatestAnamnesis(patientId);
+    componentDidMount(): void {
+        if (!this.state.birthNumber) {
+            this.setState({ errorText: "Rodné číslo nebylo zadáno." });
+            return;
         }
-    }
 
-    loadLatestAnamnesis = (patientId: number): void => {
-        Axios.get(`/patients/${patientId}/latest-anamnesis`, {
+        const encoded = encodeURIComponent(this.state.birthNumber.trim());
+        Axios.get(`/patients/by-birth-number/${encoded}/anamneses`, {
             headers: {
-                Authorization: "Bearer " + this.props.editor.token
+                Authorization: "Bearer " + this.props.loginData.token
             }
         })
-        .then((response) => {
-            if (response.data && response.data.anamnesis) {
-                this.setState({ anamnesis: response.data.anamnesis });
-            } else {
-                this.setState({ anamnesis: "Žádná anamnéza zatím nebyla vygenerována." });
-            }
-        })
-        .catch(() => {
-            this.setState({ anamnesis: "Nepodařilo se načíst anamnézu." });
-        });
-    }
-
-    retrieveData = (user: IUserData): void => {
-        this.setState({ errorText: "" });
-
-        const uid = user.id === this.props.editor.id ? "@self" : user.id;
-
-        Axios.get(`/users/${uid}/profile-detail`, {
-            headers: {
-                "Content-Type": "application/json; charset=UTF-8",
-                "Authorization": "Bearer " + this.props.editor.token
-            }
-        }).then((response) => {
-            const apiResponse = response.data as IAPIResponse;
-
-            switch (apiResponse.code) {
-                case 200: {
-                    const results = apiResponse as IExtendedUserData;
-                    this.setState(state => ({
-                        loaded: state.loaded + 1,
-                        fields: {
-                            ...results,
-                            role: RoleToNameMap[results.role],
-                            id: results.id.toString()
-                        }
-                    }));
-                    break;
+            .then((response) => {
+                if (Array.isArray(response.data)) {
+                    this.setState({ anamneses: response.data, errorText: undefined });
+                } else {
+                    this.setState({ anamneses: [], errorText: "Žádné výsledky." });
                 }
-                default:
-                    if ((apiResponse as IAPIReadableResponse).humanReadableMessage)
-                        this.setState({ errorText: `Chyba při vyhledávání: ${(apiResponse as IAPIReadableResponse).humanReadableMessage}` });
-                    else
-                        this.setState({ errorText: "Došlo k chybě při vyhledávání, prosím zkuste to znovu později." });
-            }
-        }).catch(() => {
-            this.setState({ errorText: "Došlo k chybě při vyhledávání, prosím zkuste to znovu později." });
-        });
+            })
+            .catch(() => {
+                this.setState({ anamneses: [], errorText: "Chyba při načítání anamnéz." });
+            });
     }
 
-    toggleProfileEdit = (): void => {
-        this.setState(state => ({ editMode: !state.editMode }));
-    }
-
-    updateProfile = (): void => {
-        this.setState({ errorText: "" });
-
-        const inputID = parseInt(this.state.fields.id);
-        const uid = inputID === this.props.editor.id ? "@self" : inputID;
-
-        Axios({
-            url: `/users/${uid}/profile-update`,
-            method: "PATCH",
-            data: {
-                "name": this.state.fields.name,
-                "surname": this.state.fields.surname,
-                "birthDate": this.state.fields.birthDate,
-                "birthID": this.state.fields.birthID,
-                "email": this.state.fields.email,
-                "phone": this.state.fields.phone
-            },
-            headers: {
-                "Content-Type": "application/json; charset=UTF-8",
-                "Authorization": "Bearer " + this.props.editor.token
-            }
-        }).then((response) => {
-            const apiResponse = response.data as IAPIResponse;
-            switch (apiResponse.code) {
-                case 200:
-                    this.setState({ editMode: false });
-                    if (this.state.yourProfile) {
-                        this.props.dispatch(new UpdateSelfUserAction({ ...this.state.fields, id: this.props.editor.id, role: this.props.editor.role }));
-                    } else {
-                        const userData = this.props.userData ?? (this.props.user as IUserData);
-                        this.props.dispatch(new UpdateManagedUserAction({ ...this.state.fields, id: userData.id, role: userData.role }));
-                    }
-                    break;
-                default:
-                    if ((apiResponse as IAPIReadableResponse).humanReadableMessage)
-                        this.setState({ errorText: `Chyba při vyhledávání: ${(apiResponse as IAPIReadableResponse).humanReadableMessage}` });
-                    else
-                        this.setState({ errorText: "Došlo k chybě při ukládání profilu, prosím zkuste to znovu později." });
-            }
-        }).catch(() => {
-            this.setState({ errorText: "Došlo k chybě při ukládání profilu, prosím zkuste to znovu později." });
-        });
-    }
-
-    render() {
+    render(): ReactNode {
         return (
-            <HCard>
-                <HForm key={this.state.loaded + (this.state.editMode ? 1 : 0)} onSubmit={this.updateProfile}>
-                    <VBox>
-                        <VBox>
-                            <HHeader>
-                                <HFlow>
-                                    {this.state.yourProfile ? "Váš profil" : `Profil uživatele ${this.state.fields.name} ${this.state.fields.surname}`}
-                                </HFlow>
-                            </HHeader>
-                            <HFlow>
-                                <HAnamnesisPanel text={this.state.anamnesis ?? "Načítání..."} />
-                            </HFlow>
-                            <HFlow>
-                                <span style={{ color: "red" }}>
-                                    {this.state.errorText}
-                                </span>
-                            </HFlow>
-                        </VBox>
-                        {this.props.editAllowed ? (
-                            <HFlow right={true}>
-                                <span style={{ visibility: (this.state.editMode ? "visible" : "hidden") }}>
-                                    <HButton buttonStyle={HButtonStyle.TEXT} action={"reset"} action2={this.toggleProfileEdit}>
-                                        Zrušit změny
-                                    </HButton>
-                                </span>
-                                <HButton buttonStyle={HButtonStyle.TEXT_INVERTED} action={this.state.editMode ? "submit" : this.toggleProfileEdit}>
-                                    {this.state.editMode ? "Uložit změny" : "Upravit profil"}
-                                </HButton>
-                            </HFlow>
-                        ) : null}
-                    </VBox>
-                </HForm>
-            </HCard>
+            <div id="hs-anamnesis-container">
+                {/* Levý sloupec – seznam anamnéz */}
+                <div className="hs-anamnesis-card">
+                    <HHeader>
+                        Seznam anamnéz pro rodné číslo: {this.state.birthNumber}
+                    </HHeader>
+                    {this.state.errorText && (
+                        <span style={{ color: "red", marginTop: "10px" }}>
+                            {this.state.errorText}
+                        </span>
+                    )}
+                    <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "20px" }}>
+                        <thead>
+                            <tr>
+                                <th style={{ textAlign: "left", borderBottom: "1px solid #ccc", padding: "8px" }}>Datum</th>
+                                <th style={{ textAlign: "left", borderBottom: "1px solid #ccc", padding: "8px" }}>Akce</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {this.state.anamneses.map((record, index) => (
+                                <tr key={index}>
+                                    <td style={{ padding: "8px" }}>{new Date(record.created).toLocaleString()}</td>
+                                    <td style={{ padding: "8px" }}>
+                                        <a href="#" onClick={() => this.setState({ selectedContent: record.content })}>
+                                            Zobrazit
+                                        </a>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+    
+                {/* Pravý sloupec – detailní výpis vybrané anamnézy */}
+                <div className="hs-anamnesis-card">
+                    <HHeader>Obsah vybrané anamnézy</HHeader>
+                    <textarea
+                        value={this.state.selectedContent}
+                        readOnly
+                        style={{
+                            width: "100%",
+                            height: "500px",
+                            padding: "16px",
+                            fontSize: "16px",
+                            borderRadius: "6px",
+                            border: "1px solid #ccc",
+                            resize: "none",
+                            whiteSpace: "pre-wrap",
+                            overflowY: "auto",
+                            boxSizing: "border-box",
+                            flexGrow: 1
+                        }}
+                    />
+                </div>
+            </div>
         );
     }
+    
 }
 
+// Kompatibilita
 export class HSelfProfileView<T extends ISectionProps> extends HView<T> {
     constructor(props: T) {
         super(props);
@@ -251,7 +132,7 @@ export class HSelfProfileView<T extends ISectionProps> extends HView<T> {
 
     render(): ReactNode {
         return (
-            <HUserProfile user={this.props.loginData} dispatch={this.props.dispatch} editor={this.props.loginData} editAllowed={true} />
+            <HUserInfo loginData={this.props.loginData} sectionState={this.props.sectionState} />
         );
     }
 }
@@ -264,17 +145,8 @@ export class HOtherProfileView<T extends ISectionProps> extends HView<T> {
     requiresUserManagement = (): boolean => true;
 
     render(): ReactNode {
-        if (this.props.managedUser) {
-            const allowEdits = (this.props.sectionState.internalState === EnumInternalState.ADMIN_PANEL) || (this.props.loginData.id === this.props.managedUser?.id);
-            return (
-                <HUserProfile userData={this.props.managedUser} dispatch={this.props.dispatch} editor={this.props.loginData} editAllowed={allowEdits} />
-            );
-        } else {
-            return (
-                <HHeader>
-                    Pro zobrazení informací prosím nejdříve vyberte uživatele.
-                </HHeader>
-            );
-        }
+        return (
+            <HUserInfo loginData={this.props.loginData} sectionState={this.props.sectionState} />
+        );
     }
 }

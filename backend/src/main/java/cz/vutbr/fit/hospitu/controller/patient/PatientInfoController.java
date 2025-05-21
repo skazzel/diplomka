@@ -3,9 +3,7 @@ import io.javalin.http.Context;
 import cz.vutbr.fit.hospitu.sql.SQLConnection;
 import io.javalin.http.Context;
 import java.sql.*;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class PatientInfoController {
 
@@ -128,4 +126,37 @@ public class PatientInfoController {
         }
     }
 
+    public static void getAnamnesesByBirthNumber(Context context) {
+        String birthNumber = context.pathParam("birthNumber");
+
+        if (birthNumber == null || birthNumber.isEmpty()) {
+            context.status(400).json(Collections.singletonMap("error", "Missing birth number"));
+            return;
+        }
+
+        try (Connection conn = SQLConnection.create()) {
+            String sql = "SELECT patient_id, content, created FROM anamneses WHERE birth_number = ? ORDER BY created DESC";
+
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, birthNumber);
+
+                try (ResultSet rs = stmt.executeQuery()) {
+                    List<Map<String, Object>> results = new ArrayList<>();
+
+                    while (rs.next()) {
+                        Map<String, Object> row = new HashMap<>();
+                        row.put("patient_id", rs.getInt("patient_id"));
+                        row.put("content", rs.getString("content"));
+                        row.put("created", rs.getTimestamp("created"));
+                        results.add(row);
+                    }
+
+                    context.status(200).json(results);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            context.status(500).json(Collections.singletonMap("error", "Internal server error"));
+        }
+    }
 }

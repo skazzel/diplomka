@@ -1,6 +1,5 @@
 import { HView, IHSection, ISectionProps } from "../HView";
 import React, { ReactNode } from "react";
-import "../../../style/MedicationAllergy.less";
 import { SwitchViewAction } from "../../../data/AppAction";
 import { HButton, HButtonStyle } from "../../HButton";
 import { AllergyFoodSelection } from "./AllergyFoodView";
@@ -164,14 +163,16 @@ export class AllergyMedicationView<T extends ISectionProps> extends AllergyMedic
 
     render(): ReactNode {
         return (
-            <div className="pharma-view">
+            <div className="patient-view">
+                <div className="container" id="symptom-input">
                 <button className="back-button" onClick={this.handleBackClick}>← Back</button>
-                <div className="pharma-container" id="symptom-input">
+                <div className="progress-container">
                     <div className="progress-bar">
-                        <div className="completed"></div>
-                        <div className="in-progress"></div>
-                        <div className="pending"></div>
+                        <div className="progress completed"></div>
+                        <div className="progress active"></div>
+                        <div className="progress pending"></div>
                     </div>
+                </div>
 
                     <h2>What medication are you allergic to?</h2>
                     <VBox className="scrollable-search-container">
@@ -233,9 +234,9 @@ export class AllergyMedicationView<T extends ISectionProps> extends AllergyMedic
                         </div>
                     </div>
 
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
-                        <button className="button" onClick={this.saveSymptomAndProceed}>Next</button>
-                        <button className="button" onClick={this.saveNoneAndProceed}>None</button>
+                    <div className="buttons-row">
+                        <button className="button-next" onClick={this.saveSymptomAndProceed}>Next</button>
+                        <button className="button-skip" onClick={this.saveNoneAndProceed}>None</button>
                     </div>
                 </div>
             </div>

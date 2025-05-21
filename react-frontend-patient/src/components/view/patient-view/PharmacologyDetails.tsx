@@ -1,6 +1,6 @@
 import { HView, IHSection, ISectionProps } from "../HView";
 import React, { ReactNode } from "react";
-import "../../../style/medication-details.less";
+//import "../../../style/medication-details.less";
 import { SwitchViewAction } from "../../../data/AppAction";
 import { MainSymptomSection } from "./MainSymptom";
 import { AllergyFoodSelection } from "./AllergyFoodView";

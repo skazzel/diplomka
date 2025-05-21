@@ -23,11 +23,15 @@ export class HPatientWelcomeView<T extends ISectionProps> extends HPatientView<T
         const stored = JSON.parse(localStorage.getItem("selectedSymptoms") || "[]");
         const validSymptoms = Array.isArray(stored) ? stored.filter(s => typeof s === "string" && s.trim() !== "") : [];
         const similarAround = localStorage.getItem("symptomNearbyOption") || "";
+        const storedTypes = JSON.parse(localStorage.getItem("symptomTypes") || "{}");
+
+        const types: Record<string, string> = { ...storedTypes };
+        let hasPain = validSymptoms.some(sym => types[sym] === "bolest");
 
         this.state = {
             selectedSymptoms: validSymptoms,
-            symptomTypes: {},
-            hasPainSymptom: false,
+            symptomTypes: types,
+            hasPainSymptom: hasPain,
             searchString: "",
             userSearch: [],
             errorText: "",
@@ -46,17 +50,52 @@ export class HPatientWelcomeView<T extends ISectionProps> extends HPatientView<T
     };
 
     removeSymptom = (symptomToRemove: string): void => {
-        this.setState(prevState => ({
-            selectedSymptoms: prevState.selectedSymptoms.filter(symptom => symptom !== symptomToRemove)
-        }), () => {
-            localStorage.setItem("selectedSymptoms", JSON.stringify(this.state.selectedSymptoms));
+        this.setState(prevState => {
+            const updatedSymptoms = prevState.selectedSymptoms.filter(symptom => symptom !== symptomToRemove);
+
+            localStorage.setItem("selectedSymptoms", JSON.stringify(updatedSymptoms));
+    
+            console.log(`🗑️ Odstraněn symptom: ${symptomToRemove}`);
+            console.log("🧨 Vymazání všech relevantních dat z localStorage...");
+    
+            const keysToRemove = [
+                "patientAnswers",
+                "selectedDiseases",
+                "selectedMainSymptom",
+                "selectedSurgeries",
+                "badHabits",
+                "drugsData",
+                "allergyFood",
+                "selectedMedicationAllergies",
+                "socialInfo",
+                "referredDoctor",
+                "chronicalSince",
+                "selectedCondition",
+                "previousTrouble",
+                "medicationDetails",
+                "selectedMedications",
+                "durationNumber",
+                "durationUnit",
+                "painChoice",
+                "symptomTypes",
+                "painData"
+            ];
+    
+            keysToRemove.forEach(key => localStorage.removeItem(key));
+    
+            console.log("🧹 Všechna data byla vymazána.");
+    
+            return {
+                selectedSymptoms: updatedSymptoms,
+                symptomTypes: {},
+                hasPainSymptom: false
+            };
         });
-    };
+    };          
 
     handleSelectSymptom = (symptom: string) => {
         const selected = this.state.userSearch.find((s: any) => s.symptom === symptom);
         const symptomType = selected?.type || "";
-        const isPain = symptomType === "bolest";
 
         this.setState((prevState) => {
             const updatedSymptoms = prevState.selectedSymptoms.includes(symptom)
@@ -68,10 +107,14 @@ export class HPatientWelcomeView<T extends ISectionProps> extends HPatientView<T
                 [symptom]: symptomType,
             };
 
+            const stillHasPain = updatedSymptoms.some(s => updatedTypes[s] === "bolest");
+
+            localStorage.setItem("symptomTypes", JSON.stringify(updatedTypes));
+
             return {
                 selectedSymptoms: updatedSymptoms,
                 symptomTypes: updatedTypes,
-                hasPainSymptom: prevState.hasPainSymptom || isPain,
+                hasPainSymptom: stillHasPain,
             };
         }, () => {
             localStorage.setItem("selectedSymptoms", JSON.stringify(this.state.selectedSymptoms));
@@ -101,7 +144,10 @@ export class HPatientWelcomeView<T extends ISectionProps> extends HPatientView<T
         localStorage.setItem("patientAnswers", JSON.stringify(answers));
         console.log("📦 Updated patientAnswers:", answers);
 
-        const nextSection = this.state.hasPainSymptom
+        const currentTypes = this.state.symptomTypes;
+        const stillHasPain = this.state.selectedSymptoms.some(sym => currentTypes[sym] === "bolest");
+
+        const nextSection = stillHasPain
             ? PainCheckSection.defaultView
             : MainSymptomSection.defaultView;
 
@@ -162,12 +208,14 @@ export class HPatientWelcomeView<T extends ISectionProps> extends HPatientView<T
     render(): ReactNode {
         return (
             <div className="patient-view">
+                <div className="container" id="symptom-input">
                 <button className="back-button" onClick={this.handleBackClick}>← Back</button>
-                <div className="patient-container" id="symptom-input">
-                    <div className="progress-bar">
-                        <div className="completed"></div>
-                        <div className="in-progress"></div>
-                        <div className="pending"></div>
+                    <div className="progress-container">
+                        <div className="progress-bar">
+                            <div className="progress completed"></div>
+                            <div className="progress active"></div>
+                            <div className="progress pending"></div>
+                        </div>
                     </div>
 
                     <h2>What symptom bothers you the most?</h2>
@@ -232,7 +280,7 @@ export class HPatientWelcomeView<T extends ISectionProps> extends HPatientView<T
                     </div>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
-                        <button className="button" onClick={this.saveSymptomAndProceed}>Next</button>
+                        <button className="button-next" onClick={this.saveSymptomAndProceed}>Next</button>
                     </div>
                 </div>
             </div>

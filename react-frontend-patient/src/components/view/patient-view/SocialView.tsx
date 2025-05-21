@@ -78,9 +78,9 @@ export class SocialView<T extends ISectionProps> extends Social<T> {
 
     render(): ReactNode {
         return (
+            <div className="patient-view">
             <div className="container">
-                <button className="back-button" onClick={this.handleBackClick}>← Zpět</button>
-
+                <button className="back-button" onClick={this.handleBackClick}>← Back</button>
                 <div className="scrollable-content">
                     <div className="progress-container">
                         <div className="progress-bar">
@@ -173,9 +173,10 @@ export class SocialView<T extends ISectionProps> extends Social<T> {
                     </select>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '30px' }}>
-                    <button className="button" onClick={this.handleNextClick}>Pokračovat</button>
+                <div>
+                    <button className="button-next" onClick={this.handleNextClick}>Next</button>
                 </div>
+            </div>
             </div>
         );
     }

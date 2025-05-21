@@ -1,6 +1,6 @@
 import { HView, IHSection, ISectionProps } from "../HView";
 import React, { ReactNode } from "react";
-import "../../../style/gynecology.less";
+//import "../../../style/gynecology.less";
 import { SwitchViewAction } from "../../../data/AppAction";
 import Axios from "axios";
 import { AllergyMedicationSelection } from "./AllergyMedicationView";

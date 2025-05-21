@@ -26,6 +26,14 @@ tasks.withType(JavaCompile) {
 
 mainClassName = "cz.vutbr.fit.hospitu.Main"
 
+jar {
+    manifest {
+        attributes(
+                'Main-Class': mainClassName
+        )
+    }
+}
+
 dependencies {
     implementation group: 'org.jetbrains', name: 'annotations', version: '13.0'
     implementation group: 'io.javalin', name: 'javalin', version: '3.12.0'

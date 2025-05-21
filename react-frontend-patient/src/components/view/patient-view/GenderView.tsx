@@ -7,6 +7,8 @@ import Axios from "axios";
 import { IAPIResponse, ILoginData } from "../../../data/UserData";
 import { HPatientSection } from "./HPatientView";
 import { BodyImageSection } from "./BodyImage";
+import "../../../style/generalStyle.less";
+import { ReferredDoctorSection } from "./ReferralUploadView";
 
 export abstract class GenderInfo<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
@@ -57,6 +59,7 @@ export class GenderInfoView<T extends ISectionProps> extends GenderInfo<T> {
             localStorage.removeItem("selectedMedications");
             localStorage.removeItem("durationNumber");
             localStorage.removeItem("durationUnit");
+            localStorage.removeItem("painChoice");
             alreadyCleared = true;
         }
 
@@ -146,17 +149,13 @@ export class GenderInfoView<T extends ISectionProps> extends GenderInfo<T> {
         localStorage.setItem("rcBefore", rcBefore);
         localStorage.setItem("rcAfter", rcAfter);
 
-        this.props.dispatch(new SwitchViewAction(BodyImageSection.defaultView));
+        this.props.dispatch(new SwitchViewAction(ReferredDoctorSection.defaultView));
     };
 
     render(): ReactNode {
         return (
-            <div className="genderview">
+            <div className="patient-view">
                 <div className="container">
-                    <button className="back-button" onClick={() => window.history.back()}>
-                        ← Back
-                    </button>
-
                     <div className="progress-container">
                         <div className="progress-bar">
                             <div className="progress completed"></div>
@@ -199,7 +198,7 @@ export class GenderInfoView<T extends ISectionProps> extends GenderInfo<T> {
                         />
                     </div>
 
-                    <button className="gender-button" onClick={this.handleSubmit}>Next</button>
+                    <button className="button-next" onClick={this.handleSubmit}>Next</button>
                 </div>
             </div>
         );

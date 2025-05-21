@@ -11,6 +11,7 @@ import { HButton, HButtonStyle } from "../../HButton";
 import { EnumRole } from "../../../data/UserData";
 import { MainSymptomSection } from "./MainSymptom";
 import { ChronicalSection } from "./ChronicalView";
+import { PainCheckSection } from "./PainView";
 
 export abstract class MainCondition<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
@@ -42,10 +43,53 @@ export class MainConditionView<T extends ISectionProps> extends MainCondition<T>
 
     handleBackClick = (): void => {
         const answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
-        const filteredAnswers = answers.filter((entry: any) => !entry.hasOwnProperty("main_symptom"));
+    
+        const hasPainAnswers = answers.some((entry: any) =>
+            entry.hasOwnProperty("painType") ||
+            entry.hasOwnProperty("painChange") ||
+            entry.hasOwnProperty("painWorse") ||
+            entry.hasOwnProperty("painRelief") ||
+            entry.hasOwnProperty("painIntensity") ||
+            entry.hasOwnProperty("painTime")
+        );
+    
+        const hasMultipleSymptoms = answers.some((entry: any) =>
+            Array.isArray(entry.symptoms) && entry.symptoms.length > 1
+        );
+    
+        console.log("📊 Pain-related entries exist:", hasPainAnswers);
+        console.log("📊 Multiple symptoms selected:", hasMultipleSymptoms);
+    
+        let filteredAnswers;
+    
+        if (hasMultipleSymptoms) {
+            console.log("↩️ Více symptomů – vracím se do výběru symptomů.");
+            this.props.dispatch(new SwitchViewAction(MainSymptomSection.defaultView));
+            return;
+        }
+    
+        if (hasPainAnswers) {
+            filteredAnswers = answers.filter((entry: any) =>
+                !(
+                    entry.hasOwnProperty("painType") ||
+                    entry.hasOwnProperty("painChange") ||
+                    entry.hasOwnProperty("painWorse") ||
+                    entry.hasOwnProperty("painRelief") ||
+                    entry.hasOwnProperty("painIntensity") ||
+                    entry.hasOwnProperty("painTime")
+                )
+            );
+    
+            console.log("🗑️ Removed pain-related entries:", filteredAnswers);
+            this.props.dispatch(new SwitchViewAction(PainCheckSection.defaultView));
+        } else {
+            filteredAnswers = answers.filter((entry: any) => !entry.hasOwnProperty("main_symptom"));
+            console.log("↩️ Returning to HPatientView, keeping symptoms intact.");
+            this.props.dispatch(new SwitchViewAction(MainSymptomSection.defaultView));
+        }
+    
         localStorage.setItem("patientAnswers", JSON.stringify(filteredAnswers));
-        this.props.dispatch(new SwitchViewAction(MainSymptomSection.defaultView));
-    };
+    };    
 
     handleSelect = (field: string, value: string) => {
         this.setState({ [field]: value });
@@ -163,12 +207,14 @@ export class MainConditionView<T extends ISectionProps> extends MainCondition<T>
     render(): ReactNode {
         return (
             <div className="patient-view">
+                <div className="container" id="symptom-input">
                 <button className="back-button" onClick={this.handleBackClick}>← Back</button>
-                <div className="patient-container" id="symptom-input">
-                    <div className="progress-bar">
-                        <div className="completed"></div>
-                        <div className="in-progress"></div>
-                        <div className="pending"></div>
+                <div className="progress-container">
+                        <div className="progress-bar">
+                            <div className="progress completed"></div>
+                            <div className="progress active"></div>
+                            <div className="progress pending"></div>
+                        </div>
                     </div>
 
                     <div className="symptom-row">
@@ -211,8 +257,8 @@ export class MainConditionView<T extends ISectionProps> extends MainCondition<T>
                         </select>
                     </div>
 
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
-                        <button className="button" onClick={this.saveSymptomAndProceed}>Next</button>
+                    <div>
+                        <button className="button-next" onClick={this.saveSymptomAndProceed}>Next</button>
                     </div>
                 </div>
             </div>

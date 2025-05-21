@@ -80,13 +80,15 @@ export class DrugsView<T extends ISectionProps> extends Drugs<T> {
         const unitOptions = ["days", "weeks", "months", "years"];
 
         return (
-            <div className="drugs-view">
+            <div className="patient-view">
+                <div className="container">
                 <button className="back-button" onClick={this.handleBackClick}>← Back</button>
-
-                <div className="progress-bar">
-                    <div className="completed"></div>
-                    <div className="in-progress"></div>
-                    <div className="pending"></div>
+                <div className="progress-container">
+                    <div className="progress-bar">
+                        <div className="progress completed"></div>
+                        <div className="progress active"></div>
+                        <div className="progress pending"></div>
+                    </div>
                 </div>
 
                 <h2>Have you ever used drugs?</h2>
@@ -154,8 +156,9 @@ export class DrugsView<T extends ISectionProps> extends Drugs<T> {
                 )}
 
                 <div style={{ marginTop: "20px" }}>
-                    <button className="button" onClick={this.handleNext}>Next</button>
+                    <button className="button-next" onClick={this.handleNext}>Next</button>
                 </div>
+            </div>
             </div>
         );
     }

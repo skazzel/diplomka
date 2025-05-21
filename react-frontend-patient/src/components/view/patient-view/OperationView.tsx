@@ -109,13 +109,15 @@ export class SurgeryTypeView<T extends ISectionProps> extends SurgeryType<T> {
 
     render(): ReactNode {
         return (
-            <div className="surgery-view">
+            <div className="patient-view">
+                <div className="container" id="symptom-input">
                 <button className="back-button" onClick={this.handleBackClick}>← Back</button>
-
-                <div className="progress-bar">
-                    <div className="completed"></div>
-                    <div className="in-progress"></div>
-                    <div className="pending"></div>
+                <div className="progress-container">
+                    <div className="progress-bar">
+                        <div className="progress completed"></div>
+                        <div className="progress active"></div>
+                        <div className="progress pending"></div>
+                    </div>
                 </div>
 
                 <h2>Have you ever had surgery?</h2>
@@ -160,12 +162,13 @@ export class SurgeryTypeView<T extends ISectionProps> extends SurgeryType<T> {
                     </ul>
                 </div>
 
-                <div className="surgery-buttons-row">
-                    <button className="button" onClick={this.handleNext}>Next</button>
-                    <button className="button secondary" onClick={this.handleNoSurgeries}>
+                <div className="buttons-row">
+                    <button className="button-next" onClick={this.handleNext}>Next</button>
+                    <button className="button-skip" onClick={this.handleNoSurgeries}>
                         Neměl jsem žádné operace
                     </button>
                 </div>
+            </div>
             </div>
         );
     }

@@ -98,7 +98,10 @@ export class InternalAppScreen extends React.Component<{
             login: "",
             role: 0 // Nebo EnumRole.PATIENT
         }));
-        this.props.dispatch(new SwitchViewAction(HOtherProfileView));
+        this.props.dispatch(new SwitchViewAction(HUserInfo, {
+            birthNumber: this.state.searchString
+          }));
+          
     }
     
     logout = (): void => {
@@ -113,12 +116,12 @@ export class InternalAppScreen extends React.Component<{
             key={ this.props.sectionState.managedUser?.id }
             dispatch={ this.props.dispatch }
             loginData={ this.props.sectionState.loginData }
-            sectionState={ this.props.sectionState.sectionState }
+            sectionState={ this.props.sectionState }  // ✅ CELÝ OBJEKT – obsahuje i internalStateData!
             managedUser={ this.props.sectionState.managedUser }
-            requiresUserManagementCallback={ enabled => this.setState({
-                userManagementEnabled: enabled
-            })} />;
-
+            requiresUserManagementCallback={ enabled => this.setState({ userManagementEnabled: enabled }) }
+        />;
+       
+        console.log("📦 ViewComponent will receive sectionState:", viewComponent);
         let sectionChooser: ReactNode | null = null;
 
         const role = this.props.sectionState.loginData.role;
@@ -210,7 +213,10 @@ export class InternalAppScreen extends React.Component<{
                                     chooseUserCallback={ this.chooseUser }
                                     viewUserCallback={ this.viewUser }
                                     loginData={ this.props.sectionState.loginData }
+                                    dispatch={ this.props.dispatch }
+                                    sectionState={ this.props.sectionState.sectionState }
                                 />
+
                             ) : undefined
                         }
 

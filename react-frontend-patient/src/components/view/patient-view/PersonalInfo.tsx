@@ -1,6 +1,6 @@
 import { HView, IHSection, ISectionProps } from "../HView";
 import React, { ReactNode } from "react";
-import "../../../style/personal-info.less";
+//import "../../../style/personal-info.less";
 import { HPatientSection } from "../patient-view/HPatientView";
 import { SwitchViewAction } from "../../../data/AppAction";
 import { GenderInfoSection } from "./GenderView";

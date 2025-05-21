@@ -102,10 +102,16 @@ export class BadHabbitsView<T extends ISectionProps> extends BadHabbits<T> {
 
     render(): ReactNode {
         return (
-            <div className="Habbit-view">
+            <div className="patient-view">
                 <div className="container">
                     <button className="back-button" onClick={this.handleBackClick}>← Back</button>
-                    <div className="progress-bar"><div className="progress"></div></div>
+                    <div className="progress-container">
+                        <div className="progress-bar">
+                            <div className="progress completed"></div>
+                            <div className="progress active"></div>
+                            <div className="progress pending"></div>
+                        </div>
+                    </div>
 
                     <h2>Do you drink alcohol?</h2>
                     <div className="habbits-group">
@@ -141,7 +147,7 @@ export class BadHabbitsView<T extends ISectionProps> extends BadHabbits<T> {
                         </>
                     )}
 
-                    <button className="next-button" onClick={this.saveHabitAndProceed}>Next</button>
+                    <button className="button-next" onClick={this.saveHabitAndProceed}>Next</button>
                 </div>
             </div>
         );

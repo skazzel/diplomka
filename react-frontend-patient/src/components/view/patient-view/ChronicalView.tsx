@@ -1,6 +1,5 @@
 import { HView, IHSection, ISectionProps } from "../HView";
 import React, { ReactNode } from "react";
-import "../../../style/chronical.less";
 import { SwitchViewAction } from "../../../data/AppAction";
 import { HBox, VBox } from "../../HCard";
 import { HButton, HButtonStyle } from "../../HButton";
@@ -110,44 +109,47 @@ export class ChronicalView<T extends ISectionProps> extends Chronical<T> {
 
     render(): ReactNode {
         return (
-            <div className="chronical-view">
+            <div className="patient-view">
+                <div className="container" id="symptom-input">
                 <button className="back-button" onClick={this.handleBackClick}>← Back</button>
-
-                <div className="progress-bar">
-                    <div className="completed"></div>
-                    <div className="in-progress"></div>
-                    <div className="pending"></div>
-                </div>
-
-                <h2>Do you suffer from any chronic disease?</h2>
-                <VBox className="scrollable-search-container">
-                    <HBox>
-                        <input
-                            type="text"
-                            value={this.state.searchString}
-                            onChange={this.performSearch}
-                            placeholder="Search for chronic condition..."
-                        />
-                    </HBox>
-
-                    {this.state.userSearch.length > 0 && (
-                        <div className="scrollable-results">
-                            {this.state.userSearch.map(d => (
-                                <div className="search-result-row" key={d.id}>
-                                    <div className="search-result-name">{d.disease}</div>
-                                    <div className="search-result-button">
-                                        <HButton
-                                            buttonStyle={HButtonStyle.TEXT_SYMPTOM}
-                                            action={() => this.handleSelectSymptom(d.disease)}
-                                        >
-                                            Vybrat
-                                        </HButton>
-                                    </div>
-                                </div>
-                            ))}
+                    <div className="progress-container">
+                        <div className="progress-bar">
+                            <div className="progress completed"></div>
+                            <div className="progress active"></div>
+                            <div className="progress pending"></div>
                         </div>
-                    )}
-                </VBox>
+                        <span className="progress-label">Basic Information</span>
+                    </div>
+
+                    <h2>Do you suffer from any chronic disease?</h2>
+                    <VBox className="scrollable-search-container">
+                            <HBox>
+                                <input
+                                    type="text"
+                                    value={this.state.searchString}
+                                    onChange={this.performSearch}
+                                    placeholder="Search for chronic condition..."
+                                />
+                            </HBox>
+
+                            {this.state.userSearch.length > 0 && (
+                                <div className="scrollable-results">
+                                    {this.state.userSearch.map(d => (
+                                        <div className="search-result-row" key={d.id}>
+                                            <div className="search-result-name">{d.disease}</div>
+                                            <div className="search-result-button">
+                                                <HButton
+                                                    buttonStyle={HButtonStyle.TEXT_SYMPTOM}
+                                                    action={() => this.handleSelectSymptom(d.disease)}
+                                                >
+                                                    Vybrat
+                                                </HButton>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                        )}
+                    </VBox>
 
                 <div className="selected-symptoms-container">
                     <h3>Selected conditions:</h3>
@@ -161,10 +163,11 @@ export class ChronicalView<T extends ISectionProps> extends Chronical<T> {
                     </ul>
                 </div>
 
-                <div className="surgery-buttons-row">
-                    <button className="button" onClick={this.handleNext}>Next</button>
-                    <button className="button no-surgery" onClick={this.handleNoChronic}>Nemám žádné chronické nemoci</button>
+                <div className="buttons-row">
+                    <button className="button-next" onClick={this.handleNext}>Next</button>
+                    <button className="button-skip" onClick={this.handleNoChronic}>Nemám žádné chronické nemoci</button>
                 </div>
+            </div>
             </div>
         );
     }

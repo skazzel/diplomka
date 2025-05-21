@@ -75,6 +75,13 @@ public class Main
                         ApiBuilder.get("latest-anamnesis", PatientInfoController::getLatestAnamnesis, Set.of(EnumAPIRole.DOCTOR));
                     });
                 });
+                ApiBuilder.path("patients", () -> {
+                    ApiBuilder.path("by-birth-number", () -> {
+                        ApiBuilder.path(":birthNumber", () -> {
+                            ApiBuilder.get("anamneses", PatientInfoController::getAnamnesesByBirthNumber, Set.of(EnumAPIRole.DOCTOR));
+                        });
+                    });
+                });
                 ApiBuilder.path("users", () -> {
                     ApiBuilder.post("login", LoginController::postLogin, Set.of(EnumAPIRole.ANONYMOUS));
 

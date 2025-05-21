@@ -128,14 +128,16 @@ export class AllergyFoodView<T extends ISectionProps> extends AllergyFood<T> {
 
     render(): ReactNode {
         return (
-            <div className="food-view">
+            <div className="patient-view">
+                <div className="container" id="symptom-input">
                 <button className="back-button" onClick={this.handleBackClick}>← Back</button>
-                <div className="food-container">
+                <div className="progress-container">
                     <div className="progress-bar">
-                        <div className="completed"></div>
-                        <div className="in-progress"></div>
-                        <div className="pending"></div>
+                        <div className="progress completed"></div>
+                        <div className="progress active"></div>
+                        <div className="progress pending"></div>
                     </div>
+                </div>
 
                     <h2>What food are you allergic to?</h2>
                     <div className="input-container">
@@ -145,8 +147,7 @@ export class AllergyFoodView<T extends ISectionProps> extends AllergyFood<T> {
                             onChange={this.handleInputChange}
                             placeholder="Type food allergy..."
                         />
-                        <button onClick={this.addAllergy}>Add</button>
-                        <button onClick={this.handleNoAllergy} className="none-button">None</button>
+                        <button className="button-add" onClick={this.addAllergy}>Add</button>
                     </div>
 
                     <h2>How does your allergy manifest?</h2>
@@ -192,8 +193,11 @@ export class AllergyFoodView<T extends ISectionProps> extends AllergyFood<T> {
                             ))}
                         </ul>
                     </div>
-
-                    <button className="next-button" onClick={this.saveAndProceed}>Next</button>
+                    
+                    <div className="buttons-row">
+                        <button className="button-next" onClick={this.saveAndProceed}>Next</button>
+                        <button onClick={this.handleNoAllergy} className="button-skip">None</button>
+                    </div>
                 </div>
             </div>
         );
