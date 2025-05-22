@@ -9,6 +9,7 @@ import { EnumRole } from "../../../data/UserData";
 import { PainCheckSection } from "./PainView";
 import { MainSymptomSection } from "./MainSymptom";
 import { BodyImageSection } from "./BodyImage";
+import birdImg from "../../../img/bird.png";
 
 export abstract class HPatientView<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
@@ -35,7 +36,8 @@ export class HPatientWelcomeView<T extends ISectionProps> extends HPatientView<T
             searchString: "",
             userSearch: [],
             errorText: "",
-            similarAround: similarAround
+            similarAround: similarAround,
+            progress: 14,
         };
 
         console.log("📦 Loaded selectedSymptoms from localStorage:", validSymptoms);
@@ -211,11 +213,23 @@ export class HPatientWelcomeView<T extends ISectionProps> extends HPatientView<T
                 <div className="container" id="symptom-input">
                 <button className="back-button" onClick={this.handleBackClick}>← Back</button>
                     <div className="progress-container">
-                        <div className="progress-bar">
-                            <div className="progress completed"></div>
-                            <div className="progress active"></div>
-                            <div className="progress pending"></div>
+                        <div className="progress-bar-wrapper">
+                            <div className="progress-bar">
+                                <div
+                                    className="progress completed"
+                                    style={{ width: `${this.state.progress}%` }}
+                                ></div>
+                                <div className="progress active"></div>
+                                <div className="progress pending"></div>
+                            </div>
+                            <img
+                                src={birdImg}
+                                className="progress-icon"
+                                style={{ left: `${this.state.progress}%` }}
+                                alt="progress"
+                            />
                         </div>
+                        <span className="progress-label">Basic Information</span>
                     </div>
 
                     <h2>What symptom bothers you the most?</h2>

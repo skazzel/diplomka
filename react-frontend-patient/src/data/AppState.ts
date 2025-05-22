@@ -2,9 +2,6 @@ import { EnumRole, IExtendedUserData, ILoginData, IUserData } from "./UserData";
 import { HView, IHSection } from "../components/view/HView";
 import { HPatientSection } from "../components/view/patient-view/HPatientView";
 import { BodyImageSection } from "../components/view/patient-view/BodyImage";
-import { HDoctorSection } from "../components/view/doctor-view/HDoctorView";
-import { HInsuranceSection } from "../components/view/insurance-view/HInsuranceView";
-import { HAdminSection } from "../components/view/admin-view/HAdminView";
 import { GenderInfoSection } from "../components/view/patient-view/GenderView";
 
 export enum LoginState {
@@ -36,9 +33,6 @@ export class LoginScreenSectionState implements IApplicationSection {
 }
 
 export enum EnumInternalState {
-    ADMIN_PANEL = "ADMIN_PANEL",
-    DOCTOR_PANEL = "DOCTOR_PANEL",
-    INSURANCE_WORKER_PANEL = "INSURANCE_WORKER_PANEL",
     PATIENT_PANEL = "PATIENT_PANEL"
 }
 
@@ -52,20 +46,12 @@ export function internalAppStateFromRole(role: EnumRole): IInternalApplicationSt
 {
     switch (role)
     {
-        case EnumRole.ADMIN:
-            return {
-                internalState: EnumInternalState.ADMIN_PANEL,
-                internalSection: HAdminSection,
-                currentView: HAdminSection.defaultView
-            };
-
         case EnumRole.PATIENT:
             return {
                 internalState: EnumInternalState.PATIENT_PANEL,
                 internalSection: GenderInfoSection, // ✅ This should be correct
                 currentView: GenderInfoSection.defaultView // ✅ Ensure this is correctly set
             };
-            
     }
 }
 

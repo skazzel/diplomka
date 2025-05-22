@@ -2,13 +2,12 @@ import { HView, IHSection, ISectionProps } from "../HView";
 import React, { ReactNode } from "react";
 import "../../../style/genders.less";
 import { SwitchViewAction, LoginAction } from "../../../data/AppAction";
-import { MainSymptomSection } from "./MainSymptom";
+import { ReferredDoctorSection } from "./ReferralUploadView";
 import Axios from "axios";
 import { IAPIResponse, ILoginData } from "../../../data/UserData";
-import { HPatientSection } from "./HPatientView";
-import { BodyImageSection } from "./BodyImage";
 import "../../../style/generalStyle.less";
-import { ReferredDoctorSection } from "./ReferralUploadView";
+import birdImg from "../../../img/bird.png";
+import { BodyImageSection } from "./BodyImage";
 
 export abstract class GenderInfo<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
@@ -19,6 +18,7 @@ export abstract class GenderInfo<T extends ISectionProps> extends HView<T> {
 interface GenderInfoState {
     rcBefore: string;
     rcAfter: string;
+    progress: number;
 }
 
 let alreadyCleared = false;
@@ -26,7 +26,8 @@ let alreadyCleared = false;
 export class GenderInfoView<T extends ISectionProps> extends GenderInfo<T> {
     state: GenderInfoState = {
         rcBefore: localStorage.getItem("rcBefore") || "",
-        rcAfter: localStorage.getItem("rcAfter") || ""
+        rcAfter: localStorage.getItem("rcAfter") || "",
+        progress: 0 // starting progress
     };
 
     constructor(props: T) {
@@ -36,30 +37,7 @@ export class GenderInfoView<T extends ISectionProps> extends GenderInfo<T> {
         const isReload = navType?.type === "reload";
 
         if (isReload && !alreadyCleared) {
-            localStorage.removeItem("patientAnswers");
-            localStorage.removeItem("selectedSymptoms");
-            localStorage.removeItem("selectedDiseases");
-            localStorage.removeItem("rcBefore");
-            localStorage.removeItem("rcAfter");
-            localStorage.removeItem("selectedMainSymptom");
-            localStorage.removeItem("symptomNearbyOption");
-            localStorage.removeItem("selectedSurgeries");
-            localStorage.removeItem("badHabits");
-            localStorage.removeItem("drugsData");
-            localStorage.removeItem("selectedPainAreas");
-            localStorage.removeItem("allergyFood");
-            localStorage.removeItem("selectedMedicationAllergies");
-            localStorage.removeItem("socialInfo");
-            localStorage.removeItem("referredDoctor");
-            localStorage.removeItem("chronicalSince");
-            localStorage.removeItem("gynecologyInfo");
-            localStorage.removeItem("selectedCondition");
-            localStorage.removeItem("previousTrouble");
-            localStorage.removeItem("medicationDetails");
-            localStorage.removeItem("selectedMedications");
-            localStorage.removeItem("durationNumber");
-            localStorage.removeItem("durationUnit");
-            localStorage.removeItem("painChoice");
+            localStorage.clear();
             alreadyCleared = true;
         }
 
@@ -149,7 +127,9 @@ export class GenderInfoView<T extends ISectionProps> extends GenderInfo<T> {
         localStorage.setItem("rcBefore", rcBefore);
         localStorage.setItem("rcAfter", rcAfter);
 
-        this.props.dispatch(new SwitchViewAction(ReferredDoctorSection.defaultView));
+        this.setState({ progress: 7 }, () => {
+            this.props.dispatch(new SwitchViewAction(BodyImageSection.defaultView));
+        });
     };
 
     render(): ReactNode {
@@ -157,10 +137,21 @@ export class GenderInfoView<T extends ISectionProps> extends GenderInfo<T> {
             <div className="patient-view">
                 <div className="container">
                     <div className="progress-container">
-                        <div className="progress-bar">
-                            <div className="progress completed"></div>
-                            <div className="progress active"></div>
-                            <div className="progress pending"></div>
+                        <div className="progress-bar-wrapper">
+                            <div className="progress-bar">
+                                <div
+                                    className="progress completed"
+                                    style={{ width: `${this.state.progress}%` }}
+                                ></div>
+                                <div className="progress active"></div>
+                                <div className="progress pending"></div>
+                            </div>
+                            <img
+                                src={birdImg}
+                                className="progress-icon"
+                                style={{ left: `${this.state.progress}%` }}
+                                alt="progress"
+                            />
                         </div>
                         <span className="progress-label">Basic Information</span>
                     </div>

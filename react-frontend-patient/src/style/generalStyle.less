@@ -99,39 +99,50 @@ h2 {
     margin-bottom: 15px;
 }
 
+.progress-bar-wrapper {
+    position: relative;
+    flex: 1;
+}
+
 .progress-bar {
     display: flex;
-    flex: 1;
     height: 6px;
     background: #e0e0e0;
     border-radius: 4px;
     overflow: hidden;
+    position: relative;
+    z-index: 1;
 }
 
 .progress {
     height: 100%;
-    transition: background 0.3s;
+    transition: width 0.3s;
 }
 
 .progress.completed {
-    flex: 1;
-    background: #11958e;
+    background: #22b3ac;
+    position: relative;
+    transition: width 0.5s ease-in-out; /* ⬅ plynulý přechod */
 }
 
 .progress.active {
-    flex: 1;
-    background: black;
+    width: 30%;
 }
 
 .progress.pending {
-    flex: 1;
     background: #e0e0e0;
+    flex: 1;
 }
 
-.progress-label {
-    font-size: 12px;
-    color: #666;
-    min-width: 100px;
+.progress-icon {
+    position: absolute;
+    top: -10px;
+    transform: translateX(-50%);
+    width: 28px;
+    height: 28px;
+    z-index: 2;
+    pointer-events: none;
+    transition: left 0.5s ease-in-out; /* ⬅ plynulý posun ptáka */
 }
 
 /* Input Section */

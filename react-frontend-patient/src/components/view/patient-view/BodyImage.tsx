@@ -6,6 +6,7 @@ import bodyImage from "../../../img/body.png";
 import { Dispatch } from "redux";
 import { SwitchViewAction } from "../../../data/AppAction";
 import { GenderInfoSection } from "./GenderView";
+import birdImg from "../../../img/bird.png";
 import { HPatientSection } from "./HPatientView";
 
 interface HPatientState {
@@ -29,6 +30,7 @@ export class BodyImageView<T extends ISectionProps> extends HView<T & BodyImageP
       showErrorMessage: false,
       selectedPainAreas: valid,
       hoveredArea: null,
+      progress: 7,
     };
   }
 
@@ -62,7 +64,9 @@ export class BodyImageView<T extends ISectionProps> extends HView<T & BodyImageP
     filtered.push({ painAreas: this.state.selectedPainAreas });
     localStorage.setItem("patientAnswers", JSON.stringify(filtered));
     localStorage.setItem("selectedPainAreas", JSON.stringify(this.state.selectedPainAreas));
-    this.props.dispatch(new SwitchViewAction(HPatientSection.defaultView));
+    this.setState({ progress: 14 }, () => {
+      this.props.dispatch(new SwitchViewAction(HPatientSection.defaultView));
+    });
   };
 
   render(): ReactNode {
@@ -90,16 +94,29 @@ export class BodyImageView<T extends ISectionProps> extends HView<T & BodyImageP
       <div className="patient-view">
         <div className="container" id="symptom-input">
         <button className="back-button" onClick={this.handleBackClick}>← Back</button>
-          <div className="progress-container">
-              <div className="progress-bar">
-                  <div className="progress completed"></div>
-                  <div className="progress active"></div>
-                  <div className="progress pending"></div>
-              </div>
-          </div>
+            <div className="progress-container">
+                <div className="progress-bar-wrapper">
+                    <div className="progress-bar">
+                        <div
+                            className="progress completed"
+                            style={{ width: `${this.state.progress}%` }}
+                        ></div>
+                        <div className="progress active"></div>
+                        <div className="progress pending"></div>
+                    </div>
+                    <img
+                        src={birdImg}
+                        className="progress-icon"
+                        style={{ left: `${this.state.progress}%` }}
+                        alt="progress"
+                    />
+                </div>
+                <span className="progress-label">Basic Information</span>
+            </div>
+          
           <h2 className="body-title">Vyberte, kde pociťujete bolest</h2>
           <div className="body-wrapper-single">
-            <img src={bodyImage} alt="Tělo" className="base-image" />
+            <img src={bodyImage} alt="Tělo" loading="eager" className="base-image" />
             <svg
               className="hover-overlay"
               viewBox="0 0 1025 1024"
