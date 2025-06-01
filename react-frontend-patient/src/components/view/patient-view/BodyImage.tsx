@@ -8,6 +8,8 @@ import { SwitchViewAction } from "../../../data/AppAction";
 import { GenderInfoSection } from "./GenderView";
 import birdImg from "../../../img/bird.png";
 import { HPatientSection } from "./HPatientView";
+import { getTranslation as t } from "../../../data/QuestionTranslation";
+import { getProgress } from "../../../data/progressMap";
 
 interface HPatientState {
   showErrorMessage: boolean;
@@ -30,7 +32,7 @@ export class BodyImageView<T extends ISectionProps> extends HView<T & BodyImageP
       showErrorMessage: false,
       selectedPainAreas: valid,
       hoveredArea: null,
-      progress: 7,
+      progress: getProgress("bodyImage", "hpatientView"),
     };
   }
 
@@ -85,7 +87,7 @@ export class BodyImageView<T extends ISectionProps> extends HView<T & BodyImageP
           onMouseLeave={() => this.setState({ hoveredArea: null })}
           onClick={() => this.handleBodyClick(name)}
         >
-          <title>{label}</title>
+          <title>{t(name)}</title>
         </polygon>
       );
     };
@@ -93,28 +95,28 @@ export class BodyImageView<T extends ISectionProps> extends HView<T & BodyImageP
     return (
       <div className="patient-view">
         <div className="container" id="symptom-input">
-        <button className="back-button" onClick={this.handleBackClick}>← Back</button>
-            <div className="progress-container">
-                <div className="progress-bar-wrapper">
-                    <div className="progress-bar">
-                        <div
-                            className="progress completed"
-                            style={{ width: `${this.state.progress}%` }}
-                        ></div>
-                        <div className="progress active"></div>
-                        <div className="progress pending"></div>
-                    </div>
-                    <img
-                        src={birdImg}
-                        className="progress-icon"
-                        style={{ left: `${this.state.progress}%` }}
-                        alt="progress"
-                    />
-                </div>
-                <span className="progress-label">Basic Information</span>
+          <button className="back-button" onClick={this.handleBackClick}>← {t("back")}</button>
+          <div className="progress-container">
+            <div className="progress-bar-wrapper">
+              <div className="progress-bar">
+                <div
+                  className="progress completed"
+                  style={{ width: `${this.state.progress}%` }}
+                ></div>
+                <div className="progress active"></div>
+                <div className="progress pending"></div>
+              </div>
+              <img
+                src={birdImg}
+                className="progress-icon"
+                style={{ left: `${this.state.progress}%` }}
+                alt="progress"
+              />
             </div>
-          
-          <h2 className="body-title">Vyberte, kde pociťujete bolest</h2>
+            <span className="progress-label">{t("progress_basic_info")}</span>
+          </div>
+
+          <h2 className="body-title">{t("select_pain_area")}</h2>
           <div className="body-wrapper-single">
             <img src={bodyImage} alt="Tělo" loading="eager" className="base-image" />
             <svg
@@ -174,7 +176,7 @@ export class BodyImageView<T extends ISectionProps> extends HView<T & BodyImageP
             </svg>
           </div>
           <button className="button-next" onClick={this.handleNextClickButton}>
-            next
+            {t("button_next")}
           </button>
         </div>
       </div>

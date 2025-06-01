@@ -24,12 +24,12 @@ interface HUserInfoState {
 }
 
 export class HUserInfo extends HFormComponent<HUserInfoProps, HUserInfoState> {
+    private reloadInterval: any;
+
     constructor(props: HUserInfoProps) {
         super(props);
 
         const birthNumber = localStorage.getItem("hospitu_birthNumber") || "";
-        console.log("🔍 birthNumber loaded from localStorage:", birthNumber);
-
         this.state = {
             birthNumber,
             anamneses: [],
@@ -39,12 +39,44 @@ export class HUserInfo extends HFormComponent<HUserInfoProps, HUserInfoState> {
     }
 
     componentDidMount(): void {
-        if (!this.state.birthNumber) {
-            this.setState({ errorText: "Rodné číslo nebylo zadáno." });
-            return;
-        }
+        this.fetchAnamneses(this.state.birthNumber);
+    
+        this.reloadInterval = setInterval(() => {
+            const encoded = encodeURIComponent(this.state.birthNumber.trim());
+            Axios.get(`/patients/by-birth-number/${encoded}/anamneses`, {
+                headers: {
+                    Authorization: "Bearer " + this.props.loginData.token
+                }
+            })
+            .then((response) => {
+                if (Array.isArray(response.data)) {
+                    if (response.data.length !== this.state.anamneses.length) {
+                        console.log("📥 Změna v počtu anamnéz. Obnovuji seznam...");
+                        this.setState({ anamneses: response.data });
+                    }
+                }
+            })
+            .catch(() => {
+                console.error("❌ Chyba při automatickém načítání anamnéz.");
+            });
+        }, 5000); // Check every 5s
+    }    
+    
+    componentWillUnmount(): void {
+        clearInterval(this.reloadInterval);
+    }
 
-        const encoded = encodeURIComponent(this.state.birthNumber.trim());
+    componentDidUpdate(_: any, prevState: HUserInfoState): void {
+        const currentBirthNumber = localStorage.getItem("hospitu_birthNumber") || "";
+        if (currentBirthNumber && currentBirthNumber !== prevState.birthNumber) {
+            this.setState({ birthNumber: currentBirthNumber }, () => {
+                this.fetchAnamneses(currentBirthNumber);
+            });
+        }
+    }
+
+    fetchAnamneses = (birthNumber: string): void => {
+        const encoded = encodeURIComponent(birthNumber.trim());
         Axios.get(`/patients/by-birth-number/${encoded}/anamneses`, {
             headers: {
                 Authorization: "Bearer " + this.props.loginData.token
@@ -60,12 +92,31 @@ export class HUserInfo extends HFormComponent<HUserInfoProps, HUserInfoState> {
             .catch(() => {
                 this.setState({ anamneses: [], errorText: "Chyba při načítání anamnéz." });
             });
-    }
+    };
+
+    checkForNewAnamnesis = (birthNumber: string): void => {
+        const previousLength = this.state.anamneses.length;
+        const encoded = encodeURIComponent(birthNumber.trim());
+
+        Axios.get(`/patients/by-birth-number/${encoded}/anamneses`, {
+            headers: {
+                Authorization: "Bearer " + this.props.loginData.token
+            }
+        })
+            .then((response) => {
+                if (Array.isArray(response.data) && response.data.length > previousLength) {
+                    console.log("🆕 Nová anamnéza nalezena.");
+                    this.setState({ anamneses: response.data });
+                }
+            })
+            .catch(() => {
+                console.error("❌ Chyba při kontrolování nových anamnéz.");
+            });
+    };
 
     render(): ReactNode {
         return (
             <div id="hs-anamnesis-container">
-                {/* Levý sloupec – seznam anamnéz */}
                 <div className="hs-anamnesis-card">
                     <HHeader>
                         Seznam anamnéz pro rodné číslo: {this.state.birthNumber}
@@ -96,8 +147,7 @@ export class HUserInfo extends HFormComponent<HUserInfoProps, HUserInfoState> {
                         </tbody>
                     </table>
                 </div>
-    
-                {/* Pravý sloupec – detailní výpis vybrané anamnézy */}
+
                 <div className="hs-anamnesis-card">
                     <HHeader>Obsah vybrané anamnézy</HHeader>
                     <textarea
@@ -121,7 +171,6 @@ export class HUserInfo extends HFormComponent<HUserInfoProps, HUserInfoState> {
             </div>
         );
     }
-    
 }
 
 // Kompatibilita

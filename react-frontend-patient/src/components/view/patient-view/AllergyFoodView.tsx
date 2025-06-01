@@ -9,6 +9,9 @@ import { EnumRole } from "../../../data/UserData";
 import Axios from "axios";
 import { HButton, HButtonStyle } from "../../HButton";
 import { MedicationDetailsSection } from "./PharmacologyDetails";
+import { getTranslation as t } from "../../../data/QuestionTranslation";
+import birdImg from "../../../img/bird.png";
+import { getProgress } from "../../../data/progressMap";
 
 export abstract class AllergyFood<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
@@ -28,7 +31,8 @@ export class AllergyFoodView<T extends ISectionProps> extends AllergyFood<T> {
             symptomSearch: "",
             userSearch: [],
             selectedSymptoms: stored.selectedSymptoms || [],
-            noAllergies: stored.noAllergies || false
+            noAllergies: stored.noAllergies || false,
+            progress: getProgress("allergyFoodView", "default")
         };
     }
 
@@ -43,7 +47,7 @@ export class AllergyFoodView<T extends ISectionProps> extends AllergyFood<T> {
         localStorage.setItem("patientAnswers", JSON.stringify(filteredAnswers));
 
         const medicationsEntry = answers.find((entry: any) => entry.medications);
-        if (medicationsEntry?.medications?.[0] === "None") {
+        if (medicationsEntry?.medications?.[0] === t("pharmacology_none")) {
             this.props.dispatch(new SwitchViewAction(PharmacologySection.defaultView));
         } else {
             this.props.dispatch(new SwitchViewAction(MedicationDetailsSection.defaultView));
@@ -62,11 +66,13 @@ export class AllergyFoodView<T extends ISectionProps> extends AllergyFood<T> {
             this.setState({ userSearch: [] });
             return;
         }
+        const lang = localStorage.getItem("language") || "cz";
 
         Axios.get("/allergy_symptom/info", {
             params: {
                 symptom: keyword + "%",
-                role: this.props.searchRole === EnumRole.PATIENT
+                role: this.props.searchRole === EnumRole.PATIENT,
+                lang: lang
             },
             method: "GET",
             headers: {
@@ -92,8 +98,6 @@ export class AllergyFoodView<T extends ISectionProps> extends AllergyFood<T> {
     addSymptom = (symptom: string) => {
         this.setState((prev) => ({
             selectedSymptoms: [...prev.selectedSymptoms, symptom],
-            symptomSearch: "",
-            userSearch: []
         }));
     };
 
@@ -112,52 +116,58 @@ export class AllergyFoodView<T extends ISectionProps> extends AllergyFood<T> {
     };
 
     saveAndProceed = () => {
+        if (!this.state.noAllergies && this.state.selectedAllergies.length === 0 && this.state.selectedSymptoms.length === 0) {
+            return;
+        }
+    
         let answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
-
-        const foodEntry = this.state.noAllergies ? { foodAllergies: ["None"] } : { foodAllergies: this.state.selectedAllergies };
-        const symptomsEntry = this.state.noAllergies ? { allergySymptoms: ["None"] } : { allergySymptoms: this.state.selectedSymptoms };
-
+    
+        const foodEntry = this.state.noAllergies ? { foodAllergies: [t("Neguje")] } : { foodAllergies: this.state.selectedAllergies };
+        const symptomsEntry = this.state.noAllergies ? { allergySymptoms: [t("Neguje")] } : { allergySymptoms: this.state.selectedSymptoms };
+    
         [foodEntry, symptomsEntry].forEach(entry => {
             const exists = answers.some(a => JSON.stringify(a) === JSON.stringify(entry));
             if (!exists) answers.push(entry);
         });
-
+    
         localStorage.setItem("patientAnswers", JSON.stringify(answers));
         this.props.dispatch(new SwitchViewAction(AllergyMedicationSelection.defaultView));
     };
-
+    
     render(): ReactNode {
         return (
             <div className="patient-view">
                 <div className="container" id="symptom-input">
-                <button className="back-button" onClick={this.handleBackClick}>← Back</button>
-                <div className="progress-container">
-                    <div className="progress-bar">
-                        <div className="progress completed"></div>
-                        <div className="progress active"></div>
-                        <div className="progress pending"></div>
+                    <button className="back-button" onClick={this.handleBackClick}>← {t("back")}</button>
+                    <div className="progress-container">
+                        <div className="progress-bar-wrapper">
+                            <div className="progress-bar">
+                                <div className="progress completed" style={{ width: `${this.state.progress}%` }}></div>
+                            </div>
+                            <img src={birdImg} className="progress-icon" style={{ left: `${this.state.progress}%` }} alt="progress" />
+                        </div>
+                        <span className="progress-label">{t("progress_basic_info")}</span>
                     </div>
-                </div>
 
-                    <h2>What food are you allergic to?</h2>
+                    <h2>{t("food_allergy_question")}</h2>
                     <div className="input-container">
                         <input
                             type="text"
                             value={this.state.inputText}
                             onChange={this.handleInputChange}
-                            placeholder="Type food allergy..."
+                            placeholder={t("food_allergy_placeholder")}
                         />
-                        <button className="button-add" onClick={this.addAllergy}>Add</button>
+                        <button className="button-add" onClick={this.addAllergy}>{t("add")}</button>
                     </div>
 
-                    <h2>How does your allergy manifest?</h2>
+                    <h2>{t("food_allergy_symptom_question")}</h2>
                     <VBox>
                         <HBox>
                             <input
                                 type="text"
                                 value={this.state.symptomSearch}
                                 onChange={this.handleSearchChange}
-                                placeholder="Search symptom..."
+                                placeholder={t("search_symptom_placeholder")}
                             />
                         </HBox>
                         {this.state.userSearch.length > 0 && (
@@ -168,7 +178,7 @@ export class AllergyFoodView<T extends ISectionProps> extends AllergyFood<T> {
                                             <tr key={s.id}>
                                                 <td>{s.name}</td>
                                                 <td>
-                                                    <HButton buttonStyle={HButtonStyle.TEXT_SYMPTOM} action={() => this.addSymptom(s.name)}>Vybrat</HButton>
+                                                    <HButton buttonStyle={HButtonStyle.TEXT_SYMPTOM} action={() => this.addSymptom(s.name)}>{t("select")}</HButton>
                                                 </td>
                                             </tr>
                                         ))}
@@ -179,24 +189,24 @@ export class AllergyFoodView<T extends ISectionProps> extends AllergyFood<T> {
                     </VBox>
 
                     <div className="selected-symptoms-container">
-                        <h3>Selected Allergies:</h3>
+                        <h3>{t("selected_allergies")}</h3>
                         <ul>
                             {this.state.selectedAllergies.map((a, i) => (
                                 <li key={i}>• {a} <span onClick={() => this.removeItem(a, "selectedAllergies")}>🗑️</span></li>
                             ))}
                         </ul>
 
-                        <h3>Selected Allergy Symptoms:</h3>
+                        <h3>{t("selected_allergy_symptoms")}</h3>
                         <ul>
                             {this.state.selectedSymptoms.map((s, i) => (
                                 <li key={i}>• {s} <span onClick={() => this.removeItem(s, "selectedSymptoms")}>🗑️</span></li>
                             ))}
                         </ul>
                     </div>
-                    
+
                     <div className="buttons-row">
-                        <button className="button-next" onClick={this.saveAndProceed}>Next</button>
-                        <button onClick={this.handleNoAllergy} className="button-skip">None</button>
+                        <button className="button-next" onClick={this.saveAndProceed}>{t("button_next")}</button>
+                        <button onClick={this.handleNoAllergy} className="button-skip">{t("button_no_allergy")}</button>
                     </div>
                 </div>
             </div>

@@ -1,9 +1,11 @@
 import { HView, IHSection, ISectionProps } from "../HView";
 import React, { ReactNode } from "react";
-import "../../../style/chronical.less";
 import { SwitchViewAction } from "../../../data/AppAction";
 import { ChronicalSection } from "./ChronicalView";
 import { SurgeryTypeSection } from "./operationView";
+import { getTranslation as t } from "../../../data/QuestionTranslation";
+import { getProgress } from "../../../data/progressMap";
+import birdImg from "../../../img/bird.png";
 
 export abstract class ChronicalSince<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
@@ -18,7 +20,7 @@ export class ChronicalSinceView<T extends ISectionProps> extends ChronicalSince<
             const answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
             const chronic = answers.find((entry: any) => entry.hasOwnProperty("chronicCondition"));
             return chronic?.chronicCondition || [];
-        })();        
+        })();
 
         const state: Record<string, { month: string; year: string }> = {};
         selected.forEach((disease: string) => {
@@ -32,7 +34,8 @@ export class ChronicalSinceView<T extends ISectionProps> extends ChronicalSince<
 
         this.state = {
             selectedDiseases: selected,
-            diseaseDates: state
+            diseaseDates: state,
+            progress: getProgress("chronicalSince", "default")
         };
     }
 
@@ -67,7 +70,13 @@ export class ChronicalSinceView<T extends ISectionProps> extends ChronicalSince<
 
     handleNext = (): void => {
         const dataToSave = this.mapDatesToArray(this.state.diseaseDates);
-
+    
+        // ✅ VALIDACE: žádný záznam nemá zadaný měsíc ani rok
+        const hasValidEntry = dataToSave.some(entry => entry.since.trim() !== "");
+        if (!hasValidEntry) {
+            return;
+        }
+    
         let answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
         const existingIndex = answers.findIndex((entry: any) => entry.hasOwnProperty("chronicalSince"));
         if (existingIndex !== -1) {
@@ -75,15 +84,15 @@ export class ChronicalSinceView<T extends ISectionProps> extends ChronicalSince<
         } else {
             answers.push({ chronicalSince: dataToSave });
         }
-
+    
         localStorage.setItem("patientAnswers", JSON.stringify(answers));
         localStorage.setItem("chronicalSince", JSON.stringify(dataToSave));
-
+    
         console.log("📦 Updated patientAnswers:", answers);
-
+    
         this.props.dispatch(new SwitchViewAction(SurgeryTypeSection.defaultView));
     };
-
+    
     handleBackClick = (): void => {
         let answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
         answers = answers.filter((entry: any) => !entry.chronicCondition);
@@ -104,8 +113,14 @@ export class ChronicalSinceView<T extends ISectionProps> extends ChronicalSince<
         return (
             <div className="patient-view">
                 <div className="container">
-                <button className="back-button" onClick={this.handleBackClick}>← Back</button>
-                    <h2>When did you develop each of these chronic conditions?</h2>
+                    <button className="back-button" onClick={this.handleBackClick}>← {t("back")}</button>
+                    <div className="progress-bar-wrapper">
+                        <div className="progress-bar">
+                            <div className="progress completed" style={{ width: `${this.state.progress}%` }}></div>
+                        </div>
+                        <img src={birdImg} className="progress-icon" style={{ left: `${this.state.progress}%` }} alt="progress" />
+                    </div>
+                    <h2>{t("chronic_since_question")}</h2>
 
                     <ul className="selected-symptoms-list">
                         {this.state.selectedDiseases.map((disease: string, i: number) => (
@@ -119,7 +134,7 @@ export class ChronicalSinceView<T extends ISectionProps> extends ChronicalSince<
                                     >
                                         <option value="">---</option>
                                         {months.map((m) => (
-                                            <option key={m} value={m}>{m}</option>
+                                            <option key={m} value={m}>{t(`month_${m.toLowerCase()}`)}</option>
                                         ))}
                                     </select>
                                     <select
@@ -137,7 +152,7 @@ export class ChronicalSinceView<T extends ISectionProps> extends ChronicalSince<
                         ))}
                     </ul>
 
-                    <button className="button-next" onClick={this.handleNext}>Next</button>
+                    <button className="button-next" onClick={this.handleNext}>{t("button_next")}</button>
                 </div>
             </div>
         );

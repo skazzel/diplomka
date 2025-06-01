@@ -4,7 +4,6 @@ import { IApplicationState, InternalScreenSectionState, LoginScreenSectionState,
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 
-import { LoginScreen } from "./LoginScreen";
 import { InternalAppScreen } from "./InternalAppScreen";
 
 class HospitalApp extends React.Component<{
@@ -24,11 +23,6 @@ class HospitalApp extends React.Component<{
                     <InternalAppScreen dispatch={ this.props.dispatch } sectionState={ internalSectionState } currentView={ internalSectionState.sectionState.currentView }/>
                 );
             }
-
-            case LoginState.LOGGED_OUT:
-                return (
-                    <LoginScreen dispatch={ this.props.dispatch } sectionState={ this.props.appState.currentSection as LoginScreenSectionState } />
-                );
         }
     }
 }

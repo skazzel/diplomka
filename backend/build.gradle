@@ -8,7 +8,7 @@ wrapper {
     gradleVersion = '6.6.1'
 }
 
-group 'cz.vutbr.fit'
+group 'syshosp'
 version '0.1-SNAPSHOT'
 
 java {
@@ -24,7 +24,7 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
-mainClassName = "cz.vutbr.fit.hospitu.Main"
+mainClassName = "syshosp.Main"
 
 jar {
     manifest {

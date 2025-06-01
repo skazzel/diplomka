@@ -4,6 +4,9 @@ import "../../../style/drugs.less";
 import { SwitchViewAction } from "../../../data/AppAction";
 import { MainSymptomSection } from "./MainSymptom";
 import { PharmacologySection } from "./PharmacologyView";
+import { getTranslation as t } from "../../../data/QuestionTranslation";
+import birdImg from "../../../img/bird.png";
+import { getProgress } from "../../../data/progressMap";
 
 export abstract class Drugs<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
@@ -23,6 +26,7 @@ export class DrugsView<T extends ISectionProps> extends Drugs<T> {
             quitDurationValue: stored.quitDurationValue || "",
             quitDurationUnit: stored.quitDurationUnit || "months",
             quitDate: stored.quitDate || "",
+            progress: getProgress("drugView", "default")
         };
     }
 
@@ -43,34 +47,53 @@ export class DrugsView<T extends ISectionProps> extends Drugs<T> {
 
     handleNext = () => {
         const { status, drugName, durationValue, durationUnit, quitDurationValue, quitDurationUnit, quitDate } = this.state;
-
+    
+        if (!status) return;
+    
+        const cz = (key: string, value: string): string => {
+            const map: Record<string, string> = {
+                yes: "Ano",
+                no: "Ne",
+                quit: "Přestal jsem",
+                days: "dní",
+                weeks: "týdnů",
+                months: "měsíců",
+                years: "let"
+            };
+            return map[value] || value;
+        };
+    
+        const translatedStatus = cz("status", status);
+        const translatedDurationUnit = cz("unit", status === "yes" ? durationUnit : quitDurationUnit);
+        const howLong = `${status === "yes" ? durationValue : quitDurationValue} ${translatedDurationUnit}`;
+    
         const answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
-
+    
         const entry = {
             drugs: {
-                status,
+                status: translatedStatus,
                 ...(status === "yes" && {
                     drugName,
-                    howLong: `${durationValue} ${durationUnit}`
+                    howLong
                 }),
                 ...(status === "quit" && {
                     drugName,
-                    howLong: `${quitDurationValue} ${quitDurationUnit}`,
+                    howLong,
                     quitDate
                 })
             }
         };
-
+    
         const existingIndex = answers.findIndex((a: any) => a.hasOwnProperty("drugs"));
         if (existingIndex !== -1) {
             answers[existingIndex] = entry;
         } else {
             answers.push(entry);
         }
-
+    
         localStorage.setItem("patientAnswers", JSON.stringify(answers));
-        console.log("\uD83D\uDCBE Saved drug answers:", answers);
-
+        console.log("📦 Saved drug answers (translated):", answers);
+    
         this.props.dispatch(new SwitchViewAction(PharmacologySection.defaultView));
     };
 
@@ -82,83 +105,87 @@ export class DrugsView<T extends ISectionProps> extends Drugs<T> {
         return (
             <div className="patient-view">
                 <div className="container">
-                <button className="back-button" onClick={this.handleBackClick}>← Back</button>
-                <div className="progress-container">
-                    <div className="progress-bar">
-                        <div className="progress completed"></div>
-                        <div className="progress active"></div>
-                        <div className="progress pending"></div>
+                    <button className="back-button" onClick={this.handleBackClick}>← {t("back")}</button>
+                    <div className="progress-container">
+                        <div className="progress-bar-wrapper">
+                            <div className="progress-bar">
+                                <div className="progress completed" style={{ width: `${this.state.progress}%` }}></div>
+                            </div>
+                            <img src={birdImg} className="progress-icon" style={{ left: `${this.state.progress}%` }} alt="progress" />
+                        </div>
+                        <span className="progress-label">{t("progress_basic_info")}</span>
+                    </div>
+
+                    <h2>{t("drugs_question")}</h2>
+                    <div className="button-group">
+                        {[
+                            { key: "yes", label: t("option_yes") },
+                            { key: "no", label: t("option_no") },
+                            { key: "quit", label: t("option_quit") }
+                        ].map(option => (
+                            <button
+                                key={option.key}
+                                className={`answer-button ${this.state.status === option.key ? "selected" : ""}`}
+                                onClick={() => this.handleOptionSelect(option.key)}
+                            >
+                                {option.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    {(status === "yes" || status === "quit") && (
+                        <>
+                            <h3>{t("drugs_name_question")} <span className="optional">({t("optional")})</span></h3>
+                            <input
+                                type="text"
+                                placeholder={t("drugs_name_placeholder")}
+                                value={this.state.drugName}
+                                onChange={e => this.setState({ drugName: e.target.value })}
+                            />
+
+                            <h3>{t("drugs_duration_question")}</h3>
+                            <div className="duration-group">
+                                <input
+                                    type="number"
+                                    min="0"
+                                    value={status === "yes" ? this.state.durationValue : this.state.quitDurationValue}
+                                    onChange={e =>
+                                        this.setState({
+                                            [status === "yes" ? "durationValue" : "quitDurationValue"]: e.target.value
+                                        })
+                                    }
+                                />
+                                <select
+                                    value={status === "yes" ? durationUnit : quitDurationUnit}
+                                    onChange={e =>
+                                        this.setState({
+                                            [status === "yes" ? "durationUnit" : "quitDurationUnit"]: e.target.value
+                                        })
+                                    }
+                                >
+                                    {unitOptions.map(unit => (
+                                        <option key={unit} value={unit}>{t("unit_" + unit)}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </>
+                    )}
+
+                    {status === "quit" && (
+                        <>
+                            <h3>{t("drugs_quit_question")}</h3>
+                            <input
+                                type="date"
+                                value={this.state.quitDate}
+                                onChange={e => this.setState({ quitDate: e.target.value })}
+                            />
+                        </>
+                    )}
+
+                    <div style={{ marginTop: "20px" }}>
+                        <button className="button-next" onClick={this.handleNext}>{t("button_next")}</button>
                     </div>
                 </div>
-
-                <h2>Have you ever used drugs?</h2>
-                <div className="button-group">
-                    {["yes", "no", "quit"].map(option => (
-                        <button
-                            key={option}
-                            className={`answer-button ${this.state.status === option ? "selected" : ""}`}
-                            onClick={() => this.handleOptionSelect(option)}
-                        >
-                            {option === "yes" && "Yes"}
-                            {option === "no" && "No"}
-                            {option === "quit" && "I used to"}
-                        </button>
-                    ))}
-                </div>
-
-                {(status === "yes" || status === "quit") && (
-                    <>
-                        <h3>What kind of drug? <span className="optional">(optional)</span></h3>
-                        <input
-                            type="text"
-                            placeholder="e.g., Marijuana"
-                            value={this.state.drugName}
-                            onChange={e => this.setState({ drugName: e.target.value })}
-                        />
-
-                        <h3>How long did you use it?</h3>
-                        <div className="duration-group">
-                            <input
-                                type="number"
-                                min="0"
-                                value={status === "yes" ? this.state.durationValue : this.state.quitDurationValue}
-                                onChange={e =>
-                                    this.setState({
-                                        [status === "yes" ? "durationValue" : "quitDurationValue"]: e.target.value
-                                    })
-                                }
-                            />
-                            <select
-                                value={status === "yes" ? durationUnit : quitDurationUnit}
-                                onChange={e =>
-                                    this.setState({
-                                        [status === "yes" ? "durationUnit" : "quitDurationUnit"]: e.target.value
-                                    })
-                                }
-                            >
-                                {unitOptions.map(unit => (
-                                    <option key={unit} value={unit}>{unit}</option>
-                                ))}
-                            </select>
-                        </div>
-                    </>
-                )}
-
-                {status === "quit" && (
-                    <>
-                        <h3>When did you quit?</h3>
-                        <input
-                            type="date"
-                            value={this.state.quitDate}
-                            onChange={e => this.setState({ quitDate: e.target.value })}
-                        />
-                    </>
-                )}
-
-                <div style={{ marginTop: "20px" }}>
-                    <button className="button-next" onClick={this.handleNext}>Next</button>
-                </div>
-            </div>
             </div>
         );
     }

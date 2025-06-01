@@ -6,6 +6,9 @@ import { SwitchViewAction } from "../../../data/AppAction";
 import { ChronicalSection } from "./ChronicalView";
 import { MainConditionSection } from "./ConditionView";
 import { PainCheckSection } from "./PainView";
+import { getTranslation as t, getCzechLabel as cz } from "../../../data/QuestionTranslation";
+import { getProgress } from "../../../data/progressMap";
+import birdImg from "../../../img/bird.png";
 
 export abstract class MainSymptom<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
@@ -26,6 +29,7 @@ export class MainSymptomView<T extends ISectionProps> extends MainSymptom<T> {
             showErrorMessage: false,
             selectedSymptoms: validSymptoms,
             selectedSymptom: selectedSymptom,
+            progress: getProgress("mainSymptom", "default")
         };
 
         console.log("📜 Initial Symptom List:", validSymptoms);
@@ -33,80 +37,72 @@ export class MainSymptomView<T extends ISectionProps> extends MainSymptom<T> {
 
     handleBackClick = (): void => {
         const answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
+        const symptomTypes = JSON.parse(localStorage.getItem("symptomTypes") || "{}");
 
-        const hasPainAnswers = answers.some((entry: any) =>
-            entry.hasOwnProperty("painType") ||
-            entry.hasOwnProperty("painChange") ||
-            entry.hasOwnProperty("painWorse") ||
-            entry.hasOwnProperty("painRelief") ||
-            entry.hasOwnProperty("painIntensity") ||
-            entry.hasOwnProperty("painTime")
+        const selectedSymptoms: string[] = answers
+            .filter((entry: any) => Array.isArray(entry.symptoms))
+            .flatMap((entry: any) => entry.symptoms);
+    
+        const hasPain = selectedSymptoms.some(sym => symptomTypes[sym] === "bolest");
+
+        const filteredAnswers = answers.filter((entry: any) =>
+            !entry.hasOwnProperty("painType") &&
+            !entry.hasOwnProperty("painChange") &&
+            !entry.hasOwnProperty("painWorse") &&
+            !entry.hasOwnProperty("painRelief") &&
+            !entry.hasOwnProperty("painIntensity") &&
+            !entry.hasOwnProperty("painTime")
         );
-
-        console.log("WTF " + hasPainAnswers.toString());
-
-        let filteredAnswers;
-
-        if (hasPainAnswers) {
-            filteredAnswers = answers.filter((entry: any) =>
-                !(
-                    entry.hasOwnProperty("painType") ||
-                    entry.hasOwnProperty("painChange") ||
-                    entry.hasOwnProperty("painWorse") ||
-                    entry.hasOwnProperty("painRelief") ||
-                    entry.hasOwnProperty("painIntensity") ||
-                    entry.hasOwnProperty("painTime")
-                )
-            );
-
-            console.log("🗑️ Removed pain-related entries:", filteredAnswers);
+    
+        localStorage.setItem("patientAnswers", JSON.stringify(filteredAnswers));
+    
+        if (hasPain) {
             this.props.dispatch(new SwitchViewAction(PainCheckSection.defaultView));
         } else {
-            console.log("↩️ Returning to HPatientView, keeping symptoms intact.");
-            filteredAnswers = answers;
             this.props.dispatch(new SwitchViewAction(HPatientSection.defaultView));
         }
-
-        localStorage.setItem("patientAnswers", JSON.stringify(filteredAnswers));
     };
-
+    
     handleSymptomSelection = (symptom: string) => {
         this.setState({ selectedSymptom: symptom });
         localStorage.setItem("selectedMainSymptom", symptom);
     };
 
     saveSymptomAndProceed = (): void => {
-        if (!this.state.selectedSymptom) {
-            console.log("⚠️ No symptom selected.");
-            return;
-        }
-
+        if (!this.state.selectedSymptom) return;
+    
         const answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
-
-        if (!answers.some(entry => JSON.stringify(entry) === JSON.stringify({ main_symptom: this.state.selectedSymptom }))) {
-            answers.push({ main_symptom: this.state.selectedSymptom });
+    
+        // Načti mapu z localStorage: český název → ID
+        const labelToIdMap = JSON.parse(localStorage.getItem("symptomLabelToIdMap") || "{}");
+    
+        // Najdi ID pro vybraný český název symptomu
+        const selectedLabel = this.state.selectedSymptom;
+        const mainSymptomId = labelToIdMap[selectedLabel] || selectedLabel;
+    
+        // Pokud záznam ještě neexistuje, ulož ho
+        if (!answers.some(entry => JSON.stringify(entry) === JSON.stringify({ main_symptom: mainSymptomId }))) {
+            answers.push({ main_symptom: mainSymptomId });
             localStorage.setItem("patientAnswers", JSON.stringify(answers));
-            console.log("📜 Updated Patient Answers:", answers);
         }
-
+    
         this.props.dispatch(new SwitchViewAction(MainConditionSection.defaultView));
     };
+    
 
     render(): ReactNode {
         return (
-            <>
             <div className="patient-view">
                 <div className="container">
-                    <button className="back-button" onClick={this.handleBackClick}>← Back</button>
-                    <div className="progress-container">
+                    <button className="back-button" onClick={this.handleBackClick}>← {t("back")}</button>
+                    <div className="progress-bar-wrapper">
                         <div className="progress-bar">
-                            <div className="progress completed"></div>
-                            <div className="progress active"></div>
-                            <div className="progress pending"></div>
+                            <div className="progress completed" style={{ width: `${this.state.progress}%` }}></div>
                         </div>
+                        <img src={birdImg} className="progress-icon" style={{ left: `${this.state.progress}%` }} alt="progress" />
                     </div>
 
-                    <h2>What symptom are you particularly concerned about at this time? Please select just one.</h2>
+                    <h2>{t("main_symptom_question")}</h2>
 
                     <div className="symptom-list">
                         {this.state.selectedSymptoms.map((symptom, index) => (
@@ -118,15 +114,14 @@ export class MainSymptomView<T extends ISectionProps> extends MainSymptom<T> {
                                     checked={this.state.selectedSymptom === symptom}
                                     onChange={() => this.handleSymptomSelection(symptom)}
                                 />
-                                <span className="symptom-label">{symptom}</span>
+                                <span className="symptom-label">{cz(symptom, symptom)}</span>
                             </label>
                         ))}
                     </div>
 
-                    <button className="button-next" onClick={this.saveSymptomAndProceed}>To the Next</button>
+                    <button className="button-next" onClick={this.saveSymptomAndProceed}>{t("button_next")}</button>
                 </div>
-                </div>
-            </>
+            </div>
         );
     }
 }

@@ -1,9 +1,13 @@
 import { HView, IHSection, ISectionProps } from "../HView";
 import React, { ReactNode } from "react";
-//import "../../../style/medication-details.less";
+import "../../../style/medication-details.less";
 import { SwitchViewAction } from "../../../data/AppAction";
 import { MainSymptomSection } from "./MainSymptom";
 import { AllergyFoodSelection } from "./AllergyFoodView";
+import "../../../style/generalStyle.less";
+import birdImg from "../../../img/bird.png";
+import { getProgress } from "../../../data/progressMap";
+import { getTranslation as t } from "../../../data/QuestionTranslation";
 
 export abstract class MedicationDetails<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
@@ -25,7 +29,8 @@ export class MedicationDetailsView<T extends ISectionProps> extends MedicationDe
                 sinceYear: storedDetails[name]?.sinceYear || "",
                 morning: storedDetails[name]?.morning || "",
                 noon: storedDetails[name]?.noon || "",
-                night: storedDetails[name]?.night || ""
+                night: storedDetails[name]?.night || "",
+                progress: getProgress("MedicationDetailsSection", "default")
             }))
         };
     }
@@ -90,8 +95,18 @@ export class MedicationDetailsView<T extends ISectionProps> extends MedicationDe
         const years = Array.from({ length: currentYear - 1899 }, (_, i) => (1900 + i).toString());
 
         return (
-            <div className="medication-details-view">
+            <div className="patient-view">
+                <div className="container">
                 <button className="back-button" onClick={this.handleBackClick}>← Back</button>
+                <div className="progress-container">
+                    <div className="progress-bar-wrapper">
+                        <div className="progress-bar">
+                            <div className="progress completed" style={{ width: `${this.state.progress}%` }}></div>
+                        </div>
+                        <img src={birdImg} className="progress-icon" style={{ left: `${this.state.progress}%` }} alt="progress" />
+                    </div>
+                    <span className="progress-label">{t("progress_basic_info")}</span>
+                </div>
 
                 <h2>Additional Information about Your Medications</h2>
 
@@ -140,7 +155,8 @@ export class MedicationDetailsView<T extends ISectionProps> extends MedicationDe
                     </div>
                 ))}
 
-                <button className="button" onClick={this.handleSave}>Next</button>
+                <button className="button-next" onClick={this.handleSave}>Next</button>
+            </div>
             </div>
         );
     }

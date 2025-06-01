@@ -1,0 +1,1346 @@
+{
+  "enter_birth_number_title": {
+    "cz": "Zadejte své rodné číslo",
+    "en": "Enter your birth number",
+    "uk": "Введіть свій ідентифікаційний номер",
+    "de": "Geben Sie Ihre Geburtsnummer ein",
+    "ja": "生年月日番号を入力してください"
+  },
+  "enter_birth_number_subtext": {
+    "cz": "Pohlaví a věk zjistíme automaticky.",
+    "en": "We will determine gender and age automatically.",
+    "uk": "Ми автоматично визначимо стать та вік.",
+    "de": "Geschlecht und Alter werden automatisch ermittelt.",
+    "ja": "性別と年齢は自動的に判別されます。"
+  },
+  "birth_number_part1_placeholder": {
+    "cz": "YYMMDD",
+    "en": "YYMMDD",
+    "uk": "РРММДД",
+    "de": "JJMMTT",
+    "ja": "YYMMDD"
+  },
+  "birth_number_part2_placeholder": {
+    "cz": "XXXX",
+    "en": "XXXX",
+    "uk": "XXXX",
+    "de": "XXXX",
+    "ja": "XXXX"
+  },
+  "button_next": {
+    "cz": "Pokračovat",
+    "en": "Next",
+    "uk": "Далі",
+    "de": "Weiter",
+    "ja": "次へ"
+  },
+  "button_no_chronic_diseases": {
+    "cz": "Nemám žádné chronické nemoci",
+    "en": "I don't have any chronic diseases",
+    "uk": "У мене немає хронічних хвороб",
+    "de": "Ich habe keine chronischen Krankheiten",
+    "ja": "慢性疾患はありません"
+  },
+  "button_no_allergy": {
+    "cz": "Nemám žádnou alergii",
+    "en": "I don't have any allergy",
+    "uk": "У мене немає жодної алергії",
+    "de": "Ich habe keine Allergien",
+    "ja": "アレルギーはありません"
+  },
+  "error_invalid_birth_number": {
+    "cz": "Zadejte prosím platné rodné číslo ve formátu YYMMDD/XXX[X]",
+    "en": "Please enter a valid birth number in format YYMMDD/XXX[X]",
+    "uk": "Будь ласка, введіть дійсний ідентифікаційний номер у форматі YYMMDD/XXX[X]",
+    "de": "Bitte geben Sie eine gültige Geburtsnummer im Format JJMMTT/XXX[X] ein.",
+    "ja": "有効な生年月日番号をYYMMDD/XXX[X]形式で入力してください。"
+  },
+  "error_invalid_birth_number_format": {
+    "cz": "Neplatné rodné číslo. Použijte formát YYMMDD/XXX[X]",
+    "en": "Invalid birth number. Use format YYMMDD/XXX[X]",
+    "uk": "Неправильний ідентифікаційний номер. Використовуйте формат YYMMDD/XXX[X]",
+    "de": "Ungültige Geburtsnummer. Verwenden Sie das Format JJMMTT/XXX[X]",
+    "ja": "無効な生年月日番号です。YYMMDD/XXX[X]形式を使用してください。"
+  },
+  "progress_basic_info": {
+    "cz": "Základní informace",
+    "en": "Basic Information",
+    "uk": "Основна інформація",
+    "de": "Grundinformationen",
+    "ja": "基本情報"
+  },
+  "select_pain_area": {
+    "cz": "Vyberte, kde pociťujete bolest",
+    "en": "Select where you feel pain",
+    "uk": "Виберіть, де ви відчуваєте біль",
+    "de": "Wählen Sie aus, wo Sie Schmerzen empfinden",
+    "ja": "痛みを感じる場所を選択してください"
+  },
+  "back": {
+    "cz": "Zpět",
+    "en": "Back",
+    "uk": "Назад",
+    "de": "Zurück",
+    "ja": "戻る"
+  },
+  "error_unexpected_api_response": {
+    "cz": "Neočekávaná odpověď z API.",
+    "en": "Unexpected API response format.",
+    "uk": "Неочікуваний формат відповіді API.",
+    "de": "Unerwartete API-Antwort.",
+    "ja": "APIからの予期しない応答です。"
+  },
+  "select": {
+    "cz": "Vybrat",
+    "en": "Select",
+    "uk": "Вибрати",
+    "de": "Auswählen",
+    "ja": "選択"
+  },
+  "currently_experiencing_symptoms": {
+    "cz": "Momentálně pociťujete tyto symptomy?",
+    "en": "You are currently experiencing these symptoms?",
+    "uk": "Ви наразі відчуваєте ці симптоми?",
+    "de": "Haben Sie derzeit diese Symptome?",
+    "ja": "現在、これらの症状がありますか？"
+  },
+  "error_symptom_search": {
+    "cz": "Došlo k chybě při vyhledávání, prosím zkuste to znovu později.",
+    "en": "There was an error searching. Please try again later.",
+    "uk": "Виникла помилка під час пошуку. Спробуйте пізніше.",
+    "de": "Bei der Suche ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
+    "ja": "検索中にエラーが発生しました。後でもう一度お試しください。"
+  },
+  "option_yes": {
+    "cz": "Ano",
+    "en": "Yes",
+    "uk": "Так",
+    "de": "Ja",
+    "ja": "はい"
+  },
+  "option_no": {
+    "cz": "Ne",
+    "en": "No",
+    "uk": "Ні",
+    "de": "Nein",
+    "ja": "いいえ"
+  },
+  "similar_symptoms_around_you": {
+    "cz": "Má někdo ve Vašem okolí podobné symptomy? (škola, domov, sportovní klub, ...)",
+    "en": "Does anyone around you have similar symptoms? (In school, home, sport club,...)",
+    "uk": "Чи є хтось навколо вас із подібними симптомами? (У школі, вдома, спортклубі,...)",
+    "de": "Hat jemand in Ihrer Umgebung ähnliche Symptome? (Schule, Zuhause, Sportverein, ...)",
+    "ja": "周囲に同様の症状がある人がいますか？（学校、自宅、スポーツクラブなど）"
+  },
+  "delete": {
+    "cz": "smazat",
+    "en": "delete",
+    "uk": "видалити",
+    "de": "Löschen",
+    "ja": "削除"
+  },
+  "what_symptom_bothers_you": {
+    "cz": "Jaký symptom Vás nejvíce trápí?",
+    "en": "What symptom bothers you the most?",
+    "uk": "Який симптом турбує вас найбільше?",
+    "de": "Welches Symptom belastet Sie am meisten?",
+    "ja": "最も気になる症状は何ですか？"
+  },
+  "select_symptom_placeholder": {
+    "cz": "Vyberte symptom...",
+    "en": "Select a symptom...",
+    "uk": "Оберіть симптом...",
+    "de": "Symptom auswählen...",
+    "ja": "症状を選択..."
+  },
+  "main_symptom_question": {
+    "cz": "Jaký symptom vás aktuálně nejvíce trápí? Vyberte prosím jen jeden.",
+    "en": "What symptom are you particularly concerned about at this time? Please select just one.",
+    "uk": "Який симптом вас турбує найбільше? Будь ласка, виберіть лише один.",
+    "de": "Welches Symptom belastet Sie derzeit am meisten? Bitte wählen Sie nur eines.",
+    "ja": "現在、最も気になる症状は何ですか？1つだけ選択してください。"
+  },
+    "pain_time_night": {
+      "cz": "Zhoršují se v noci",
+      "en": "Worse at night",
+      "de": "Schlimmer in der Nacht",
+      "ja": "夜に悪化します",
+      "uk": "Гірше вночі"
+    },
+    "pain_time_morning": {
+      "cz": "Zhoršují se ráno",
+      "en": "Worse in the morning",
+      "de": "Schlimmer am Morgen",
+      "ja": "朝に悪化します",
+      "uk": "Гірше вранці"
+    },
+    "pain_time_afternoon": {
+      "cz": "Zhoršují se odpoledne",
+      "en": "Worse in the afternoon",
+      "de": "Schlimmer am Nachmittag",
+      "ja": "午後に悪化します",
+      "uk": "Гірше вдень"
+    },
+    "pain_time_after_meal": {
+      "cz": "Zhoršují se po jídle",
+      "en": "Worse after meals",
+      "de": "Schlimmer nach dem Essen",
+      "ja": "食後に悪化します",
+      "uk": "Після їжі гірше"
+    },
+    "pain_time_activity": {
+      "cz": "Zhoršují se při fyzické aktivitě",
+      "en": "Worse during physical activity",
+      "de": "Schlimmer bei körperlicher Aktivität",
+      "ja": "運動中に悪化します",
+      "uk": "При фізичному навантаженні гірше"
+    },
+    "pain_time_temperature": {
+      "cz": "Zhoršují se při chladu/teple",
+      "en": "Worse with cold/heat",
+      "de": "Schlimmer bei Kälte/Hitze",
+      "ja": "寒さや暑さで悪化します",
+      "uk": "При холоді/спеці гірше"
+    },
+    "pain_time_constant": {
+      "cz": "Příznaky jsou stejné celý den",
+      "en": "Symptoms are the same all day",
+      "de": "Symptome sind den ganzen Tag gleich",
+      "ja": "一日中同じです",
+      "uk": "Симптоми однакові протягом дня"
+    },  
+    "pain_worse_movement": {
+      "cz": "Pohyb",
+      "en": "Movement",
+      "de": "Bewegung",
+      "ja": "動作",
+      "uk": "Рух"
+    },
+    "pain_worse_rest": {
+      "cz": "Odpočinek",
+      "en": "Rest",
+      "de": "Ruhe",
+      "ja": "安静",
+      "uk": "Відпочинок"
+    },
+    "pain_worse_nothing": {
+      "cz": "Nic nezhoršuje bolest",
+      "en": "Nothing makes the pain worse",
+      "de": "Nichts verschlimmert den Schmerz",
+      "ja": "何も痛みを悪化させません",
+      "uk": "Нічого не погіршує біль"
+    },
+    "pain_worse_food": {
+      "cz": "Jídlo / pití",
+      "en": "Food / drink",
+      "de": "Essen / Trinken",
+      "ja": "食べ物 / 飲み物",
+      "uk": "Їжа / напої"
+    },
+    "pain_worse_heat": {
+      "cz": "Teplo",
+      "en": "Heat",
+      "de": "Wärme",
+      "ja": "温かさ",
+      "uk": "Тепло"
+    },
+    "pain_worse_cold": {
+      "cz": "Chlad",
+      "en": "Cold",
+      "de": "Kälte",
+      "ja": "寒さ",
+      "uk": "Холод"
+    },
+    "pain_worse_sitting": {
+      "cz": "Sezení / stání",
+      "en": "Sitting / standing",
+      "de": "Sitzen / Stehen",
+      "ja": "座る / 立つ",
+      "uk": "Сидіння / стояння"
+    },
+    "pain_worse_stress": {
+      "cz": "Stres",
+      "en": "Stress",
+      "de": "Stress",
+      "ja": "ストレス",
+      "uk": "Стрес"
+    },
+    "pain_relief_painkillers": {
+      "cz": "Léky proti bolesti",
+      "en": "Painkillers",
+      "de": "Schmerzmittel",
+      "ja": "鎮痛剤",
+      "uk": "Знеболювальні"
+    },
+    "pain_relief_rest": {
+      "cz": "Odpočinek",
+      "en": "Rest",
+      "de": "Ruhe",
+      "ja": "休息",
+      "uk": "Відпочинок"
+    },
+    "pain_relief_warm": {
+      "cz": "Teplý obklad",
+      "en": "Warm compress",
+      "de": "Warme Kompresse",
+      "ja": "温湿布",
+      "uk": "Теплий компрес"
+    },
+    "pain_relief_cold": {
+      "cz": "Studený obklad",
+      "en": "Cold compress",
+      "de": "Kalte Kompresse",
+      "ja": "冷湿布",
+      "uk": "Холодний компрес"
+    },
+    "pain_relief_position": {
+      "cz": "Změna polohy",
+      "en": "Change of position",
+      "de": "Positionswechsel",
+      "ja": "姿勢の変更",
+      "uk": "Зміна пози"
+    },
+    "pain_relief_food": {
+      "cz": "Jídlo / pití",
+      "en": "Food / drink",
+      "de": "Essen / Trinken",
+      "ja": "食事 / 飲み物",
+      "uk": "Їжа / напої"
+    },
+    "pain_relief_nothing": {
+      "cz": "Nic nepomáhá",
+      "en": "Nothing helps",
+      "de": "Nichts hilft",
+      "ja": "効果がない",
+      "uk": "Нічого не допомагає"
+    },
+    "pain_type_label": {
+    "cz": "Typ bolesti:",
+    "en": "Type of pain:",
+    "de": "Schmerztyp:",
+    "ja": "痛みの種類：",
+    "uk": "Тип болю:"
+  },
+  "dropdown_select_placeholder": {
+    "cz": "-- Vyberte --",
+    "en": "-- Select --",
+    "de": "-- Wählen --",
+    "ja": "-- 選択 --",
+    "uk": "-- Виберіть --"
+  },
+  "pain_change_label": {
+    "cz": "Bolest se:",
+    "en": "The pain:",
+    "de": "Der Schmerz:",
+    "ja": "痛みの変化：",
+    "uk": "Біль:"
+  },
+  "pain_time_label": {
+    "cz": "Kdy se bolest zhoršuje:",
+    "en": "When does the pain worsen:",
+    "de": "Wann wird der Schmerz schlimmer:",
+    "ja": "痛みが悪化するのはいつですか：",
+    "uk": "Коли біль посилюється:"
+  },
+  "pain_worse_label": {
+    "cz": "Co bolest zhoršuje:",
+    "en": "What makes the pain worse:",
+    "de": "Was verschlimmert den Schmerz:",
+    "ja": "痛みを悪化させる要因：",
+    "uk": "Що посилює біль:"
+  },
+  "pain_relief_label": {
+    "cz": "Co bolest zlepšuje:",
+    "en": "What relieves the pain:",
+    "de": "Was lindert den Schmerz:",
+    "ja": "痛みを和らげるもの：",
+    "uk": "Що полегшує біль:"
+  },
+  "took_painkillers_label": {
+    "cz": "Užil(a) jste léky proti bolesti?",
+    "en": "Did you take painkillers?",
+    "de": "Haben Sie Schmerzmittel genommen?",
+    "ja": "鎮痛剤を服用しましたか？",
+    "uk": "Ви приймали знеболювальні?"
+  },
+  "painkiller_effect_label": {
+    "cz": "Měly léky účinek?",
+    "en": "Did the painkillers work?",
+    "de": "Haben die Schmerzmittel gewirkt?",
+    "ja": "鎮痛剤は効果がありましたか？",
+    "uk": "Чи подіяли знеболювальні?"
+  },
+  "painkiller_effect_better": {
+    "cz": "Lépe",
+    "en": "Better",
+    "de": "Besser",
+    "ja": "良くなった",
+    "uk": "Краще"
+  },
+  "painkiller_effect_worse": {
+    "cz": "Hůře",
+    "en": "Worse",
+    "de": "Schlechter",
+    "ja": "悪化した",
+    "uk": "Гірше"
+  },
+  "painkiller_effect_same": {
+    "cz": "Stejně",
+    "en": "Same",
+    "de": "Gleich",
+    "ja": "変わらない",
+    "uk": "Без змін"
+  },
+  "pain_intensity_label": {
+    "cz": "Jak velká je bolest?",
+    "en": "How intense is the pain?",
+    "de": "Wie stark ist der Schmerz?",
+    "ja": "痛みの強さはどのくらいですか？",
+    "uk": "Наскільки сильний біль?"
+  },
+  "pain_type_sharp": {
+    "cz": "Ostrá",
+    "en": "Sharp",
+    "de": "Stechend",
+    "ja": "鋭い",
+    "uk": "Гострий"
+  },
+  "pain_type_dull": {
+    "cz": "Tupá",
+    "en": "Dull",
+    "de": "Dumpf",
+    "ja": "鈍い",
+    "uk": "Тупий"
+  },
+  "pain_type_burning": {
+    "cz": "Pálivá",
+    "en": "Burning",
+    "de": "Brennend",
+    "ja": "焼けるような",
+    "uk": "Пекучий"
+  },
+  "pain_type_throbbing": {
+    "cz": "Pulsující",
+    "en": "Throbbing",
+    "de": "Pochend",
+    "ja": "ズキズキする",
+    "uk": "Пульсуючий"
+  },
+  "pain_type_cramping": {
+    "cz": "Křečová",
+    "en": "Cramping",
+    "de": "Krampfartig",
+    "ja": "けいれん性",
+    "uk": "Судомний"
+  },
+  "pain_type_radiating": {
+    "cz": "Vystřelující",
+    "en": "Radiating",
+    "de": "Ausstrahlend",
+    "ja": "放散性",
+    "uk": "Віддає"
+  },
+  "pain_type_pressing": {
+    "cz": "Tlaková",
+    "en": "Pressing",
+    "de": "Druckend",
+    "ja": "圧迫感",
+    "uk": "Тиснучий"
+  },
+  "pain_change_worse": {
+    "cz": "Zhoršuje",
+    "en": "Gets worse",
+    "de": "Wird schlimmer",
+    "ja": "悪化する",
+    "uk": "Погіршується"
+  },
+  "pain_change_better": {
+    "cz": "Zlepšuje",
+    "en": "Gets better",
+    "de": "Wird besser",
+    "ja": "良くなる",
+    "uk": "Покращується"
+  },
+  "pain_change_same": {
+    "cz": "Je stejná",
+    "en": "Stays the same",
+    "de": "Bleibt gleich",
+    "ja": "変わらない",
+    "uk": "Без змін"
+  },
+  "condition_change_label": {
+    "cz": "Změnily se Vaše potíže?",
+    "en": "Have your symptoms changed?",
+    "de": "Haben sich Ihre Beschwerden verändert?",
+    "ja": "症状に変化はありますか？",
+    "uk": "Чи змінились ваші симптоми?"
+  },
+  "condition_better": {
+    "cz": "Lepší",
+    "en": "Better",
+    "de": "Besser",
+    "ja": "良くなった",
+    "uk": "Краще"
+  },
+  "condition_worse": {
+    "cz": "Horší",
+    "en": "Worse",
+    "de": "Schlechter",
+    "ja": "悪化した",
+    "uk": "Гірше"
+  },
+  "condition_same": {
+    "cz": "Beze změny",
+    "en": "No change",
+    "de": "Unverändert",
+    "ja": "変化なし",
+    "uk": "Без змін"
+  },
+  "condition_duration_label": {
+    "cz": "Jak dlouho máte tyto potíže?",
+    "en": "How long have you had these symptoms?",
+    "de": "Wie lange haben Sie diese Beschwerden?",
+    "ja": "どのくらいの間この症状がありますか？",
+    "uk": "Скільки часу у вас ці симптоми?"
+  },
+  "duration_unit_hours": {
+    "cz": "hodin",
+    "en": "hours",
+    "de": "Stunden",
+    "ja": "時間",
+    "uk": "годин"
+  },
+  "duration_unit_days": {
+    "cz": "dní",
+    "en": "days",
+    "de": "Tage",
+    "ja": "日間",
+    "uk": "днів"
+  },
+  "duration_unit_weeks": {
+    "cz": "týdnů",
+    "en": "weeks",
+    "de": "Wochen",
+    "ja": "週間",
+    "uk": "тижнів"
+  },
+  "duration_unit_years": {
+    "cz": "let",
+    "en": "years",
+    "de": "Jahre",
+    "ja": "年間",
+    "uk": "років"
+  },
+  "condition_repeat_label": {
+    "cz": "Měl(a) jste tyto potíže i dříve?",
+    "en": "Have you had these problems before?",
+    "de": "Hatten Sie diese Beschwerden schon einmal?",
+    "ja": "以前にもこのような症状がありましたか？",
+    "uk": "Чи були у вас ці симптоми раніше?"
+  },
+  "condition_previous_yes_repeat": {
+    "cz": "Ano, opakovaně",
+    "en": "Yes, repeatedly",
+    "de": "Ja, wiederholt",
+    "ja": "はい、繰り返しあります",
+    "uk": "Так, неодноразово"
+  },
+  "condition_previous_yes_once": {
+    "cz": "Ano, jednorázově",
+    "en": "Yes, once",
+    "de": "Ja, einmalig",
+    "ja": "はい、一度だけあります",
+    "uk": "Так, один раз"
+  },
+  "condition_previous_no": {
+    "cz": "Ne, nikdy",
+    "en": "No, never",
+    "de": "Nein, nie",
+    "ja": "いいえ、一度もありません",
+    "uk": "Ні, ніколи"
+  },
+  "condition_previous_dont_know": {
+    "cz": "Nevím",
+    "en": "I don't know",
+    "de": "Ich weiß nicht",
+    "ja": "わかりません",
+    "uk": "Не знаю"
+  },
+  "chronic_question": {
+    "cz": "Trpíte nějakým chronickým onemocněním?",
+    "en": "Do you suffer from any chronic disease?",
+    "de": "Leiden Sie an einer chronischen Krankheit?",
+    "ja": "慢性疾患はありますか？",
+    "uk": "Ви страждаєте на хронічне захворювання?"
+  },
+  "chronic_search_placeholder": {
+    "cz": "Vyhledejte chronické onemocnění...",
+    "en": "Search for chronic condition...",
+    "de": "Chronische Erkrankung suchen...",
+    "ja": "慢性疾患を検索...",
+    "uk": "Пошук хронічного захворювання..."
+  },
+  "chronic_none": {
+    "cz": "Nemám žádné chronické nemoci",
+    "en": "I don't have any chronic diseases",
+    "de": "Ich habe keine chronischen Krankheiten",
+    "ja": "慢性疾患はありません",
+    "uk": "У мене немає хронічних захворювань"
+  },
+  "selected_conditions": {
+    "cz": "Vybraná onemocnění:",
+    "en": "Selected conditions:",
+    "de": "Ausgewählte Erkrankungen:",
+    "ja": "選択された疾患：",
+    "uk": "Вибрані захворювання:"
+  },
+  "chronic_since_question": {
+    "cz": "Od kdy trpíte každým z těchto chronických onemocnění?",
+    "en": "When did you develop each of these chronic conditions?",
+    "de": "Seit wann leiden Sie an diesen chronischen Erkrankungen?",
+    "ja": "それぞれの慢性疾患はいつからありますか？",
+    "uk": "З якого часу у вас кожне з цих хронічних захворювань?"
+  },
+  "month_january": {
+    "cz": "Leden",
+    "en": "January",
+    "de": "Januar",
+    "ja": "1月",
+    "uk": "Січень"
+  },
+  "month_february": {
+    "cz": "Únor",
+    "en": "February",
+    "de": "Februar",
+    "ja": "2月",
+    "uk": "Лютий"
+  },
+  "month_march": {
+    "cz": "Březen",
+    "en": "March",
+    "de": "März",
+    "ja": "3月",
+    "uk": "Березень"
+  },
+  "month_april": {
+    "cz": "Duben",
+    "en": "April",
+    "de": "April",
+    "ja": "4月",
+    "uk": "Квітень"
+  },
+  "month_may": {
+    "cz": "Květen",
+    "en": "May",
+    "de": "Mai",
+    "ja": "5月",
+    "uk": "Травень"
+  },
+  "month_june": {
+    "cz": "Červen",
+    "en": "June",
+    "de": "Juni",
+    "ja": "6月",
+    "uk": "Червень"
+  },
+  "month_july": {
+    "cz": "Červenec",
+    "en": "July",
+    "de": "Juli",
+    "ja": "7月",
+    "uk": "Липень"
+  },
+  "month_august": {
+    "cz": "Srpen",
+    "en": "August",
+    "de": "August",
+    "ja": "8月",
+    "uk": "Серпень"
+  },
+  "month_september": {
+    "cz": "Září",
+    "en": "September",
+    "de": "September",
+    "ja": "9月",
+    "uk": "Вересень"
+  },
+  "month_october": {
+    "cz": "Říjen",
+    "en": "October",
+    "de": "Oktober",
+    "ja": "10月",
+    "uk": "Жовтень"
+  },
+  "month_november": {
+    "cz": "Listopad",
+    "en": "November",
+    "de": "November",
+    "ja": "11月",
+    "uk": "Листопад"
+  },
+  "month_december": {
+    "cz": "Prosinec",
+    "en": "December",
+    "de": "Dezember",
+    "ja": "12月",
+    "uk": "Грудень"
+  },
+  "surgery_question": {
+    "cz": "Podstoupil(a) jste někdy operaci?",
+    "en": "Have you ever had surgery?",
+    "de": "Haben Sie jemals eine Operation gehabt?",
+    "ja": "これまでに手術を受けたことがありますか？",
+    "uk": "Чи мали ви коли-небудь операцію?"
+  },
+  "surgery_search_placeholder": {
+    "cz": "Vyhledejte operaci...",
+    "en": "Search for surgery...",
+    "de": "Operation suchen...",
+    "ja": "手術を検索...",
+    "uk": "Пошук операції..."
+  },
+  "surgery_none": {
+    "cz": "Neměl jsem žádné operace",
+    "en": "I haven't had any surgeries",
+    "de": "Ich hatte keine Operationen",
+    "ja": "手術は受けていません",
+    "uk": "У мене не було операцій"
+  },
+  "surgery_none_value": {
+    "cz": "Neměl jsem žádné operace",
+    "en": "I haven't had any surgeries",
+    "de": "Ich hatte keine Operationen",
+    "ja": "手術は受けていません",
+    "uk": "У мене не було операцій"
+  },
+  "selected_surgeries": {
+    "cz": "Vybrané operace:",
+    "en": "Selected surgeries:",
+    "de": "Ausgewählte Operationen:",
+    "ja": "選択された手術:",
+    "uk": "Обрані операції:"
+  },
+  "alcohol_question": {
+    "cz": "Pijete alkohol?",
+    "en": "Do you drink alcohol?",
+    "de": "Trinken Sie Alkohol?",
+    "ja": "お酒を飲みますか？",
+    "uk": "Ви вживаєте алкоголь?"
+  },
+  "alcohol_amount_question": {
+    "cz": "Pokud ano, kolik za týden?",
+    "en": "If yes, how much per week?",
+    "de": "Wenn ja, wie viel pro Woche?",
+    "ja": "はいの場合、週にどれくらいですか？",
+    "uk": "Якщо так, скільки на тиждень?"
+  },
+  "alcohol_hard_placeholder": {
+    "cz": "Panáky tvrdého alkoholu",
+    "en": "Shots of hard liquor",
+    "de": "Schnäpse",
+    "ja": "蒸留酒のショット数",
+    "uk": "Шоти міцного алкоголю"
+  },
+  "alcohol_wine_placeholder": {
+    "cz": "Sklenky vína",
+    "en": "Glasses of wine",
+    "de": "Gläser Wein",
+    "ja": "ワインのグラス数",
+    "uk": "Келихи вина"
+  },
+  "alcohol_beer_placeholder": {
+    "cz": "Piva",
+    "en": "Beers",
+    "de": "Biere",
+    "ja": "ビールの本数",
+    "uk": "Пляшки пива"
+  },
+  "smoking_question": {
+    "cz": "Kouříte cigarety?",
+    "en": "Do you smoke cigarettes?",
+    "de": "Rauchen Sie Zigaretten?",
+    "ja": "たばこを吸いますか？",
+    "uk": "Ви палите сигарети?"
+  },
+  "smoking_amount_question": {
+    "cz": "Pokud ano, kolik?",
+    "en": "If yes, how much?",
+    "de": "Wenn ja, wie viel?",
+    "ja": "はいの場合、どのくらい？",
+    "uk": "Якщо так, скільки?"
+  },
+  "smoking_amount_placeholder": {
+    "cz": "Počet cigaret za den",
+    "en": "Number of cigarettes per day",
+    "de": "Anzahl der Zigaretten pro Tag",
+    "ja": "1日に吸う本数",
+    "uk": "Кількість сигарет на день"
+  },
+  "smoking_since_question": {
+    "cz": "Od kdy kouříte?",
+    "en": "Since when do you smoke?",
+    "de": "Seit wann rauchen Sie?",
+    "ja": "いつから吸っていますか？",
+    "uk": "З якого часу ви курите?"
+  },
+  "smoking_since_placeholder": {
+    "cz": "např. 2015",
+    "en": "e.g. 2015",
+    "de": "z.B. 2015",
+    "ja": "例: 2015",
+    "uk": "наприклад, 2015"
+  },
+  "drugs_question": {
+    "cz": "Užíval(a) jste někdy drogy?",
+    "en": "Have you ever used drugs?",
+    "de": "Haben Sie jemals Drogen genommen?",
+    "ja": "薬物を使用したことがありますか？",
+    "uk": "Ви коли-небудь вживали наркотики?"
+  },
+  "option_quit": {
+    "cz": "Užíval(a) jsem dříve",
+    "en": "I used to",
+    "de": "Ich habe früher",
+    "ja": "以前使っていた",
+    "uk": "Раніше вживав(ла)"
+  },
+  "drugs_name_question": {
+    "cz": "Jaký typ drogy?",
+    "en": "What kind of drug?",
+    "de": "Welche Art von Droge?",
+    "ja": "どんな種類の薬物？",
+    "uk": "Який вид наркотиків?"
+  },
+  "optional": {
+    "cz": "nepovinné",
+    "en": "optional",
+    "de": "optional",
+    "ja": "任意",
+    "uk": "необов’язково"
+  },
+  "drugs_name_placeholder": {
+    "cz": "např. marihuana",
+    "en": "e.g., Marijuana",
+    "de": "z.B. Marihuana",
+    "ja": "例: マリファナ",
+    "uk": "наприклад, марихуана"
+  },
+  "drugs_duration_question": {
+    "cz": "Jak dlouho jste ji užíval(a)?",
+    "en": "How long did you use it?",
+    "de": "Wie lange haben Sie sie verwendet?",
+    "ja": "どのくらいの期間使用しましたか？",
+    "uk": "Як довго ви її вживали?"
+  },
+  "drugs_quit_question": {
+    "cz": "Kdy jste přestal(a)?",
+    "en": "When did you quit?",
+    "de": "Wann haben Sie aufgehört?",
+    "ja": "いつやめましたか？",
+    "uk": "Коли ви припинили?"
+  },
+  "unit_days": {
+    "cz": "dny",
+    "en": "days",
+    "de": "Tage",
+    "ja": "日",
+    "uk": "дні"
+  },
+  "unit_weeks": {
+    "cz": "týdny",
+    "en": "weeks",
+    "de": "Wochen",
+    "ja": "週",
+    "uk": "тижні"
+  },
+  "unit_months": {
+    "cz": "měsíce",
+    "en": "months",
+    "de": "Monate",
+    "ja": "ヶ月",
+    "uk": "місяці"
+  },
+  "unit_years": {
+    "cz": "roky",
+    "en": "years",
+    "de": "Jahre",
+    "ja": "年",
+    "uk": "роки"
+  },
+  "pharmacology_question": {
+    "cz": "Jaké léky aktuálně užíváte?",
+    "en": "What medication are you currently taking?",
+    "de": "Welche Medikamente nehmen Sie derzeit ein?",
+    "ja": "現在服用している薬は何ですか？",
+    "uk": "Які ліки ви зараз приймаєте?"
+  },
+  "pharmacology_search_placeholder": {
+    "cz": "Zadejte název léku...",
+    "en": "Enter medication name...",
+    "de": "Geben Sie den Medikamentennamen ein...",
+    "ja": "薬の名前を入力...",
+    "uk": "Введіть назву ліків..."
+  },
+  "pharmacology_selected_heading": {
+    "cz": "Užívané léky:",
+    "en": "Medications you are taking:",
+    "de": "Eingenommene Medikamente:",
+    "ja": "服用中の薬:",
+    "uk": "Ліки, які ви приймаєте:"
+  },
+  "pharmacology_none": {
+    "cz": "Neu užívám žádné léky",
+    "en": "I take no medications",
+    "de": "Ich nehme keine Medikamente",
+    "ja": "薬は服用していません",
+    "uk": "Я не приймаю жодних ліків"
+  },
+  "food_allergy_question": {
+    "cz": "Na jaké potraviny jste alergický/á?",
+    "en": "What food are you allergic to?",
+    "de": "Gegen welche Lebensmittel sind Sie allergisch?",
+    "ja": "どの食べ物にアレルギーがありますか？",
+    "uk": "На які продукти у вас алергія?"
+  },
+  "food_allergy_placeholder": {
+    "cz": "Zadejte potravinovou alergii...",
+    "en": "Type food allergy...",
+    "de": "Lebensmittelallergie eingeben...",
+    "ja": "食物アレルギーを入力...",
+    "uk": "Введіть алерген..."
+  },
+  "food_allergy_symptom_question": {
+    "cz": "Jak se vaše alergie projevuje?",
+    "en": "How does your allergy manifest?",
+    "de": "Wie äußert sich Ihre Allergie?",
+    "ja": "アレルギーの症状はどのように現れますか？",
+    "uk": "Як проявляється ваша алергія?"
+  },
+  "search_symptom_placeholder": {
+    "cz": "Vyhledejte symptom...",
+    "en": "Search symptom...",
+    "de": "Symptom suchen...",
+    "ja": "症状を検索...",
+    "uk": "Пошук симптому..."
+  },
+  "selected_allergies": {
+    "cz": "Vybrané alergie:",
+    "en": "Selected Allergies:",
+    "de": "Ausgewählte Allergien:",
+    "ja": "選択されたアレルギー：",
+    "uk": "Обрані алергії:"
+  },
+  "selected_allergy_symptoms": {
+    "cz": "Vybrané příznaky alergie:",
+    "en": "Selected Allergy Symptoms:",
+    "de": "Ausgewählte Allergiesymptome:",
+    "ja": "選択されたアレルギー症状：",
+    "uk": "Обрані симптоми алергії:"
+  },
+  "Neguje": {
+    "cz": "Neguje",
+    "en": "Neguje",
+    "de": "Keine",
+    "ja": "ない",
+    "uk": "Немає"
+  },
+  "add": {
+    "cz": "Přidat",
+    "en": "Add",
+    "de": "Hinzufügen",
+    "ja": "追加",
+    "uk": "Додати"
+  },
+  "medication_allergy_question": {
+    "cz": "Na jaké léky jste alergický/á?",
+    "en": "What medication are you allergic to?",
+    "de": "Gegen welche Medikamente sind Sie allergisch?",
+    "ja": "どの薬にアレルギーがありますか？",
+    "uk": "На які ліки у вас алергія?"
+  },
+  "medication_allergy_selected_heading": {
+    "cz": "Léky, na které jste alergický/á:",
+    "en": "Medications you are allergic to:",
+    "de": "Medikamente, gegen die Sie allergisch sind:",
+    "ja": "アレルギーのある薬:",
+    "uk": "Ліки, на які у вас алергія:"
+  },
+  "select_option": {
+    "cz": "vyberte",
+    "en": "select",
+    "de": "auswählen",
+    "ja": "選択",
+    "uk": "виберіть"
+  },
+  "yes": {
+    "cz": "Ano",
+    "en": "Yes",
+    "de": "Ja",
+    "ja": "はい",
+    "uk": "Так"
+  },
+  "no": {
+    "cz": "Ne",
+    "en": "No",
+    "de": "Nein",
+    "ja": "いいえ",
+    "uk": "Ні"
+  },
+  "social_q1": {
+    "cz": "1. Jaký je váš současný status?",
+    "en": "1. What is your current status?",
+    "de": "1. Was ist Ihr aktueller Status?",
+    "ja": "1. 現在のステータスは何ですか？",
+    "uk": "1. Який у вас поточний статус?"
+  },
+  "social_employed": {
+    "cz": "Pracuji",
+    "en": "Employed",
+    "de": "Angestellt",
+    "ja": "就業中",
+    "uk": "Працюю"
+  },
+  "social_student": {
+    "cz": "Studuji",
+    "en": "Student",
+    "de": "Student",
+    "ja": "学生",
+    "uk": "Студент"
+  },
+  "social_retired": {
+    "cz": "Jsem v důchodu",
+    "en": "Retired",
+    "de": "Im Ruhestand",
+    "ja": "退職者",
+    "uk": "На пенсії"
+  },
+  "social_unemployed": {
+    "cz": "Nezaměstnaný",
+    "en": "Unemployed",
+    "de": "Arbeitslos",
+    "ja": "失業中",
+    "uk": "Безробітний"
+  },
+  "social_q2": {
+    "cz": "2. Kde a s kým bydlíte?",
+    "en": "2. Where and with whom do you live?",
+    "de": "2. Wo und mit wem wohnen Sie?",
+    "ja": "2. どこで誰と住んでいますか？",
+    "uk": "2. Де і з ким ви живете?"
+  },
+  "social_alone": {
+    "cz": "Sám/Sama",
+    "en": "Alone",
+    "de": "Allein",
+    "ja": "一人暮らし",
+    "uk": "Сам/сама"
+  },
+  "social_family": {
+    "cz": "S rodinou",
+    "en": "With family",
+    "de": "Mit Familie",
+    "ja": "家族と",
+    "uk": "З родиною"
+  },
+  "social_partner_children": {
+    "cz": "S partnerem a dětmi",
+    "en": "With partner and children",
+    "de": "Mit Partner und Kindern",
+    "ja": "パートナーと子供と",
+    "uk": "З партнером та дітьми"
+  },
+  "social_friends": {
+    "cz": "S přáteli",
+    "en": "With friends",
+    "de": "Mit Freunden",
+    "ja": "友人と",
+    "uk": "З друзями"
+  },
+  "social_q3": {
+    "cz": "3. Bydlíte v paneláku nebo v domě?",
+    "en": "3. Do you live in an apartment or a house?",
+    "de": "3. Leben Sie in einer Wohnung oder einem Haus?",
+    "ja": "3. アパートまたは一軒家に住んでいますか？",
+    "uk": "3. Ви живете в квартирі чи будинку?"
+  },
+  "social_apartment": {
+    "cz": "Panelák",
+    "en": "Apartment building",
+    "de": "Wohnblock",
+    "ja": "アパート",
+    "uk": "Багатоквартирний будинок"
+  },
+  "social_house": {
+    "cz": "Dům",
+    "en": "House",
+    "de": "Haus",
+    "ja": "一軒家",
+    "uk": "Будинок"
+  },
+  "social_q3a": {
+    "cz": "Na kterém patře bydlíte?",
+    "en": "On which floor do you live?",
+    "de": "In welchem Stock wohnen Sie?",
+    "ja": "何階に住んでいますか？",
+    "uk": "На якому поверсі ви живете?"
+  },
+  "social_floor_placeholder": {
+    "cz": "např. 3",
+    "en": "e.g. 3",
+    "de": "z. B. 3",
+    "ja": "例: 3",
+    "uk": "напр. 3"
+  },
+  "social_q3b": {
+    "cz": "Máte ve vchodě výtah?",
+    "en": "Do you have an elevator?",
+    "de": "Haben Sie einen Aufzug?",
+    "ja": "エレベーターはありますか？",
+    "uk": "У вас є ліфт?"
+  },
+  "social_q4": {
+    "cz": "4. Jste cizinec?",
+    "en": "4. Are you a foreigner?",
+    "de": "4. Sind Sie ein Ausländer?",
+    "ja": "4. 外国人ですか？",
+    "uk": "4. Ви іноземець?"
+  },
+  "social_q4a": {
+    "cz": "Odkud pocházíte?",
+    "en": "Where are you from?",
+    "de": "Woher kommen Sie?",
+    "ja": "どこの出身ですか？",
+    "uk": "Звідки ви?"
+  },
+  "social_origin_placeholder": {
+    "cz": "Země původu",
+    "en": "Country of origin",
+    "de": "Herkunftsland",
+    "ja": "出身国",
+    "uk": "Країна походження"
+  },
+  "social_q4b": {
+    "cz": "Co děláte v ČR?",
+    "en": "What are you doing in the Czech Republic?",
+    "de": "Was machen Sie in der Tschechischen Republik?",
+    "ja": "チェコでは何をしていますか？",
+    "uk": "Що ви робите в Чехії?"
+  },
+  "reason_study": {
+    "cz": "Studium",
+    "en": "Study",
+    "de": "Studium",
+    "ja": "留学",
+    "uk": "Навчання"
+  },
+  "reason_work": {
+    "cz": "Práce",
+    "en": "Work",
+    "de": "Arbeit",
+    "ja": "仕事",
+    "uk": "Робота"
+  },
+  "reason_tourism": {
+    "cz": "Turismus",
+    "en": "Tourism",
+    "de": "Tourismus",
+    "ja": "観光",
+    "uk": "Туризм"
+  },
+  "reason_other": {
+    "cz": "Jiné",
+    "en": "Other",
+    "de": "Andere",
+    "ja": "その他",
+    "uk": "Інше"
+  },
+  "social_q5": {
+    "cz": "5. Vycestoval(a) jste mimo Evropu během posledních 6 měsíců?",
+    "en": "5. Have you traveled outside Europe in the past 6 months?",
+    "de": "5. Haben Sie in den letzten 6 Monaten Europa verlassen?",
+    "ja": "5. 過去6ヶ月間にヨーロッパを離れましたか？",
+    "uk": "5. Ви виїжджали за межі Європи протягом останніх 6 місяців?"
+  },
+  "referred_question": {
+    "cz": "Byl jste poslán do nemocnice jiným lékařem?",
+    "en": "Were you referred to the hospital by another doctor?",
+    "de": "Wurden Sie von einem anderen Arzt ins Krankenhaus überwiesen?",
+    "ja": "他の医師から病院への紹介を受けましたか？",
+    "uk": "Чи направив вас до лікарні інший лікар?"
+  },
+  "referred_upload_prompt": {
+    "cz": "Můžete nahrát doporučení nebo zprávu?",
+    "en": "Can you upload the referral or report?",
+    "de": "Können Sie die Überweisung oder den Bericht hochladen?",
+    "ja": "紹介状やレポートをアップロードできますか？",
+    "uk": "Чи можете ви завантажити направлення або звіт?"
+  },
+  "referred_doctor_name_question": {
+    "cz": "Vzpomínáte si na jméno lékaře, který vás poslal?",
+    "en": "Do you remember the name of the referring doctor?",
+    "de": "Erinnern Sie sich an den Namen des überweisenden Arztes?",
+    "ja": "紹介した医師の名前を覚えていますか？",
+    "uk": "Чи памʼятаєте ви імʼя лікаря, який вас направив?"
+  },
+  "referred_doctor_name_placeholder": {
+    "cz": "Jméno lékaře (nepovinné)",
+    "en": "Doctor's name (optional)",
+    "de": "Name des Arztes (optional)",
+    "ja": "医師の名前（任意）",
+    "uk": "Імʼя лікаря (необовʼязково)"
+  },
+  "files_uploaded": {
+    "cz": "soubor(ů) nahráno.",
+    "en": "file(s) uploaded.",
+    "de": "Datei(en) hochgeladen.",
+    "ja": "ファイルがアップロードされました。",
+    "uk": "файл(ів) завантажено."
+  },
+  "files_saved": {
+    "cz": "Soubory uloženy:",
+    "en": "Files saved:",
+    "de": "Dateien gespeichert:",
+    "ja": "ファイルが保存されました：",
+    "uk": "Файли збережено:"
+  },
+  "error_no_file_paths": {
+    "cz": "Server nevrátil cesty k souborům.",
+    "en": "Server did not return file paths.",
+    "de": "Server hat keine Dateipfade zurückgegeben.",
+    "ja": "サーバーがファイルパスを返しませんでした。",
+    "uk": "Сервер не повернув шляхи до файлів."
+  },
+  "error_upload": {
+    "cz": "Chyba při uploadu:",
+    "en": "Upload error:",
+    "de": "Fehler beim Hochladen:",
+    "ja": "アップロードエラー：",
+    "uk": "Помилка під час завантаження:"
+  },
+  "error_birth_number_missing": {
+    "cz": "Rodné číslo nebylo nalezeno v odpovědích.",
+    "en": "Birth number not found in answers.",
+    "de": "Geburtsnummer wurde in den Antworten nicht gefunden.",
+    "ja": "回答に生年月日番号が見つかりませんでした。",
+    "uk": "Номер народження не знайдено у відповідях."
+  },
+  "submit_success": {
+    "cz": "Odpovědi úspěšně odeslány",
+    "en": "Answers successfully submitted",
+    "de": "Antworten erfolgreich gesendet",
+    "ja": "回答が正常に送信されました",
+    "uk": "Відповіді успішно надіслані"
+  },
+  "submit_success_alert": {
+    "cz": "Odpovědi pacienta byly úspěšně odeslány!",
+    "en": "Patient answers successfully submitted!",
+    "de": "Patientenantworten erfolgreich gesendet!",
+    "ja": "患者の回答が正常に送信されました！",
+    "uk": "Відповіді пацієнта успішно надіслані!"
+  },
+  "submit_error": {
+    "cz": "Chyba při odesílání",
+    "en": "Error submitting",
+    "de": "Fehler beim Senden",
+    "ja": "送信エラー",
+    "uk": "Помилка під час надсилання"
+  },
+  "submit_error_alert": {
+    "cz": "Chyba při odesílání údajů pacienta. Zkuste to prosím znovu.",
+    "en": "Error submitting patient data. Please try again.",
+    "de": "Fehler beim Senden der Patientendaten. Bitte versuchen Sie es erneut.",
+    "ja": "患者データの送信中にエラーが発生しました。もう一度お試しください。",
+    "uk": "Помилка надсилання даних пацієнта. Будь ласка, спробуйте ще раз."
+  },
+  "gynecology_title": {
+    "cz": "Gynekologie",
+    "en": "Gynecology",
+    "de": "Gynäkologie",
+    "ja": "婦人科",
+    "uk": "Гінекологія"
+  },
+  "pregnancy_question": {
+    "cz": "Je možné, že jste těhotná?",
+    "en": "Is there a possibility that you are pregnant?",
+    "de": "Besteht die Möglichkeit, dass Sie schwanger sind?",
+    "ja": "妊娠している可能性はありますか？",
+    "uk": "Чи є ймовірність, що ви вагітні?"
+  },
+  "pregnancy_week_question": {
+    "cz": "V kterém týdnu těhotenství jste?",
+    "en": "In which week of pregnancy are you?",
+    "de": "In welcher Schwangerschaftswoche befinden Sie sich?",
+    "ja": "妊娠何週目ですか？",
+    "uk": "На якому тижні вагітності ви перебуваєте?"
+  },
+  "select_week": {
+    "cz": "-- Vyberte týden --",
+    "en": "-- Select week --",
+    "de": "-- Woche auswählen --",
+    "ja": "-- 週を選択 --",
+    "uk": "-- Виберіть тиждень --"
+  },
+  "gynecology_last_check": {
+    "cz": "Kdy jste byla naposledy na gynekologické prohlídce?",
+    "en": "When was your last gynecological check?",
+    "de": "Wann war Ihre letzte gynäkologische Untersuchung?",
+    "ja": "最後の婦人科検診はいつでしたか？",
+    "uk": "Коли у вас був останній гінекологічний огляд?"
+  },
+  "days": {
+    "cz": "dny",
+    "en": "days",
+    "de": "Tage",
+    "ja": "日",
+    "uk": "днів"
+  },
+  "weeks": {
+    "cz": "týdny",
+    "en": "weeks",
+    "de": "Wochen",
+    "ja": "週間",
+    "uk": "тижнів"
+  },
+  "months": {
+    "cz": "měsíce",
+    "en": "months",
+    "de": "Monate",
+    "ja": "ヶ月",
+    "uk": "місяців"
+  },
+  "years": {
+    "cz": "roky",
+    "en": "years",
+    "de": "Jahre",
+    "ja": "年",
+    "uk": "років"
+  },
+  "finish": {
+    "cz": "Dokončit",
+    "en": "Finish",
+    "de": "Fertigstellen",
+    "ja": "完了",
+    "uk": "Завершити"
+  },
+  "thank_you_progress_label": {
+    "cz": "Dokončeno",
+    "en": "Completed",
+    "de": "Abgeschlossen",
+    "ja": "完了",
+    "uk": "Завершено"
+  },
+  "thank_you_title": {
+      "cz": "Děkujeme!",
+      "en": "Thank you!",
+      "de": "Vielen Dank!",
+      "ja": "ありがとうございました！",
+      "uk": "Дякуємо!"
+  },
+  "thank_you_description": {
+      "cz": "Vaše odpovědi byly úspěšně odeslány a lékař je nyní může zkontrolovat.",
+      "en": "Your responses have been successfully submitted and can now be reviewed by the doctor.",
+      "de": "Ihre Antworten wurden erfolgreich übermittelt und können nun vom Arzt eingesehen werden.",
+      "ja": "あなたの回答は正常に送信され、医師が確認できるようになりました。",
+      "uk": "Ваші відповіді успішно надіслані і тепер можуть бути переглянуті лікарем."
+  }
+}

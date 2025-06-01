@@ -1,0 +1,21 @@
+-- pokud mam aktivni virtualni prostredi
+source langflow_env/bin/activate
+langflow run
+
+-- nova instalace
+python3.10
+python3.10 -m venv langflow_env
+source langflow_env/bin/activate
+-- REQUIREMENT SOUBOR IGNOROVAT
+1- install uv with pip. " pip install uv".
+2- run "uv pip install langflow"
+3- run " langflow run".
+-- pokud error astraDB tak 
+pip install langchain-astradb==0.5.2
+
+
+ziskani textu ze souboru
+pip install openai
+
+
+https://github.com/langflow-ai/langflow/issues/4913

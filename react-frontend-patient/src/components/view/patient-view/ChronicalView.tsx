@@ -8,6 +8,9 @@ import { EnumRole } from "../../../data/UserData";
 import { MainConditionSection } from "./ConditionView";
 import { ChronicalSinceSection } from "./chronicSince";
 import { SurgeryTypeSection } from "./operationView";
+import { getTranslation as t } from "../../../data/QuestionTranslation";
+import birdImg from "../../../img/bird.png";
+import { getProgress } from "../../../data/progressMap";
 
 export abstract class Chronical<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
@@ -18,16 +21,21 @@ export abstract class Chronical<T extends ISectionProps> extends HView<T> {
 export class ChronicalView<T extends ISectionProps> extends Chronical<T> {
     constructor(props: T) {
         super(props);
-        const stored = JSON.parse(localStorage.getItem("selectedDiseases") || "[]");
-        const validDiseases = Array.isArray(stored) ? stored.filter(d => typeof d === "string" && d.trim() !== "") : [];
-
+        let stored = JSON.parse(localStorage.getItem("selectedDiseases") || "[]");
+        if (!Array.isArray(stored)) stored = [];
+    
+        const validDiseases = stored.includes("Neguje") && stored.length === 1
+            ? [] // Pokud bylo vybráno pouze "Neguje", zobrazíme prázdný seznam
+            : stored.filter(d => typeof d === "string" && d.trim() !== "");
+    
         this.state = {
             selectedDiseases: validDiseases,
             searchString: "",
             userSearch: [],
-            errorText: ""
+            errorText: "",
+            progress: getProgress("chronicalView", "default")
         };
-    }
+    }    
 
     handleBackClick = (): void => {
         const answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
@@ -58,30 +66,38 @@ export class ChronicalView<T extends ISectionProps> extends Chronical<T> {
     performSearch = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const value = e.target.value.trim();
         this.setState({ searchString: value });
-
+    
         if (!value) {
-            this.setState({ userSearch: [] });
+            this.setState({ userSearch: [], errorText: "" });
             return;
         }
-
+    
+        const lang = localStorage.getItem("language") || "cz";
+    
         Axios.get("/diseases/info", {
             params: {
                 disease: value + "%",
-                role: this.props.searchRole === EnumRole.PATIENT
+                role: this.props.searchRole === EnumRole.PATIENT,
+                lang: lang
             },
             headers: {
                 Authorization: "Bearer " + this.props.loginData.token
             }
         })
         .then((res) => {
-            if (Array.isArray(res.data)) {
-                this.setState({ userSearch: res.data });
-            }
+            const results = Array.isArray(res.data) ? res.data : [];
+            this.setState({
+                userSearch: results,
+                errorText: results.length === 0 ? t("error_symptom_search") : ""
+            });
         })
         .catch(() => {
-            this.setState({ errorText: "Chyba při vyhledávání." });
+            this.setState({
+                userSearch: [],
+                errorText: t("error_symptom_search")
+            });
         });
-    };
+    };    
 
     saveAndProceed = (diseases: string[]): void => {
         const answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
@@ -97,77 +113,91 @@ export class ChronicalView<T extends ISectionProps> extends Chronical<T> {
         localStorage.setItem("patientAnswers", JSON.stringify(answers));
         localStorage.setItem("selectedDiseases", JSON.stringify(diseases));
 
-        const isNone = diseases.length === 1 && diseases[0] === "None";
+        const isNone = diseases.length === 1 && diseases[0] === "Neguje";
+        console.log("WTF " + diseases[0]);
         const nextSection = isNone ? SurgeryTypeSection.defaultView : ChronicalSinceSection.defaultView;
 
         this.props.dispatch(new SwitchViewAction(nextSection));
     };
 
-    handleNext = () => this.saveAndProceed(this.state.selectedDiseases);
+    handleNext = () => {
+        if (this.state.selectedDiseases.length === 0) {
+            return;
+        }
+        this.saveAndProceed(this.state.selectedDiseases);
+    };
+    
 
-    handleNoChronic = () => this.saveAndProceed(["None"]);
+    handleNoChronic = () => this.saveAndProceed(["Neguje"]);
 
     render(): ReactNode {
         return (
             <div className="patient-view">
                 <div className="container" id="symptom-input">
-                <button className="back-button" onClick={this.handleBackClick}>← Back</button>
+                    <button className="back-button" onClick={this.handleBackClick}>← {t("back")}</button>
                     <div className="progress-container">
-                        <div className="progress-bar">
-                            <div className="progress completed"></div>
-                            <div className="progress active"></div>
-                            <div className="progress pending"></div>
+                        <div className="progress-bar-wrapper">
+                            <div className="progress-bar">
+                                <div className="progress completed" style={{ width: `${this.state.progress}%` }}></div>
+                            </div>
+                            <img src={birdImg} className="progress-icon" style={{ left: `${this.state.progress}%` }} alt="progress" />
                         </div>
-                        <span className="progress-label">Basic Information</span>
+                        <span className="progress-label">{t("progress_basic_info")}</span>
                     </div>
 
-                    <h2>Do you suffer from any chronic disease?</h2>
+                    <h2>{t("chronic_question")}</h2>
                     <VBox className="scrollable-search-container">
-                            <HBox>
-                                <input
-                                    type="text"
-                                    value={this.state.searchString}
-                                    onChange={this.performSearch}
-                                    placeholder="Search for chronic condition..."
-                                />
-                            </HBox>
+                        <HBox>
+                            <input
+                                type="text"
+                                value={this.state.searchString}
+                                onChange={this.performSearch}
+                                placeholder={t("chronic_search_placeholder")}
+                            />
+                        </HBox>
 
-                            {this.state.userSearch.length > 0 && (
-                                <div className="scrollable-results">
-                                    {this.state.userSearch.map(d => (
-                                        <div className="search-result-row" key={d.id}>
-                                            <div className="search-result-name">{d.disease}</div>
-                                            <div className="search-result-button">
-                                                <HButton
-                                                    buttonStyle={HButtonStyle.TEXT_SYMPTOM}
-                                                    action={() => this.handleSelectSymptom(d.disease)}
-                                                >
-                                                    Vybrat
-                                                </HButton>
-                                            </div>
+                        {this.state.errorText && this.state.userSearch.length === 0 && (
+                            <div className="hs-userbox-error">
+                                {this.state.errorText}
+                            </div>
+                        )}
+
+                        {this.state.userSearch.length > 0 && (
+                            <div className="scrollable-results">
+                                {this.state.userSearch.map(d => (
+                                    <div className="search-result-row" key={d.id}>
+                                        <div className="search-result-name">{d.disease}</div>
+                                        <div className="search-result-button">
+                                            <HButton
+                                                buttonStyle={HButtonStyle.TEXT_SYMPTOM}
+                                                action={() => this.handleSelectSymptom(d.disease)}
+                                            >
+                                                {t("select")}
+                                            </HButton>
                                         </div>
-                                    ))}
-                                </div>
+                                    </div>
+                                ))}
+                            </div>
                         )}
                     </VBox>
 
-                <div className="selected-symptoms-container">
-                    <h3>Selected conditions:</h3>
-                    <ul className="selected-symptoms-list">
-                        {this.state.selectedDiseases.map((disease, index) => (
-                            <li key={index}>
-                                • {disease}
-                                <span className="delete-symptom" onClick={() => this.removeSymptom(disease)}>🗑️ delete</span>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+                    <div className="selected-symptoms-container">
+                        <h3>{t("selected_conditions")}</h3>
+                        <ul className="selected-symptoms-list">
+                            {this.state.selectedDiseases.map((disease, index) => (
+                                <li key={index}>
+                                    • {disease} <span className="delete-symptom" onClick={() => this.removeSymptom(disease)}>🗑️ {t("delete")}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
 
-                <div className="buttons-row">
-                    <button className="button-next" onClick={this.handleNext}>Next</button>
-                    <button className="button-skip" onClick={this.handleNoChronic}>Nemám žádné chronické nemoci</button>
+                    <div className="buttons-row">
+                        <button className="button-next" onClick={this.handleNext}>{t("button_next")}</button>
+                        <button className="button-skip" onClick={this.handleNoChronic}>{t("button_no_chronic_diseases")}</button>
+
+                    </div>
                 </div>
-            </div>
             </div>
         );
     }

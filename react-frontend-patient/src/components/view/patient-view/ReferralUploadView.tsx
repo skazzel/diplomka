@@ -7,6 +7,10 @@ import { VBox } from "../../HCard";
 import "../../../style/ReferredDoctor.less";
 import Axios from "axios";
 import { SocialSelection } from "./SocialView";
+import { getTranslation as t } from "../../../data/QuestionTranslation";
+import { FinalThankYouSection } from "./thankYouView";
+import birdImg from "../../../img/bird.png";
+import { getProgress } from "../../../data/progressMap";
 
 export abstract class ReferredDoctor<T extends ISectionProps> extends HView<T> {
   protected constructor(props: T) {
@@ -23,7 +27,9 @@ export class ReferredDoctorView<T extends ISectionProps> extends ReferredDoctor<
       referred: stored.referred || "",
       file: null,
       doctorName: stored.doctorName || "",
-      recognizedText: stored.recognizedText || ""
+      recognizedText: stored.recognizedText || "",
+      uploadedFilesCount: 0,
+      progress: getProgress("referralUploadView", "default")
     };
   }
 
@@ -37,59 +43,76 @@ export class ReferredDoctorView<T extends ISectionProps> extends ReferredDoctor<
   };
 
   handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    this.setState({ file });
-
-    if (!file) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
     const answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
-    const birthEntry = answers.find((entry: any) => entry.key === "birthNumber");
-    const birthNumber = birthEntry?.value;
+    let birthNumber = "";
 
-    if (!birthNumber) {
-      alert("❌ Rodné číslo nebylo nalezeno v odpovědích.");
-      return;
+    const entryByKey = answers.find((entry: any) => entry.key === "birthNumber");
+    if (entryByKey && entryByKey.value) {
+      birthNumber = entryByKey.value;
+    } else {
+      const entryDirect = answers.find((entry: any) => entry.birthNumber);
+      if (entryDirect) {
+        birthNumber = entryDirect.birthNumber;
+      }
     }
 
+    console.log("📌 NUMBER:", birthNumber);
+
     const formData = new FormData();
-    formData.append("file", file);
+    for (const file of files) {
+      formData.append("file", file);
+    }
     formData.append("birthNumber", birthNumber);
 
     try {
-      const res = await Axios.post("/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" }
+      const res = await Axios.post("/image/save", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: "Bearer " + this.props.loginData.token
+        }
       });
 
-      if (res.data?.filePath) {
-        localStorage.setItem("referralFilePath", res.data.filePath);
-        console.log("📁 Soubor uložen na:", res.data.filePath);
+      if (res.data?.filePaths) {
+        localStorage.setItem("referralFilePath", res.data.filePaths.join(", "));
+        this.setState({ uploadedFilesCount: res.data.totalUploaded });
+        console.log("📁 " + t("files_saved"), res.data.filePaths);
       } else {
-        console.error("❌ Server nevrátil cestu k souboru.");
+        console.error("❌ " + t("error_no_file_paths"));
       }
     } catch (err) {
-      console.error("❌ Chyba při uploadu:", err);
+      console.error("❌ " + t("error_upload"), err);
     }
   };
 
   handleSave = () => {
-    const { referred, file, doctorName, recognizedText } = this.state;
+    const { referred, doctorName, recognizedText } = this.state;
+
+    if (referred !== "yes" && referred !== "no") return;
+
     const answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
 
+    const translated = referred === "yes" ? t("yes") : t("no");
+
     const entry = {
-      referredByDoctor: referred === "yes",
+      referredByDoctor: translated,
       referralDoctorName: doctorName || undefined,
-      referralFileName: file?.name || undefined,
       referralText: recognizedText || undefined,
-      referralFilePath: localStorage.getItem("referralFilePath") || undefined
+      referralFilePaths: localStorage.getItem("referralFilePath")?.split(", ") || []
     };
 
-    answers.push(entry);
-    localStorage.setItem("patientAnswers", JSON.stringify(answers));
+    const alreadyExists = answers.some((a: any) => JSON.stringify(a) === JSON.stringify(entry));
+    if (!alreadyExists) {
+      answers.push(entry);
+      localStorage.setItem("patientAnswers", JSON.stringify(answers));
+    }
 
-    const genderEntry = answers.find((a: any) => a.key === "gender");
-    const gender = genderEntry?.value?.toLowerCase();
+    const genderEntry = answers.find((a: any) => a.key === "gender" || a.gender);
+    const genderValue = genderEntry?.value || genderEntry?.gender || "";
 
-    if (gender === "female") {
+    if (genderValue.toLowerCase() === "female" || genderValue.toLowerCase() === "žena") {
       this.props.dispatch(new SwitchViewAction(GynecologySection.defaultView));
     } else {
       this.submitAllPatientAnswersToAPI();
@@ -112,6 +135,9 @@ export class ReferredDoctorView<T extends ISectionProps> extends ReferredDoctor<
       return acc;
     }, {});
 
+    const lang = localStorage.getItem("language") || "cz";
+    formattedAnswers.language = lang;
+
     Axios.post(`/answers/info`, formattedAnswers, {
       headers: {
         Authorization: "Bearer " + this.props.loginData.token,
@@ -119,69 +145,66 @@ export class ReferredDoctorView<T extends ISectionProps> extends ReferredDoctor<
       }
     })
       .then((response) => {
-        console.log("✅ Submitted:", response.data);
-        localStorage.removeItem("patientAnswers");
-        alert("Patient answers successfully submitted!");
-      })
-      .catch((error) => {
-        console.error("❌ Submit error:", error);
-        alert("Error submitting patient data. Please try again.");
-      });
+          console.log("✅ " + t("submit_success"), response.data);
+          localStorage.removeItem("patientAnswers");
+      
+          // 🔁 Notify other components (like HUserInfo) to refresh
+          localStorage.setItem("hospitu_reload", "true");
+      
+          this.props.dispatch(new SwitchViewAction(FinalThankYouSection.defaultView));
+      }) 
   };
 
   render(): ReactNode {
-    const { referred, doctorName, recognizedText } = this.state;
+    const { referred, doctorName, recognizedText, uploadedFilesCount } = this.state;
 
     return (
       <div className="patient-view">
         <div className="container" id="symptom-input">
-          <button className="back-button" onClick={this.handleBackClick}>← Back</button>
+          <button className="back-button" onClick={this.handleBackClick}>← {t("back")}</button>
+          <div className="progress-container">
+                <div className="progress-bar-wrapper">
+                    <div className="progress-bar">
+                        <div className="progress completed" style={{ width: `${this.state.progress}%` }}></div>
+                    </div>
+                    <img src={birdImg} className="progress-icon" style={{ left: `${this.state.progress}%` }} alt="progress" />
+                </div>
+                <span className="progress-label">{t("progress_basic_info")}</span>
+            </div>
 
           <div className="question-row">
-            <h2>Byl jste poslán do nemocnice jiným lékařem?</h2>
+            <h2>{t("referred_question")}</h2>
             <div className="button-group">
               <button
                 type="button"
                 className={`answer-button ${referred === "yes" ? "selected" : ""}`}
                 onClick={() => this.setState({ referred: "yes" })}
               >
-                Ano
+                {t("yes")}
               </button>
               <button
                 type="button"
                 className={`answer-button ${referred === "no" ? "selected" : ""}`}
                 onClick={() => this.setState({ referred: "no", file: null, doctorName: "", recognizedText: "" })}
               >
-                Ne
+                {t("no")}
               </button>
             </div>
           </div>
 
           {referred === "yes" && (
             <div className="followup-section">
-              <h2>Můžete nahrát doporučení nebo zprávu?</h2>
-              <input type="file" accept="image/*,application/pdf" onChange={this.handleFileChange} />
+              <h2>{t("referred_upload_prompt")}</h2>
+              <input type="file" accept="image/*,application/pdf" onChange={this.handleFileChange} multiple />
 
-              <h2>Rozpoznaný text:</h2>
-              <textarea
-                value={recognizedText}
-                onChange={(e) => this.setState({ recognizedText: e.target.value })}
-                placeholder="Rozpoznaný text z obrázku"
-                style={{
-                  width: "100%",
-                  height: "200px",
-                  padding: "10px",
-                  fontSize: "14px",
-                  borderRadius: "5px",
-                  border: "1px solid #ccc",
-                  marginTop: "10px"
-                }}
-              />
+              {uploadedFilesCount > 0 && (
+                <p>{uploadedFilesCount} {t("files_uploaded")}</p>
+              )}
 
-              <h2>Vzpomínáte si na jméno lékaře, který vás poslal?</h2>
+              <h2>{t("referred_doctor_name_question")}</h2>
               <input
                 type="text"
-                placeholder="Jméno lékaře (nepovinné)"
+                placeholder={t("referred_doctor_name_placeholder")}
                 value={doctorName}
                 onChange={(e) => this.setState({ doctorName: e.target.value })}
               />
@@ -189,7 +212,7 @@ export class ReferredDoctorView<T extends ISectionProps> extends ReferredDoctor<
           )}
 
           <div>
-            <button className="button-next" onClick={this.handleSave}>Next</button>
+            <button className="button-next" onClick={this.handleSave}>{t("button_next")}</button>
           </div>
         </div>
       </div>

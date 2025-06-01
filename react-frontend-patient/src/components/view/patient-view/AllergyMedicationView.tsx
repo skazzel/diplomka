@@ -7,6 +7,9 @@ import { GynecologySection } from "./GynecologyView";
 import { HBox, VBox } from "../../HCard";
 import Axios from "axios";
 import { SocialSelection } from "./SocialView";
+import birdImg from "../../../img/bird.png";
+import { getTranslation as t } from "../../../data/QuestionTranslation";
+import { getProgress } from "../../../data/progressMap";
 
 export abstract class AllergyMedication<T extends ISectionProps> extends HView<T> {
     protected constructor(props: T) {
@@ -27,10 +30,11 @@ export class AllergyMedicationView<T extends ISectionProps> extends AllergyMedic
             searchString: "",
             searchKey: 0,
             errorText: "",
-            userSearch: []
+            userSearch: [],
+            progress: getProgress("aleergyMedicationView", "default")
         };
 
-        console.log("📜 Initial Medication List:", this.state.selectedSymptoms);
+        console.log("\ud83d\udcdc Initial Medication List:", this.state.selectedSymptoms);
     }
 
     componentDidUpdate(): void {
@@ -44,14 +48,14 @@ export class AllergyMedicationView<T extends ISectionProps> extends AllergyMedic
             !entry.hasOwnProperty("allergySymptoms")
         );
         localStorage.setItem("patientAnswers", JSON.stringify(answers));
-        console.log("🗑️ Removed 'foodAllergies' and 'allergySymptoms' entries from patientAnswers:", answers);
+        console.log("\ud83d\udd91\ufe0f Removed 'foodAllergies' and 'allergySymptoms' entries from patientAnswers:", answers);
 
         this.props.dispatch(new SwitchViewAction(AllergyFoodSelection.defaultView));
     };
 
     saveSymptomAndProceed = (): void => {
         if (this.state.selectedSymptoms.length === 0 && !this.state.selectedSymptom.trim()) {
-            console.log("⚠️ No medication allergy selected.");
+            console.log("\u26a0\ufe0f No medication allergy selected.");
             return;
         }
 
@@ -66,11 +70,11 @@ export class AllergyMedicationView<T extends ISectionProps> extends AllergyMedic
             if (!answers.some(entry => JSON.stringify(entry) === JSON.stringify({ medication_allergy: updatedSymptoms }))) {
                 answers.push({ medication_allergy: updatedSymptoms });
                 localStorage.setItem("patientAnswers", JSON.stringify(answers));
-                console.log("📜 Updated Patient Answers:", answers);
+                console.log("\ud83d\udcdc Updated Patient Answers:", answers);
             }
 
             localStorage.setItem("selectedMedicationAllergies", JSON.stringify(updatedSymptoms));
-            console.log("📜 Updated Medication Allergy List:", updatedSymptoms);
+            console.log("\ud83d\udcdc Updated Medication Allergy List:", updatedSymptoms);
 
             return { selectedSymptoms: updatedSymptoms, selectedSymptom: "" };
         }, () => {
@@ -83,8 +87,8 @@ export class AllergyMedicationView<T extends ISectionProps> extends AllergyMedic
             const updatedSymptoms = prevState.selectedSymptoms.filter(symptom => symptom !== symptomToRemove);
 
             localStorage.setItem("selectedMedicationAllergies", JSON.stringify(updatedSymptoms));
-            console.log("🗑️ Medication removed:", symptomToRemove);
-            console.log("📜 Updated Medication List (After Removal):", updatedSymptoms);
+            console.log("\ud83d\udd91\ufe0f Medication removed:", symptomToRemove);
+            console.log("\ud83d\udcdc Updated Medication List (After Removal):", updatedSymptoms);
 
             return { selectedSymptoms: updatedSymptoms };
         });
@@ -92,7 +96,7 @@ export class AllergyMedicationView<T extends ISectionProps> extends AllergyMedic
 
     saveNoneAndProceed = (): void => {
         let answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
-        answers.push({ medication_allergy: ["None"] });
+        answers.push({ medication_allergy: [t("Neguje")] });
         localStorage.setItem("patientAnswers", JSON.stringify(answers));
         this.props.dispatch(new SwitchViewAction(SocialSelection.defaultView));
     };
@@ -100,14 +104,14 @@ export class AllergyMedicationView<T extends ISectionProps> extends AllergyMedic
     handleSelectSymptom = (medication: string) => {
         this.setState((prevState) => {
             if (prevState.selectedSymptoms.includes(medication)) {
-                console.log("⚠️ Medication already added.");
+                console.log("\u26a0\ufe0f Medication already added.");
                 return prevState;
             }
 
             const updatedSymptoms = [...prevState.selectedSymptoms, medication];
 
             localStorage.setItem("selectedMedicationAllergies", JSON.stringify(updatedSymptoms));
-            console.log("📜 Updated Medication List:", updatedSymptoms);
+            console.log("\ud83d\udcdc Updated Medication List:", updatedSymptoms);
 
             return { selectedSymptoms: updatedSymptoms };
         });
@@ -140,18 +144,14 @@ export class AllergyMedicationView<T extends ISectionProps> extends AllergyMedic
                     Authorization: "Bearer " + this.props.loginData.token
                 }
             }).then((response) => {
-                if (Array.isArray(response.data)) {
-                    this.setState(() => ({
-                        userSearch: response.data
-                    }));
-                } else {
-                    this.setState(() => ({
-                        errorText: "Unexpected API response format."
-                    }));
-                }
+                const results = Array.isArray(response.data) ? response.data : [];
+                this.setState({
+                    userSearch: results,
+                    errorText: results.length === 0 ? t("error_symptom_search") : ""
+                });
             }).catch(() => {
                 this.setState(() => ({
-                    errorText: "Došlo k chybě při vyhledávání, prosím zkuste to znovu později."
+                    errorText: t("error_symptom_search")
                 }));
             });
         }, 350);
@@ -165,16 +165,18 @@ export class AllergyMedicationView<T extends ISectionProps> extends AllergyMedic
         return (
             <div className="patient-view">
                 <div className="container" id="symptom-input">
-                <button className="back-button" onClick={this.handleBackClick}>← Back</button>
-                <div className="progress-container">
-                    <div className="progress-bar">
-                        <div className="progress completed"></div>
-                        <div className="progress active"></div>
-                        <div className="progress pending"></div>
+                    <button className="back-button" onClick={this.handleBackClick}>← {t("back")}</button>
+                    <div className="progress-container">
+                        <div className="progress-bar-wrapper">
+                            <div className="progress-bar">
+                                <div className="progress completed" style={{ width: `${this.state.progress}%` }}></div>
+                            </div>
+                            <img src={birdImg} className="progress-icon" style={{ left: `${this.state.progress}%` }} alt="progress" />
+                        </div>
+                        <span className="progress-label">{t("progress_basic_info")}</span>
                     </div>
-                </div>
 
-                    <h2>What medication are you allergic to?</h2>
+                    <h2>{t("medication_allergy_question")}</h2>
                     <VBox className="scrollable-search-container">
                         <HBox>
                             <input
@@ -182,11 +184,11 @@ export class AllergyMedicationView<T extends ISectionProps> extends AllergyMedic
                                 type="text"
                                 value={this.state.searchString || ""}
                                 onChange={this.performSearch}
-                                placeholder="Enter medication name..."
+                                placeholder={t("pharmacology_search_placeholder")}
                             />
                         </HBox>
 
-                        {this.state.errorText && (
+                        {this.state.errorText && this.state.userSearch.length === 0 && (
                             <div className="hs-userbox-error">
                                 {this.state.errorText}
                             </div>
@@ -207,7 +209,7 @@ export class AllergyMedicationView<T extends ISectionProps> extends AllergyMedic
                                                 </td>
                                                 <td className="hs-userbox-controls">
                                                     <HButton buttonStyle={HButtonStyle.TEXT_SYMPTOM} action={() => { this.handleSelectSymptom(result.medicine); }} >
-                                                        Vybrat
+                                                        {t("select")}
                                                     </HButton>
                                                 </td>
                                             </tr>
@@ -219,14 +221,14 @@ export class AllergyMedicationView<T extends ISectionProps> extends AllergyMedic
                     </VBox>
 
                     <div className="selected-symptoms-container">
-                        <h3>Medications you are allergic to:</h3>
+                        <h3>{t("medication_allergy_selected_heading")}</h3>
                         <div className="scrollable-selected-symptoms">
                             <ul className="selected-symptoms-list">
                                 {this.state.selectedSymptoms.map((mecication) => (
                                     <li key={mecication}>
                                         • {mecication}
                                         <span className="delete-symptom" onClick={() => this.removeSymptom(mecication)}>
-                                            🗑️ delete
+                                            🗑️ {t("delete")}
                                         </span>
                                     </li>
                                 ))}
@@ -235,8 +237,8 @@ export class AllergyMedicationView<T extends ISectionProps> extends AllergyMedic
                     </div>
 
                     <div className="buttons-row">
-                        <button className="button-next" onClick={this.saveSymptomAndProceed}>Next</button>
-                        <button className="button-skip" onClick={this.saveNoneAndProceed}>None</button>
+                        <button className="button-next" onClick={this.saveSymptomAndProceed}>{t("button_next")}</button>
+                        <button className="button-skip" onClick={this.saveNoneAndProceed}>{t("button_no_allergy")}</button>
                     </div>
                 </div>
             </div>
