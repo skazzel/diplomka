@@ -1,9 +1,6 @@
 1. Nastavení DB
 
-CREATE DATABASE IF NOT EXISTS itudata CHARACTER SET UTF8 COLLATE utf8_czech_ci;
-CREATE USER IF NOT EXISTS 'itubackend' IDENTIFIED BY '<vložte heslo uživatele>';
-GRANT CREATE, INDEX, DELETE, INSERT, SELECT, UPDATE ON itudata.* TO 'itubackend';
-FLUSH PRIVILEGES;
+mysql -u root -p < syshosp.sql
 
 
 2. Spuštění backendu
@@ -21,8 +18,8 @@ FLUSH PRIVILEGES;
 
  Konfigurační soubor: `react-frontend/src/config.ts` 
 
- Příkazy: `npm install` ve složce `react-frontend`
-          `npm start` ve složce `react-frontend`
+ Příkazy: `npm install` ve složce `react-frontend-doctor` a `react-frontend-patient`
+          `npm start` ve složce `react-frontend` a `react-frontend-patient`
 
 4. Spuštění desktopové aplikace
 
@@ -31,3 +28,5 @@ FLUSH PRIVILEGES;
  Konfigurační soubor: `javafx-frontend/src/main/resources/config/api_config.json`
 
  Příkaz: `./gradlew run` ve složce `javafx-frontend`
+
+5. for testing pusposes, please use this server: 
