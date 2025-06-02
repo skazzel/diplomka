@@ -57,7 +57,7 @@ export class HUserInfo extends HFormComponent<HUserInfoProps, HUserInfoState> {
                 }
             })
             .catch(() => {
-                console.error("❌ Chyba při automatickém načítání anamnéz.");
+                console.error("Chyba při automatickém načítání anamnéz.");
             });
         }, 5000); // Check every 5s
     }    
@@ -83,14 +83,22 @@ export class HUserInfo extends HFormComponent<HUserInfoProps, HUserInfoState> {
             }
         })
             .then((response) => {
-                if (Array.isArray(response.data)) {
+                if (Array.isArray(response.data) && response.data.length > 0) {
                     this.setState({ anamneses: response.data, errorText: undefined });
                 } else {
-                    this.setState({ anamneses: [], errorText: "Žádné výsledky." });
+                    this.setState({
+                        anamneses: [],
+                        selectedContent: "", // ✨ Vymazání obsahu při prázdném výsledku
+                        errorText: "Žádné výsledky."
+                    });
                 }
             })
             .catch(() => {
-                this.setState({ anamneses: [], errorText: "Chyba při načítání anamnéz." });
+                this.setState({
+                    anamneses: [],
+                    selectedContent: "", // ✨ Vymazání obsahu i při chybě
+                    errorText: "Chyba při načítání anamnéz."
+                });
             });
     };
 
@@ -110,7 +118,7 @@ export class HUserInfo extends HFormComponent<HUserInfoProps, HUserInfoState> {
                 }
             })
             .catch(() => {
-                console.error("❌ Chyba při kontrolování nových anamnéz.");
+                console.error("Chyba při kontrolování nových anamnéz.");
             });
     };
 

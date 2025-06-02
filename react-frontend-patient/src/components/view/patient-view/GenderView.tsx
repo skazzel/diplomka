@@ -78,7 +78,7 @@ export class GenderInfoView<T extends ISectionProps> extends GenderInfo<T> {
     checkAndAutoLogin = (): void => {
         const user = this.props.user;
         if (user && user.username) {
-            console.log(`✅ Already logged in as ${user.username}`);
+            console.log(`Already logged in as ${user.username}`);
         } else {
             this.autoLogin();
         }
@@ -98,10 +98,10 @@ export class GenderInfoView<T extends ISectionProps> extends GenderInfo<T> {
                 const loginData = apiResponse as ILoginData;
                 this.props.dispatch(new LoginAction(loginData));
             } else {
-                console.error("❌ Login failed:", apiResponse);
+                console.error("Login failed:", apiResponse);
             }
         }).catch((err) => {
-            console.error("❌ Error during auto-login:", err);
+            console.error("Error during auto-login:", err);
         });
     };
 

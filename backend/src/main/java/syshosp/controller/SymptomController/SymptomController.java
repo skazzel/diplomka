@@ -28,7 +28,7 @@ public class SymptomController {
         }
 
         if (symptomName == null || symptomName.trim().isEmpty()) {
-            System.out.println("❌ Error: Missing or empty symptom parameter.");
+            System.out.println("Error: Missing or empty symptom parameter.");
             context.status(400).json("{\"error\": \"Missing or empty symptom parameter.\"}");
             return;
         }

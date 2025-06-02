@@ -51,7 +51,7 @@ export class PersonalInfoView<T extends ISectionProps> extends PersonalInfo<T> {
         if (this.props.dispatch) {
             this.props.dispatch(new SwitchViewAction(GenderInfoSection.defaultView));
         } else {
-            console.error("❌ Error: Dispatch function missing.");
+            console.error("Error: Dispatch function missing.");
         }
     };
 
@@ -59,7 +59,7 @@ export class PersonalInfoView<T extends ISectionProps> extends PersonalInfo<T> {
         let answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
         
         if (answers.length > 0) {
-            answers.pop(); // ✅ Remove the last added entry
+            answers.pop(); // Remove the last added entry
             localStorage.setItem("patientAnswers", JSON.stringify(answers));
         }
 

@@ -20,14 +20,14 @@ public class AnswersController {
             Map<String, Object> answers = context.bodyAsClass(Map.class);
 
             if (answers == null || answers.isEmpty()) {
-                System.out.println("❌ Received empty request body.");
+                System.out.println("Received empty request body.");
                 context.status(400).json("{\"error\": \"Empty request body.\"}");
                 return;
             }
 
             String language = (String) answers.getOrDefault("language", "cz");
 
-            System.out.println("📜 Received Patient Answers: " + answers);
+            System.out.println("Received Patient Answers: " + answers);
 
             try (Connection connection = SQLConnection.create()) {
                 String sql = """
@@ -107,7 +107,7 @@ public class AnswersController {
                         ResultSet generatedKeys = statement.getGeneratedKeys();
                         if (generatedKeys.next()) {
                             int newPatientId = generatedKeys.getInt(1);
-                            System.out.println("✅ Patient saved with ID: " + newPatientId);
+                            System.out.println("Patient saved with ID: " + newPatientId);
                             context.status(201).json(Map.of("message", "Patient saved", "patient_id", newPatientId));
                         }
                     } else {
@@ -116,7 +116,7 @@ public class AnswersController {
                 }
             }
         } catch (Exception e) {
-            System.err.println("❌ Error processing patient answers: " + e.getMessage());
+            System.err.println("Error processing patient answers: " + e.getMessage());
             e.printStackTrace();
             context.status(500).json("{\"error\": \"Server error.\"}");
         }
@@ -140,7 +140,7 @@ public class AnswersController {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("❌ Error fetching anamneses: " + e.getMessage());
+            System.err.println("Error fetching anamneses: " + e.getMessage());
             context.status(500).json(Map.of("error", "Database error"));
             return;
         }
@@ -165,7 +165,7 @@ public class AnswersController {
                         if (rs.next()) {
                             idList.add(String.valueOf(rs.getInt("id")));
                         } else {
-                            System.err.println("⚠️ ID not found for " + tableName + " value: " + value);
+                            System.err.println("ID not found for " + tableName + " value: " + value);
                         }
                     }
                 }

@@ -116,7 +116,7 @@ export class InternalAppScreen extends React.Component<{
             key={ this.props.sectionState.managedUser?.id }
             dispatch={ this.props.dispatch }
             loginData={ this.props.sectionState.loginData }
-            sectionState={ this.props.sectionState }  // ✅ CELÝ OBJEKT – obsahuje i internalStateData!
+            sectionState={ this.props.sectionState }
             managedUser={ this.props.sectionState.managedUser }
             requiresUserManagementCallback={ enabled => this.setState({ userManagementEnabled: enabled }) }
         />;

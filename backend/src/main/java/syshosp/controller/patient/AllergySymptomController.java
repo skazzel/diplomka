@@ -38,7 +38,7 @@ public class AllergySymptomController {
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, symptomName + "%");
 
-                System.out.println("✅ Executing query: " + statement);
+                System.out.println("Executing query: " + statement);
                 ResultSet result = statement.executeQuery();
 
                 List<AllergySymptomResponse> allergy_responses = new ArrayList<>();
@@ -50,15 +50,15 @@ public class AllergySymptomController {
                 }
 
                 if (allergy_responses.isEmpty()) {
-                    System.out.println("ℹ️ No allergy responses found for: '" + symptomName + "'");
+                    System.out.println("ℹNo allergy responses found for: '" + symptomName + "'");
                     context.status(404).json("{\"message\": \"No allergy responses found.\"}");
                 } else {
-                    System.out.println("✅ Found " + allergy_responses.size() + " allergy responses.");
+                    System.out.println("Found " + allergy_responses.size() + " allergy responses.");
                     context.status(200).json(allergy_responses);
                 }
             }
         } catch (SQLException e) {
-            System.err.println("❌ Database error: " + e.getMessage());
+            System.err.println("Database error: " + e.getMessage());
             e.printStackTrace();
             context.status(500).json("{\"error\": \"Database error.\"}");
         }

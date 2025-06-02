@@ -83,7 +83,7 @@ export class AllergyFoodView<T extends ISectionProps> extends AllergyFood<T> {
                 this.setState({ userSearch: response.data });
             }
         }).catch(() => {
-            console.error("❌ Error fetching allergy symptoms");
+            console.error("Error fetching allergy symptoms");
         });
     };
 

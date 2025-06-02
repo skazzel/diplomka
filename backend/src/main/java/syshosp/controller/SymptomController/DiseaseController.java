@@ -30,7 +30,7 @@ public class DiseaseController {
 
         // Ověření vstupního parametru
         if (diseaseName == null || diseaseName.trim().isEmpty()) {
-            System.out.println("❌ Missing or empty disease parameter.");
+            System.out.println("Missing or empty disease parameter.");
             context.status(400).json("{\"error\": \"Missing or empty disease parameter.\"}");
             return;
         }
@@ -42,7 +42,7 @@ public class DiseaseController {
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, diseaseName + "%");
 
-                System.out.println("✅ Executing query: " + statement);
+                System.out.println("Executing query: " + statement);
 
                 ResultSet result = statement.executeQuery();
                 List<DiseaseResponse> diseases = new ArrayList<>();
@@ -55,15 +55,15 @@ public class DiseaseController {
                 }
 
                 if (diseases.isEmpty()) {
-                    System.out.println("ℹ️ No diseases found for: '" + diseaseName + "'");
+                    System.out.println("No diseases found for: '" + diseaseName + "'");
                     context.status(404).json("{\"message\": \"No diseases found.\"}");
                 } else {
-                    System.out.println("✅ Found " + diseases.size() + " diseases.");
+                    System.out.println("Found " + diseases.size() + " diseases.");
                     context.status(200).json(diseases);
                 }
             }
         } catch (SQLException e) {
-            System.err.println("❌ Database error: " + e.getMessage());
+            System.err.println("Database error: " + e.getMessage());
             e.printStackTrace();
             context.status(500).json("{\"error\": \"Database error.\"}");
         }

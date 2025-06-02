@@ -71,7 +71,6 @@ export class ChronicalSinceView<T extends ISectionProps> extends ChronicalSince<
     handleNext = (): void => {
         const dataToSave = this.mapDatesToArray(this.state.diseaseDates);
     
-        // ✅ VALIDACE: žádný záznam nemá zadaný měsíc ani rok
         const hasValidEntry = dataToSave.some(entry => entry.since.trim() !== "");
         if (!hasValidEntry) {
             return;

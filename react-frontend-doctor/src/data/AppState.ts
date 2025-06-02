@@ -60,7 +60,7 @@ export function internalAppStateFromRole(role: EnumRole): IInternalApplicationSt
                 currentView: HDoctorSection.defaultView
             };
         default:
-                throw new Error("❌ Unknown role – access denied.");
+                throw new Error("Unknown role – access denied.");
     }
 }
 

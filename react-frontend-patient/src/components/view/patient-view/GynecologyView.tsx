@@ -118,7 +118,7 @@ export class GynecologyView<T extends ISectionProps> extends Gynecology<T> {
             }
         })
         .then((response) => {
-            console.log("✅ " + t("submit_success"), response.data);
+            console.log("" + t("submit_success"), response.data);
             localStorage.removeItem("patientAnswers");
         
             // 🔁 Notify other components (like HUserInfo) to refresh

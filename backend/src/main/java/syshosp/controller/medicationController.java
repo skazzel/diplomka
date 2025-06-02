@@ -15,7 +15,6 @@ public class medicationController {
     public static void getMedication(Context context) {
         String medicationName = context.queryParam("medication");
 
-        // ✅ Check if the query parameter is null or empty
         if (medicationName == null || medicationName.trim().isEmpty()) {
             System.out.println("Error: Missing or empty medication parameter.");
             context.status(400).json("{\"error\": \"Missing or empty medication parameter.\"}");
@@ -28,9 +27,9 @@ public class medicationController {
             """;
 
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setString(1, medicationName + "%"); // ✅ Prevents 'null' being passed in query
+                statement.setString(1, medicationName + "%");
 
-                System.out.println("Executing query: " + statement.toString()); // ✅ Debugging log
+                System.out.println("Executing query: " + statement.toString());
 
                 ResultSet result = statement.executeQuery();
                 List<MedicalResponse> medicine = new ArrayList<>();
@@ -43,7 +42,7 @@ public class medicationController {
                 }
 
                 if (medicine.isEmpty()) {
-                    System.out.println("No medication found for: '" + medicationName + "'"); // ✅ Debugging log
+                    System.out.println("No medication found for: '" + medicationName + "'");
                     context.status(404).json("{\"message\": \"No medication found.\"}");
                 } else {
                     System.out.println("Found " + medicine.size() + " medication.");
@@ -51,7 +50,7 @@ public class medicationController {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Database error: " + e.getMessage()); // ✅ Better logging for debugging
+            System.err.println("Database error: " + e.getMessage());
             e.printStackTrace();
             context.status(500).json("{\"error\": \"Database error.\"}");
         }

@@ -50,7 +50,7 @@ export class PharmacologyView<T extends ISectionProps> extends Pharmacology<T> {
 
     saveSymptomAndProceed = (): void => {
         if (this.state.selectedSymptoms.length === 0 && !this.state.selectedSymptom.trim()) {
-            console.log("⚠️ No medication selected.");
+            console.log("No medication selected.");
             return;
         }
 

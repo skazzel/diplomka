@@ -80,10 +80,10 @@ export class ReferredDoctorView<T extends ISectionProps> extends ReferredDoctor<
         this.setState({ uploadedFilesCount: res.data.totalUploaded });
         console.log("📁 " + t("files_saved"), res.data.filePaths);
       } else {
-        console.error("❌ " + t("error_no_file_paths"));
+        console.error("" + t("error_no_file_paths"));
       }
     } catch (err) {
-      console.error("❌ " + t("error_upload"), err);
+      console.error("" + t("error_upload"), err);
     }
   };
 
@@ -145,7 +145,7 @@ export class ReferredDoctorView<T extends ISectionProps> extends ReferredDoctor<
       }
     })
       .then((response) => {
-          console.log("✅ " + t("submit_success"), response.data);
+          console.log("" + t("submit_success"), response.data);
           localStorage.removeItem("patientAnswers");
       
           // 🔁 Notify other components (like HUserInfo) to refresh

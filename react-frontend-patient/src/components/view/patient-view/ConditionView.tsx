@@ -84,7 +84,7 @@ export class MainConditionView<T extends ISectionProps> extends MainCondition<T>
         const { selectedCondition, previousTrouble } = this.state;
 
         if (!numberValue || !unitValue || unitValue === "---" || selectedCondition === "---" || previousTrouble === "---") {
-            console.log("⚠️ Missing values in form.");
+            console.log("Missing values in form.");
             return;
         }
 
