@@ -56,6 +56,19 @@ export class GynecologyView<T extends ISectionProps> extends Gynecology<T> {
             gynecologyLastCheckValue,
             gynecologyLastCheckUnit
         } = this.state;
+    
+        // VALIDACE
+        if (!pregnancyStatus) {
+            return;
+        }
+    
+        if (pregnancyStatus === "yes" && !pregnancyWeek) {
+            return;
+        }
+    
+        if (pregnancyStatus === "no" && !gynecologyLastCheckValue) {
+            return;
+        }
 
         const answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
 

@@ -40,6 +40,31 @@ export class SocialView<T extends ISectionProps> extends Social<T> {
     }
 
     handleNextClick = (): void => {
+        const {
+            employmentStatus,
+            livingWith,
+            residenceType,
+            apartmentFloor,
+            hasElevator,
+            isForeigner,
+            foreignerOrigin,
+            foreignerReason,
+            traveledOutsideEurope
+        } = this.state;
+    
+        if (
+            !employmentStatus ||
+            !livingWith ||
+            !residenceType ||
+            (residenceType === "panelák" && (!apartmentFloor || !hasElevator)) ||
+            !isForeigner ||
+            (isForeigner === "ano" && (!foreignerOrigin || !foreignerReason)) ||
+            !traveledOutsideEurope
+        ) {
+
+            return;
+        }
+
         const answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
     
         const cz = (key: string, value: string): string => {

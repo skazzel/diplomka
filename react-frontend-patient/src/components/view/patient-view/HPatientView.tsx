@@ -113,7 +113,7 @@ export class HPatientWelcomeView<T extends ISectionProps> extends HPatientView<T
     };
 
     saveSymptomAndProceed = (): void => {
-        if (this.state.selectedSymptoms.length === 0) return;
+        if (this.state.selectedSymptoms.length === 0 || this.state.similarAround === "") return;
 
         localStorage.setItem("symptomNearbyOption", this.state.similarAround);
 

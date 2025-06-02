@@ -83,10 +83,12 @@ export class MainConditionView<T extends ISectionProps> extends MainCondition<T>
         const unitValue = this.selectedUnit?.value;
         const { selectedCondition, previousTrouble } = this.state;
 
-        if (!numberValue || !unitValue || unitValue === "---" || selectedCondition === "---" || previousTrouble === "---") {
-            console.log("Missing values in form.");
+        if (!numberValue || !unitValue || unitValue === "" || selectedCondition === "" || previousTrouble === "") {
+            this.setState({ showErrorMessage: true, errorText: "Vyplňte prosím všechna pole." });
             return;
         }
+    
+        this.setState({ showErrorMessage: false, errorText: "" });
 
         localStorage.setItem("durationNumber", numberValue);
         localStorage.setItem("durationUnit", unitValue);

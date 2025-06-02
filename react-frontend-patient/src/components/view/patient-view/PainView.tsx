@@ -62,7 +62,28 @@ export class PainChoiceView<T extends ISectionProps> extends PainChoice<T> {
         localStorage.setItem("patientAnswers", JSON.stringify(answers));
     };
 
+    allFieldsValid = (): boolean => {
+        const {
+            painType, painChange, painWorse, painRelief,
+            painIntensity, painTime, tookPainkillers, painkillerEffect
+        } = this.state;
+
+        if (
+            !painType || !painChange || !painWorse || !painRelief ||
+            !painTime || !tookPainkillers
+        ) return false;
+
+        if (tookPainkillers === cz("option", "yes") && !painkillerEffect) return false;
+
+        return true;
+    };
+
     savePainAndProceed = (): void => {
+        if (!this.allFieldsValid()) {
+            this.setState({ showErrorMessage: true });
+            return;
+        }
+        
         this.savePainToAnswers();
         const symptoms: string[] = JSON.parse(localStorage.getItem("selectedSymptoms") || "[]");
         const symptomTypes = JSON.parse(localStorage.getItem("symptomTypes") || "{}");

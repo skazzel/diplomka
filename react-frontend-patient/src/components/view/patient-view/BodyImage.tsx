@@ -61,6 +61,10 @@ export class BodyImageView<T extends ISectionProps> extends HView<T & BodyImageP
   };
 
   handleNextClickButton = (): void => {
+    if (this.state.selectedPainAreas.length === 0) {
+      this.setState({ showErrorMessage: true });
+      return;
+    }
     const answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
     const filtered = answers.filter((entry: any) => !entry.hasOwnProperty("painAreas"));
     filtered.push({ painAreas: this.state.selectedPainAreas });

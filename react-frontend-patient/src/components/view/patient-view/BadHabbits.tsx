@@ -44,7 +44,25 @@ export class BadHabbitsView<T extends ISectionProps> extends BadHabbits<T> {
     };
 
     saveHabitAndProceed = (): void => {
-        if (Object.keys(this.state.selectedHabits).length === 0) return;
+        const habits = this.state.selectedHabits;
+
+        // Ověření povinných polí
+        if (!habits.alcohol || !habits.smoking) {
+            this.setState({ errorText: t("error_habits_required") });
+            return;
+        }
+    
+        if (habits.alcohol === "yes" && (!habits.alcoholHard && !habits.alcoholWine && !habits.alcoholBeer)) {
+            this.setState({ errorText: t("error_alcohol_amount_required") });
+            return;
+        }
+    
+        if (habits.smoking === "yes" && (!habits.smokingAmount || !habits.smokingSince)) {
+            this.setState({ errorText: t("error_smoking_details_required") });
+            return;
+        }
+    
+        this.setState({ errorText: "" });
     
         this.setState((prevState) => {
             const answers = JSON.parse(localStorage.getItem("patientAnswers") || "[]");
