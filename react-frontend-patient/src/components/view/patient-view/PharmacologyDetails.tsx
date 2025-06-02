@@ -63,6 +63,18 @@ export class MedicationDetailsView<T extends ISectionProps> extends MedicationDe
     };
 
     handleSave = () => {
+        const allValid = this.state.medicationData.every(m =>
+            m.sinceMonth &&
+            m.sinceYear &&
+            m.morning !== "" &&
+            m.noon !== "" &&
+            m.night !== ""
+        );
+    
+        if (!allValid) {
+            return;
+        }
+
         const filled = this.state.medicationData
             .filter(m => m.sinceMonth || m.sinceYear || m.morning || m.noon || m.night)
             .map(m => ({

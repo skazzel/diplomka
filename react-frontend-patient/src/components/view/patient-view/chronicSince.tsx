@@ -71,8 +71,12 @@ export class ChronicalSinceView<T extends ISectionProps> extends ChronicalSince<
     handleNext = (): void => {
         const dataToSave = this.mapDatesToArray(this.state.diseaseDates);
     
-        const hasValidEntry = dataToSave.some(entry => entry.since.trim() !== "");
-        if (!hasValidEntry) {
+        const invalidEntries = dataToSave.filter(entry => {
+            const [month, year] = entry.since.trim().split(" ");
+            return !month || !year;
+        });
+    
+        if (invalidEntries.length > 0) {
             return;
         }
     
