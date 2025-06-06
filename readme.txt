@@ -30,3 +30,5 @@ mysql -u root -p < syshosp.sql
  Příkaz: `./gradlew run` ve složce `javafx-frontend`
 
 5. for testing pusposes, please visit this github repository, which will contain IP address for testing server. In this server you will be able to test my development.
+http://138.201.152.25:3000/
+http://138.201.152.25:9000/
